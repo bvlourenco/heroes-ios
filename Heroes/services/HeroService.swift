@@ -8,9 +8,11 @@
 import Foundation
 
 enum NetworkError: Error {
-    case badUrl
-    case serverError
-    case decodingError
+    case badUrl, serverError, decodingError
+}
+
+enum CategoryTypes: String {
+    case comics, stories, series, events
 }
 
 class HeroService {
@@ -23,8 +25,8 @@ class HeroService {
         return imagePath + "." + imageExtension
     }
     
-    private func getItemsFromList(_ type: String, _ hero: [String: Any]) -> [HeroCategoryDetails] {
-        var heroItems: [HeroCategoryDetails] = []
+    private func getItemsFromList(_ type: String, _ hero: [String: Any]) -> [String:HeroCategoryDetails] {
+        var heroItems: [String:HeroCategoryDetails] = [:]
         let items = (hero[type] as AnyObject)["items"] as? [[String: Any]]
         
         for (index, item) in items!.enumerated() {
@@ -34,7 +36,7 @@ class HeroService {
             
             let name = item["name"] as? String ?? ""
             let url = item["resourceURI"] as? String ?? ""
-            heroItems.append(HeroCategoryDetails(resourceURL: url, name: name, description: nil))
+            heroItems[url] = HeroCategoryDetails(name: name, description: nil)
         }
         return heroItems
     }
@@ -51,10 +53,10 @@ class HeroService {
                         let description = hero["description"] as? String ?? ""
                         let imageURL = extractImageURL(hero)
                         
-                        let heroComics = getItemsFromList("comics", hero)
-                        let heroEvents = getItemsFromList("events", hero)
-                        let heroStories = getItemsFromList("stories", hero)
-                        let heroSeries = getItemsFromList("series", hero)
+                        let heroComics = getItemsFromList(CategoryTypes.comics.rawValue, hero)
+                        let heroEvents = getItemsFromList(CategoryTypes.events.rawValue, hero)
+                        let heroStories = getItemsFromList(CategoryTypes.stories.rawValue, hero)
+                        let heroSeries = getItemsFromList(CategoryTypes.series.rawValue, hero)
                         
                         heroes.append(Hero(name: name, 
                                            description: description,
@@ -91,20 +93,54 @@ class HeroService {
         throw NetworkError.decodingError
     }
     
-    func getCategoryDetails(_ heroCategoryDetails: inout [HeroCategoryDetails]) async throws {
-        for (index, categoryDetail) in heroCategoryDetails.enumerated() {
-            let data = try await performRequest(resourceURL: categoryDetail.resourceURL)
-            let description = try getCategoryDescriptionFromJson(data)
-            heroCategoryDetails[index].setDescription(description)
-        }
+    func getCategoryDetails(_ resourceURL: String, _ categoryDetail: HeroCategoryDetails) async throws -> String? {
+        let data = try await performRequest(resourceURL: resourceURL)
+        return try getCategoryDescriptionFromJson(data)
     }
     
     func getHeroDetails(_ hero: inout Hero) async throws {
-        // TODO: I can do these requests at the same time!!!
-        try await getCategoryDetails(&hero.heroComics)
-        try await getCategoryDetails(&hero.heroEvents)
-        try await getCategoryDetails(&hero.heroSeries)
-        try await getCategoryDetails(&hero.heroStories)
+        // Task group
+        try await withThrowingTaskGroup(of: (String, String, String?).self, body: { group in
+            
+            for (resourceURL, comic) in hero.heroComics {
+                group.addTask { [self] in
+                    return (resourceURL, CategoryTypes.comics.rawValue, try await self.getCategoryDetails(resourceURL, comic))
+                }
+            }
+            
+            for (resourceURL, story) in hero.heroStories {
+                group.addTask { [self] in
+                    return (resourceURL, CategoryTypes.stories.rawValue, try await self.getCategoryDetails(resourceURL, story))
+                }
+            }
+            
+            for (resourceURL, series) in hero.heroSeries {
+                group.addTask { [self] in
+                    return (resourceURL, CategoryTypes.series.rawValue, try await self.getCategoryDetails(resourceURL, series))
+                }
+            }
+            
+            for (resourceURL, event) in hero.heroEvents {
+                group.addTask { [self] in
+                    return (resourceURL, CategoryTypes.events.rawValue, try await self.getCategoryDetails(resourceURL, event))
+                }
+            }
+            
+            for try await (resourceURL, type, category) in group {
+                switch type {
+                case CategoryTypes.comics.rawValue:
+                    hero.heroComics[resourceURL]!.description = category
+                case CategoryTypes.stories.rawValue:
+                    hero.heroStories[resourceURL]!.description = category
+                case CategoryTypes.series.rawValue:
+                    hero.heroSeries[resourceURL]!.description = category
+                case CategoryTypes.events.rawValue:
+                    hero.heroEvents[resourceURL]!.description = category
+                default:
+                    break
+                }
+            }
+        })
     }
     
     func performRequest(resourceURL url: String) async throws -> Data {

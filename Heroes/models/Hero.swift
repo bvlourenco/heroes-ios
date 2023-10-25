@@ -9,8 +9,6 @@ import Foundation
 
 // TODO: HeroCategoryDetails is a bad name
 struct HeroCategoryDetails: Decodable {
-    // TODO: Decide whether resourceURL is a String or URL
-    let resourceURL: String
     let name: String
     var description: String?
     
@@ -23,8 +21,8 @@ struct Hero: Decodable {
     let name: String
     let description: String
     let imageURL: String
-    var heroComics: [HeroCategoryDetails]
-    var heroEvents: [HeroCategoryDetails]
-    var heroStories: [HeroCategoryDetails]
-    var heroSeries: [HeroCategoryDetails]
+    var heroComics: [String: HeroCategoryDetails]
+    var heroEvents: [String: HeroCategoryDetails]
+    var heroStories: [String: HeroCategoryDetails]
+    var heroSeries: [String: HeroCategoryDetails]
 }
