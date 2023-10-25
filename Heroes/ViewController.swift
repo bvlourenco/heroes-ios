@@ -22,9 +22,13 @@ class ViewController: UIViewController {
     // FIXME: Only for testing purposes
     func getAllHeroes() async {
         do {
-            let heroes = try await HeroService().getHeroes()
-            print(heroes.count)
-            print(heroes[0])
+            let heroService = HeroService()
+            var heroes = try await heroService.getHeroes()
+            try await heroService.getHeroDetails(&heroes[0])
+            print(heroes[0].heroComics as AnyObject)
+            print(heroes[0].heroSeries as AnyObject)
+            print(heroes[0].heroStories as AnyObject)
+            print(heroes[0].heroEvents as AnyObject)
         } catch {
             print(error)
         }

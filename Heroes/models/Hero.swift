@@ -12,15 +12,19 @@ struct HeroCategoryDetails: Decodable {
     // TODO: Decide whether resourceURL is a String or URL
     let resourceURL: String
     let name: String
-    let description: String?
+    var description: String?
+    
+    mutating func setDescription(_ description: String?) {
+        self.description = description
+    }
 }
 
 struct Hero: Decodable {
     let name: String
     let description: String
     let imageURL: String
-    let heroComics: [HeroCategoryDetails]
-    let heroEvents: [HeroCategoryDetails]
-    let heroStories: [HeroCategoryDetails]
-    let heroSeries: [HeroCategoryDetails]
+    var heroComics: [HeroCategoryDetails]
+    var heroEvents: [HeroCategoryDetails]
+    var heroStories: [HeroCategoryDetails]
+    var heroSeries: [HeroCategoryDetails]
 }

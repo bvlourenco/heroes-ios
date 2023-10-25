@@ -74,7 +74,41 @@ class HeroService {
     }
     
     func getHeroes() async throws -> [Hero] {
-        guard var urlComponents = URLComponents(string: "http://gateway.marvel.com/v1/public/characters") else {
+        let data = try await performRequest(resourceURL: "http://gateway.marvel.com/v1/public/characters")
+        
+        let heroes = getHeroesFromJson(data)
+        
+        return heroes
+    }
+    
+    func getCategoryDescriptionFromJson(_ data: Data) throws -> String? {
+        if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+            if let data = json["data"] as? AnyObject,
+               let results = data["results"] as? AnyObject {
+                return (results[0] as AnyObject)["description"] as? String
+            }
+        }
+        throw NetworkError.decodingError
+    }
+    
+    func getCategoryDetails(_ heroCategoryDetails: inout [HeroCategoryDetails]) async throws {
+        for (index, categoryDetail) in heroCategoryDetails.enumerated() {
+            let data = try await performRequest(resourceURL: categoryDetail.resourceURL)
+            let description = try getCategoryDescriptionFromJson(data)
+            heroCategoryDetails[index].setDescription(description)
+        }
+    }
+    
+    func getHeroDetails(_ hero: inout Hero) async throws {
+        // TODO: I can do these requests at the same time!!!
+        try await getCategoryDetails(&hero.heroComics)
+        try await getCategoryDetails(&hero.heroEvents)
+        try await getCategoryDetails(&hero.heroSeries)
+        try await getCategoryDetails(&hero.heroStories)
+    }
+    
+    func performRequest(resourceURL url: String) async throws -> Data {
+        guard var urlComponents = URLComponents(string: url) else {
             throw NetworkError.badUrl
         }
         
@@ -91,8 +125,6 @@ class HeroService {
             throw NetworkError.serverError
         }
         
-        let heroes = getHeroesFromJson(data)
-        
-        return heroes
+        return data
     }
 }
