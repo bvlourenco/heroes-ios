@@ -26,9 +26,14 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        fetchHeroes(offset: 0)
+    }
+    
+    private func fetchHeroes(offset: Int) {
         Task {
             do {
-                self.heroes = try await self.heroService.getHeroes()
+                self.heroes.append(contentsOf: try await self.heroService
+                    .getHeroes(offset: offset))
             } catch {
                 print(error)
             }
@@ -37,39 +42,65 @@ class MainViewController: UIViewController {
 }
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView,
+                   numberOfRowsInSection section: Int) -> Int {
         return self.heroes.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+    func tableView(_ tableView: UITableView,
+                   cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
+                                                 for: indexPath)
         
+        // Since we are reusing cells, this instruction will remove the image
+        // associated to the reusable cell.
+        cell.imageView?.image = UIImage(named: "placeholder")
         cell.textLabel?.text = self.heroes[indexPath.row].name
         
-        // Source: https://stackoverflow.com/a/52416497
-        ImageCache.imageForUrl(urlString: self.heroes[indexPath.row].imageURL, completionHandler: { (image, url, isNotLoaded) in
-            if image != nil {
-                cell.imageView?.image = image
-            }
-            if isNotLoaded {
-                self.customView.tableView.reloadRows(at: [indexPath], with: .none)
-            }
-        })
+        // If imageURL points to a not available image, use a placeholder
+        if self.heroes[indexPath.row].imageURL
+            .hasSuffix("image_not_available.jpg") == false {
+            // Source: https://stackoverflow.com/a/52416497
+            ImageCache.imageForUrl(urlString:
+                                    self.heroes[indexPath.row].imageURL,
+                                   completionHandler: {
+                (image, url, isNotLoaded) in
+                if image != nil {
+                    cell.imageView!.alpha = 0
+                    cell.imageView?.image = image
+                    UIView.animate(withDuration: 1,
+                                   delay: 0,
+                                   options: UIView.AnimationOptions
+                        .showHideTransitionViews,
+                                   animations: { () -> Void in
+                        cell.imageView!.alpha = 1 }
+                    )
+                }
+            })
+        }
         
         return cell
     }
     
     // From: https://stackoverflow.com/a/42457571
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView,
+                   willDisplay cell: UITableViewCell,
+                   forRowAt indexPath: IndexPath) {
         let lastSectionIndex = tableView.numberOfSections - 1
-        let lastRowIndex = tableView.numberOfRows(inSection: lastSectionIndex) - 1
-        if indexPath.section == lastSectionIndex && indexPath.row == lastRowIndex {
+        let lastRowIndex = tableView.numberOfRows(inSection:
+                                                    lastSectionIndex) - 1
+        if indexPath.section == lastSectionIndex
+            && indexPath.row == lastRowIndex {
             let spinner = UIActivityIndicatorView(style: .medium)
             spinner.startAnimating()
-            spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
+            spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0),
+                                   width: tableView.bounds.width,
+                                   height: CGFloat(44))
             
             customView.tableView.tableFooterView = spinner
             customView.tableView.tableFooterView?.isHidden = false
+            
+            fetchHeroes(offset: self.heroes.count)
         } else {
             customView.tableView.tableFooterView?.isHidden = true
             customView.tableView.tableFooterView = nil

@@ -15,8 +15,13 @@ class ImageCache {
     // String is a value type
     static var cache = NSCache<NSString, AnyObject>()
     
-    static func imageForUrl(urlString: String, completionHandler: @escaping (_ image: UIImage?, _ url: String, _ isNotLoaded: Bool) -> ()) {
-        let data: Data? = self.cache.object(forKey: urlString as NSString) as? Data
+    static func imageForUrl(urlString: String,
+                            completionHandler: @escaping (_ image: UIImage?,
+                                                          _ url: String,
+                                                          _ isNotLoaded: Bool)
+                                                          -> ()) {
+        let data: Data? = self.cache.object(forKey: urlString as NSString)
+        as? Data
         
         if let imageData = data {
             let image = UIImage(data: imageData)
@@ -26,11 +31,13 @@ class ImageCache {
             return
         } else {
             if let url = URL(string: urlString) {
-                URLSession.shared.dataTask(with: url) { (data, response, error) in
+                URLSession.shared.dataTask(with: url) {
+                    (data, response, error) in
                     if error == nil {
                         if data != nil {
                             let image = UIImage(data: data!)
-                            self.cache.setObject(data! as AnyObject, forKey: urlString as NSString)
+                            self.cache.setObject(data! as AnyObject,
+                                                 forKey: urlString as NSString)
                             DispatchQueue.main.async {
                                 completionHandler(image, urlString, true)
                             }
