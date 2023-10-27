@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CustomView: UIView {
+class HeroesTableView: UIView {
     // 1. Creating the new element
     lazy var tableView: UITableView = {
         let tableView = UITableView(frame: CGRectZero, style: .plain)

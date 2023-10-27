@@ -7,21 +7,22 @@
 
 import UIKit
 
-class MainViewController: UIViewController {
+class HeroesTableViewController: UIViewController {
     private var heroes: [Hero] = [] {
         didSet {
             if isViewLoaded {
-                customView.tableView.reloadData()
+                heroesTableView.tableView.reloadData()
             }
         }
     }
     private let heroService = HeroService()
-    lazy var customView = CustomView()
+    lazy var heroesTableView = HeroesTableView()
     
     override func loadView() {
-        customView.tableView.delegate = self
-        customView.tableView.dataSource = self
-        view = customView
+        heroesTableView.tableView.delegate = self
+        heroesTableView.tableView.dataSource = self
+        view = heroesTableView
+        navigationItem.title = "All heroes"
     }
     
     override func viewDidLoad() {
@@ -41,7 +42,7 @@ class MainViewController: UIViewController {
     }
 }
 
-extension MainViewController: UITableViewDelegate, UITableViewDataSource {
+extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
         return self.heroes.count
@@ -82,6 +83,15 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, 
+                   didSelectRowAt indexPath: IndexPath) {
+
+        tableView.deselectRow(at: indexPath, animated: true)
+
+        let destination = HeroViewController(hero: self.heroes[indexPath.row])
+        navigationController?.pushViewController(destination, animated: true)
+    }
+    
     // From: https://stackoverflow.com/a/42457571
     func tableView(_ tableView: UITableView,
                    willDisplay cell: UITableViewCell,
@@ -97,13 +107,13 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
                                    width: tableView.bounds.width,
                                    height: CGFloat(44))
             
-            customView.tableView.tableFooterView = spinner
-            customView.tableView.tableFooterView?.isHidden = false
+            heroesTableView.tableView.tableFooterView = spinner
+            heroesTableView.tableView.tableFooterView?.isHidden = false
             
             fetchHeroes(offset: self.heroes.count)
         } else {
-            customView.tableView.tableFooterView?.isHidden = true
-            customView.tableView.tableFooterView = nil
+            heroesTableView.tableView.tableFooterView?.isHidden = true
+            heroesTableView.tableView.tableFooterView = nil
         }
     }
 }
