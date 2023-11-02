@@ -25,24 +25,40 @@ class HeroView: UIView {
         return imageView
     }()
     
+    let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        return scrollView
+    }()
+    
+    let scrollViewContainer: UIStackView = {
+        let view = UIStackView()
+        view.axis = .vertical
+        view.spacing = 10
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     let comicsView: CategoryViewComponent
     let seriesView: CategoryViewComponent
     let eventsView: CategoryViewComponent
     let storiesView: CategoryViewComponent
     
     override init(frame: CGRect) {
-        self.comicsView = CategoryViewComponent(frame: frame, categoryName: "comics")
-        self.seriesView = CategoryViewComponent(frame: frame, categoryName: "series")
-        self.eventsView = CategoryViewComponent(frame: frame, categoryName: "events")
-        self.storiesView = CategoryViewComponent(frame: frame, categoryName: "stories")
+        self.comicsView = CategoryViewComponent(frame: frame, categoryName: "Comics")
+        self.seriesView = CategoryViewComponent(frame: frame, categoryName: "Series")
+        self.eventsView = CategoryViewComponent(frame: frame, categoryName: "Events")
+        self.storiesView = CategoryViewComponent(frame: frame, categoryName: "Stories")
         super.init(frame: frame)
-        backgroundColor = .yellow
+        backgroundColor = .white
         addSubview(heroDescriptionLabel)
         addSubview(heroImageView)
-        addSubview(comicsView)
-        addSubview(seriesView)
-        addSubview(storiesView)
-        addSubview(eventsView)
+        addSubview(scrollView)
+        scrollView.addSubview(scrollViewContainer)
+        scrollViewContainer.addArrangedSubview(comicsView)
+        scrollViewContainer.addArrangedSubview(seriesView)
+        scrollViewContainer.addArrangedSubview(storiesView)
+        scrollViewContainer.addArrangedSubview(eventsView)
         setupConstrains()
     }
     
@@ -52,6 +68,17 @@ class HeroView: UIView {
     
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
     private func setupConstrains() {
+        scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: heroDescriptionLabel.bottomAnchor, constant: 16).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        
+        scrollViewContainer.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,
+                                                     constant: 18).isActive = true
+        scrollViewContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        scrollViewContainer.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        scrollViewContainer.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        
         // Needed to avoid auto layout conflicts
         heroDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         heroImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -73,15 +100,5 @@ class HeroView: UIView {
                                                 UIScreen.main.bounds.height / 4).isActive = true
         heroImageView.widthAnchor.constraint(equalTo: heroImageView.heightAnchor,
                                              multiplier: 1).isActive = true
-        
-        comicsView.topAnchor.constraint(equalTo: self.heroDescriptionLabel
-                                                     .bottomAnchor,
-                                        constant: 32).isActive = true
-        seriesView.topAnchor.constraint(equalTo: self.comicsView.bottomAnchor,
-                                        constant: 32).isActive = true
-        storiesView.topAnchor.constraint(equalTo: self.seriesView.bottomAnchor,
-                                         constant: 32).isActive = true
-        eventsView.topAnchor.constraint(equalTo: self.storiesView.bottomAnchor,
-                                        constant: 32).isActive = true
     }
 }
