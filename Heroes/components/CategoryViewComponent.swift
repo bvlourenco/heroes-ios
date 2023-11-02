@@ -8,54 +8,60 @@
 import UIKit
 
 class CategoryViewComponent: UIView {
-    lazy var categoryLabel: UILabel = getNewLabel(textLabel: "")
+    lazy var categoryLabel: UILabel = {
+        let label = UILabel()
+        label.text = ""
+        label.textAlignment = .center
+        label.textColor = .black
+        label.font = UIFont.boldSystemFont(ofSize: 20)
+        addSubview(label)
+        label.sizeToFit()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width).isActive = true
+        return label
+    }()
     
     // TODO: Refactor name and description labels
     var nameLabels: [UILabel] = []
     var descriptionLabels: [UILabel] = []
     
+    var placeholderLabel: UILabel? = nil
+    
     init(frame: CGRect, categoryName: String) {
         super.init(frame: frame)
-        setupCategoryLabel(categoryName: categoryName)
+        self.layer.borderWidth = 1
+        self.layer.borderColor = UIColor.systemGray2.cgColor
+        self.backgroundColor = UIColor.systemGray6
+        categoryLabel.text = categoryName
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupCategoryLabel(categoryName: String) {
-        categoryLabel.text = categoryName
-        categoryLabel.sizeToFit()
-        addSubview(categoryLabel)
-        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-    }
-    
     func addCategoryNameAndDescription(name: String, description: String) {
-        let nameLabel = getNewLabel(textLabel: name)
-        let descriptionLabel = getNewLabel(textLabel: description)
-        addSubview(nameLabel)
-        addSubview(descriptionLabel)
+        let nameLabel = getNewLabel(textLabel: "Name: " + name)
+        let descriptionLabel = getNewLabel(textLabel: "Description: " + description)
         setupLabelConstraints(nameLabel, descriptionLabel)
         self.nameLabels.append(nameLabel)
         self.descriptionLabels.append(descriptionLabel)
     }
     
-    func getNewLabel(textLabel: String) -> UILabel {
+    private func getNewLabel(textLabel: String) -> UILabel {
         let label = UILabel()
         label.text = textLabel
         label.textAlignment = .left
         label.textColor = .black
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
+        addSubview(label)
         label.sizeToFit()
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }
     
-    func setupLabelConstraints(_ nameLabel: UILabel,
-                               _ descriptionLabel: UILabel) {
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        
+    private func setupLabelConstraints(_ nameLabel: UILabel,
+                                       _ descriptionLabel: UILabel) {
         if descriptionLabels.count > 0 {
             let lastIndex = descriptionLabels.count - 1
             nameLabel.topAnchor.constraint(equalTo: descriptionLabels[lastIndex]
@@ -67,9 +73,14 @@ class CategoryViewComponent: UIView {
         }
         descriptionLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor,
                                               constant: 8).isActive = true
+
+        nameLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8).isActive = true
+        descriptionLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8).isActive = true
+        nameLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8).isActive = true
+        descriptionLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8).isActive = true
         
-        nameLabel.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width).isActive = true
-        descriptionLabel.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width).isActive = true
+        nameLabel.layoutIfNeeded()
+        descriptionLabel.layoutIfNeeded()
     }
     
     func setViewIntrinsicHeight() {
@@ -80,6 +91,27 @@ class CategoryViewComponent: UIView {
         for descriptionLabel in descriptionLabels {
             totalHeight += descriptionLabel.frame.size.height + 8
         }
+        
+        if let placeholderLabel = placeholderLabel {
+            totalHeight += placeholderLabel.frame.size.height + 16
+        }
+
+        // Adding a special "bottom padding" in each view to add some space
+        // between two CategoryViewComponent.
+        totalHeight += 16
+        
         self.heightAnchor.constraint(equalToConstant: totalHeight).isActive = true
+    }
+    
+    func addPlaceholderView() {
+        let categoryName = categoryLabel.text ?? ""
+        self.placeholderLabel = getNewLabel(textLabel: "No " + categoryName + " for this hero :(")
+        if let placeholderLabel = placeholderLabel {
+            placeholderLabel.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor,
+                                                  constant: 16).isActive = true
+            placeholderLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8).isActive = true
+            placeholderLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8).isActive = true
+            placeholderLabel.layoutIfNeeded()
+        }
     }
 }

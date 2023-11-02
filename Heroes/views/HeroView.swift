@@ -12,7 +12,7 @@ class HeroView: UIView {
         // internal label, not the same as the external label
         let label = UILabel()
         label.text = "There is no description for this hero :("
-        label.textAlignment = .center
+        label.textAlignment = .left
         label.textColor = .black
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
@@ -51,14 +51,14 @@ class HeroView: UIView {
         self.storiesView = CategoryViewComponent(frame: frame, categoryName: "Stories")
         super.init(frame: frame)
         backgroundColor = .white
-        addSubview(heroDescriptionLabel)
-        addSubview(heroImageView)
         addSubview(scrollView)
         scrollView.addSubview(scrollViewContainer)
+        scrollViewContainer.addArrangedSubview(heroImageView)
+        scrollViewContainer.addArrangedSubview(heroDescriptionLabel)
         scrollViewContainer.addArrangedSubview(comicsView)
         scrollViewContainer.addArrangedSubview(seriesView)
-        scrollViewContainer.addArrangedSubview(storiesView)
         scrollViewContainer.addArrangedSubview(eventsView)
+        scrollViewContainer.addArrangedSubview(storiesView)
         setupConstrains()
     }
     
@@ -68,37 +68,22 @@ class HeroView: UIView {
     
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
     private func setupConstrains() {
-        scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-        scrollView.topAnchor.constraint(equalTo: heroDescriptionLabel.bottomAnchor, constant: 16).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        scrollView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
-        scrollViewContainer.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,
-                                                     constant: 18).isActive = true
-        scrollViewContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        scrollViewContainer.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 8).isActive = true
+        scrollViewContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -8).isActive = true
         scrollViewContainer.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
         scrollViewContainer.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         
         // Needed to avoid auto layout conflicts
         heroDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         heroImageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        heroDescriptionLabel.topAnchor.constraint(equalTo: self.heroImageView
-            .bottomAnchor,
-                                                  constant: 16).isActive = true
-        heroDescriptionLabel.leftAnchor.constraint(equalTo:
-                                                    self.safeAreaLayoutGuide.leftAnchor,
-                                                   constant: 18).isActive = true
-        heroDescriptionLabel.rightAnchor.constraint(equalTo:
-                                                        self.safeAreaLayoutGuide.rightAnchor,
-                                                    constant: -18).isActive = true
-        
-        heroImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor,
-                                           constant: 16).isActive = true
-        heroImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
-        heroImageView.heightAnchor.constraint(equalToConstant:
-                                                UIScreen.main.bounds.height / 4).isActive = true
-        heroImageView.widthAnchor.constraint(equalTo: heroImageView.heightAnchor,
-                                             multiplier: 1).isActive = true
+
+        heroDescriptionLabel.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 16).isActive = true
+        heroImageView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 16).isActive = true
+        heroImageView.heightAnchor.constraint(equalTo: heroImageView.widthAnchor).isActive = true
     }
 }

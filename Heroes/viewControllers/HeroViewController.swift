@@ -50,18 +50,29 @@ class HeroViewController: UIViewController {
             })
         }
         
-        addCategory(categoryValues: self.hero.heroComics.values, viewCategory: self.heroView.comicsView)
-        addCategory(categoryValues: self.hero.heroEvents.values, viewCategory: self.heroView.eventsView)
-        addCategory(categoryValues: self.hero.heroSeries.values, viewCategory: self.heroView.seriesView)
-        addCategory(categoryValues: self.hero.heroStories.values, viewCategory: self.heroView.storiesView)
+        addCategory(categoryValues: self.hero.heroComics.values, 
+                    viewCategory: self.heroView.comicsView)
+        
+        addCategory(categoryValues: self.hero.heroEvents.values,
+                    viewCategory: self.heroView.eventsView)
+        
+        addCategory(categoryValues: self.hero.heroSeries.values,
+                    viewCategory: self.heroView.seriesView)
+        
+        addCategory(categoryValues: self.hero.heroStories.values,
+                    viewCategory: self.heroView.storiesView)
     }
     
     func addCategory(categoryValues: Dictionary<String, HeroCategoryDetails>.Values,
                      viewCategory: CategoryViewComponent) {
-        for category in categoryValues {
-            let description = category.description ?? "No description :("
-            viewCategory.addCategoryNameAndDescription(name: category.name,
-                                                       description: description)
+        if categoryValues.count == 0 {
+            viewCategory.addPlaceholderView()
+        } else {
+            for category in categoryValues {
+                let description = category.description ?? "No description :("
+                viewCategory.addCategoryNameAndDescription(name: category.name,
+                                                           description: description)
+            }
         }
         viewCategory.setViewIntrinsicHeight()
     }
