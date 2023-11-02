@@ -111,7 +111,6 @@ class CategoryViewComponent: UIView {
                                                   constant: 16).isActive = true
             placeholderLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8).isActive = true
             placeholderLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8).isActive = true
-            placeholderLabel.layoutIfNeeded()
         }
     }
 }

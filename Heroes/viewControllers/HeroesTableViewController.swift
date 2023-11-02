@@ -8,13 +8,7 @@
 import UIKit
 
 class HeroesTableViewController: UIViewController {
-    private var heroes: [Hero] = [] {
-        didSet {
-            if isViewLoaded {
-                heroesTableView.tableView.reloadData()
-            }
-        }
-    }
+    private var heroes: [Hero] = []
     private let heroService = HeroService()
     lazy var heroesTableView = HeroesTableView()
     
@@ -33,8 +27,13 @@ class HeroesTableViewController: UIViewController {
     private func fetchHeroes(offset: Int) {
         Task {
             do {
-                self.heroes.append(contentsOf: try await self.heroService
-                    .getHeroes(offset: offset))
+                let additionalHeroes = try await self.heroService.getHeroes(offset: offset)
+                self.heroes.append(contentsOf: additionalHeroes)
+                let indexPaths = (self.heroes.count - additionalHeroes.count ..< self.heroes.count)
+                    .map { IndexPath(row: $0, section: 0) }
+                heroesTableView.tableView.beginUpdates()
+                heroesTableView.tableView.insertRows(at: indexPaths, with: .automatic)
+                heroesTableView.tableView.endUpdates()
             } catch {
                 print(error)
             }
