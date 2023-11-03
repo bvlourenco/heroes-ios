@@ -18,21 +18,51 @@ enum CategoryTypes: String {
 }
 
 class HeroService {
-    let decoder = JSONDecoder()
+    private let decoder = JSONDecoder()
     
     func getHeroes(offset: Int) async throws -> [Hero] {
         let data = try await performRequest(resourceURL:
-                                            "http://gateway.marvel.com/v1/public/characters",
+                                                "http://gateway.marvel.com/v1/public/characters",
                                             limit: Constants.numberOfHeroesPerRequest,
                                             offset: offset)
         let heroes = try decoder.decode(Heroes.self, from: data)
         return heroes.heroes
     }
     
-    func getCategoryDescriptionFromJson(_ data: Data) throws -> String? {
-        if let json = try JSONSerialization.jsonObject(with: data, 
-                                                       options: [])
-                                                            as? [String: Any] {
+    func downloadImages(heroes: [Hero]) async throws -> [Hero] {
+        return try await withThrowingTaskGroup(of: (Hero, Data?).self,
+                                               body: { group in
+            for hero in heroes {
+                group.addTask { [self] in
+                    let imageData = try await self.downloadImage(imageURL:
+                                                                    hero.imageURL)
+                    return (hero, imageData)
+                }
+            }
+            
+            var heroes: [Hero] = []
+            for try await (var hero, imageData) in group {
+                hero.imageData = imageData
+                heroes.append(hero)
+            }
+            return heroes
+        })
+    }
+    
+    private func downloadImage(imageURL: String) async throws -> Data? {
+        if imageURL.hasSuffix("image_not_available.jpg") {
+            return nil
+        } else if let url = URL(string: imageURL) {
+            let (imageData, _) = try await URLSession.shared.data(from: url)
+            return imageData
+        } else {
+            throw NetworkError.badUrl
+        }
+    }
+    
+    private func getCategoryDescriptionFromJson(data: Data) throws -> String? {
+        if let json = try JSONSerialization.jsonObject(with: data,
+                                                       options: []) as? [String: Any] {
             if let data = json["data"] as? AnyObject,
                let results = data["results"] as? AnyObject {
                 return (results[0] as AnyObject)["description"] as? String
@@ -41,55 +71,35 @@ class HeroService {
         throw NetworkError.decodingError
     }
     
-    func getCategoryDetails(_ resourceURL: String,
-                            _ categoryDetail: HeroCategoryDetails)
-                                                      async throws -> String? {
+    private func getCategoryDetails(resourceURL: String,
+                                    categoryDetail: HeroCategoryDetails)
+    async throws -> String? {
         let data = try await performRequest(resourceURL: resourceURL,
                                             limit: nil,
                                             offset: nil)
-        return try getCategoryDescriptionFromJson(data)
+        return try getCategoryDescriptionFromJson(data: data)
     }
     
-    func getHeroDetails(_ hero: inout Hero) async throws {
+    private func getHeroDetails(hero: inout Hero) async throws {
         // Task group
-        try await withThrowingTaskGroup(of: (String, String, String?).self, 
+        try await withThrowingTaskGroup(of: (String, String, String?).self,
                                         body: { group in
             
-            for (resourceURL, comic) in hero.heroComics {
-                group.addTask { [self] in
-                    return (resourceURL, 
-                            CategoryTypes.comics.rawValue,
-                            try await self.getCategoryDetails(resourceURL, 
-                                                              comic))
-                }
-            }
+            addTasksToTaskGroup(heroCategory: hero.heroComics,
+                                categoryType: CategoryTypes.comics,
+                                group: &group)
             
-            for (resourceURL, story) in hero.heroStories {
-                group.addTask { [self] in
-                    return (resourceURL, 
-                            CategoryTypes.stories.rawValue,
-                            try await self.getCategoryDetails(resourceURL, 
-                                                              story))
-                }
-            }
+            addTasksToTaskGroup(heroCategory: hero.heroStories,
+                                categoryType: CategoryTypes.stories,
+                                group: &group)
             
-            for (resourceURL, series) in hero.heroSeries {
-                group.addTask { [self] in
-                    return (resourceURL, 
-                            CategoryTypes.series.rawValue,
-                            try await self.getCategoryDetails(resourceURL, 
-                                                              series))
-                }
-            }
+            addTasksToTaskGroup(heroCategory: hero.heroSeries,
+                                categoryType: CategoryTypes.series,
+                                group: &group)
             
-            for (resourceURL, event) in hero.heroEvents {
-                group.addTask { [self] in
-                    return (resourceURL,
-                            CategoryTypes.events.rawValue,
-                            try await self.getCategoryDetails(resourceURL,
-                                                              event))
-                }
-            }
+            addTasksToTaskGroup(heroCategory: hero.heroEvents,
+                                categoryType: CategoryTypes.events,
+                                group: &group)
             
             for try await (resourceURL, type, category) in group {
                 switch type {
@@ -108,36 +118,20 @@ class HeroService {
         })
     }
     
-    func downloadImages(heroes: [Hero]) async throws -> [Hero] {
-        return try await withThrowingTaskGroup(of: (Hero, Data?).self,
-                                        body: { group in
-            for hero in heroes {
-                group.addTask { [self] in
-                    return (hero, try await self.downloadImage(imageURL: hero.imageURL))
-                }
+    private func addTasksToTaskGroup(heroCategory: [String:HeroCategoryDetails],
+                                     categoryType: CategoryTypes,
+                                     group: inout ThrowingTaskGroup<(String, String, String?), Error>) {
+        for (resourceURL, category) in heroCategory {
+            group.addTask { [self] in
+                return (resourceURL,
+                        categoryType.rawValue,
+                        try await self.getCategoryDetails(resourceURL: resourceURL,
+                                                          categoryDetail: category))
             }
-            
-            var heroes: [Hero] = []
-            for try await (var hero, imageData) in group {
-                hero.imageData = imageData
-                heroes.append(hero)
-            }
-            return heroes
-        })
-    }
-    
-    func downloadImage(imageURL: String) async throws -> Data? {
-        if imageURL.hasSuffix("image_not_available.jpg") {
-            return nil
-        } else if let url = URL(string: imageURL) {
-            let (imageData, _) = try await URLSession.shared.data(from: url)
-            return imageData
-        } else {
-            throw NetworkError.badUrl
         }
     }
     
-    func performRequest(resourceURL url: String, limit: Int?, offset: Int?) 
+    private func performRequest(resourceURL url: String, limit: Int?, offset: Int?)
     async throws -> Data {
         guard var urlComponents = URLComponents(string: url) else {
             throw NetworkError.badUrl

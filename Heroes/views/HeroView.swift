@@ -8,7 +8,7 @@
 import UIKit
 
 class HeroView: UIView {
-    lazy var heroDescriptionLabel: UILabel = {
+    var heroDescriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "There is no description for this hero :("
         label.textAlignment = .left
@@ -19,20 +19,20 @@ class HeroView: UIView {
         return label
     }()
     
-    lazy var heroImageView: UIImageView = {
+    let heroImageView: UIImageView = {
         let placeholderImage = UIImage(named: "placeholder")
         let imageView = UIImageView(image: placeholderImage)
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     
-    let scrollView: UIScrollView = {
+    private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         return scrollView
     }()
     
-    let scrollViewContainer: UIStackView = {
+    private let stackView: UIStackView = {
         let view = UIStackView()
         view.axis = .vertical
         view.spacing = 10
@@ -52,14 +52,7 @@ class HeroView: UIView {
         self.storiesView = CategoryViewComponent(frame: frame, categoryName: "Stories")
         super.init(frame: frame)
         backgroundColor = .white
-        addSubview(scrollView)
-        scrollView.addSubview(scrollViewContainer)
-        scrollViewContainer.addArrangedSubview(heroImageView)
-        scrollViewContainer.addArrangedSubview(heroDescriptionLabel)
-        scrollViewContainer.addArrangedSubview(comicsView)
-        scrollViewContainer.addArrangedSubview(seriesView)
-        scrollViewContainer.addArrangedSubview(eventsView)
-        scrollViewContainer.addArrangedSubview(storiesView)
+        addElementsToView()
         setupConstrains()
     }
     
@@ -67,25 +60,42 @@ class HeroView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func addElementsToView() {
+        addSubview(scrollView)
+        scrollView.addSubview(stackView)
+        
+        stackView.addArrangedSubview(heroImageView)
+        stackView.addArrangedSubview(heroDescriptionLabel)
+        stackView.addArrangedSubview(comicsView)
+        stackView.addArrangedSubview(seriesView)
+        stackView.addArrangedSubview(eventsView)
+        stackView.addArrangedSubview(storiesView)
+    }
+    
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
     // and: https://gist.github.com/moraei/08f1c1841f7bb73bb5c9e89ac428e027
     private func setupConstrains() {
-        scrollView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        scrollView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        
-        scrollViewContainer.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 8).isActive = true
-        scrollViewContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -8).isActive = true
-        scrollViewContainer.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        scrollViewContainer.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-
-        heroDescriptionLabel.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 16).isActive = true
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: self.topAnchor),
+            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            
+            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            stackView.leftAnchor.constraint(equalTo: scrollView.leftAnchor,
+                                            constant: Constants.smallPadding),
+            stackView.rightAnchor.constraint(equalTo: scrollView.rightAnchor,
+                                             constant: -Constants.smallPadding),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            
+            heroDescriptionLabel.widthAnchor.constraint(equalToConstant: UIScreen
+                .main.bounds.width - Constants.mediumPadding)
+        ])
         
         // Used to remove white space inside scroll view with image view (when having images
         // with aspect ratio of 1:1 approximately)
         if let image = heroImageView.image {
-            let height = (heroImageView.frame.width * heroImageView.image!.size.height) /  heroImageView.image!.size.width
+            let height = (heroImageView.frame.width * image.size.height) /  image.size.width
             heroImageView.heightAnchor.constraint(equalToConstant: height).isActive = true
         }
     }

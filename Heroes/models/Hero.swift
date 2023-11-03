@@ -93,62 +93,74 @@ struct Heroes: Decodable {
         return heroCategoryItems
     }
     
-    init(from decoder: Decoder) throws {
-        self.heroes = []
+    private mutating func parseHero(resultsContainer:
+                                    inout UnkeyedDecodingContainer) throws {
+        let heroContainer = try resultsContainer
+            .nestedContainer(keyedBy: CodingKeys
+                .DataKeys
+                .ResultKeys
+                .self)
+        let heroName = try heroContainer.decode(String.self, forKey: .name)
+        let heroDescription = try heroContainer.decode(String.self,
+                                                       forKey: .description)
         
-        let rootContainer = try decoder.container(keyedBy: CodingKeys.self)
-        let dataContainer = try rootContainer
-            .nestedContainer(keyedBy: CodingKeys.DataKeys
+        let thumbnailContainer = try heroContainer
+            .nestedContainer(keyedBy: CodingKeys
+                .DataKeys
+                .ResultKeys
+                .ThumbnailKeys
                 .self,
-                             forKey: .data)
-        var resultsContainer = try dataContainer
-            .nestedUnkeyedContainer(forKey: .results)
+                             forKey: .thumbnail)
+        let heroImagePath = try thumbnailContainer.decode(String.self,
+                                                          forKey: .path)
+        let heroImageExtension = try thumbnailContainer.decode(String.self,
+                                                               forKey: .ext)
+        let heroImageURL = heroImagePath + "." + heroImageExtension
         
-        while resultsContainer.isAtEnd == false {
-            let heroContainer = try resultsContainer
-                .nestedContainer(keyedBy: CodingKeys
-                    .DataKeys
-                    .ResultKeys
-                    .self)
-            let heroName = try heroContainer.decode(String.self, forKey: .name)
-            let heroDescription = try heroContainer.decode(String.self,
-                                                           forKey: .description)
-            
-            let thumbnailContainer = try heroContainer
-                .nestedContainer(keyedBy: CodingKeys
-                    .DataKeys
-                    .ResultKeys
-                    .ThumbnailKeys
+        let heroComics = try parseCategory(key: CodingKeys.DataKeys
+            .ResultKeys.comics,
+                                           heroContainer: heroContainer)
+        let heroSeries = try parseCategory(key: CodingKeys.DataKeys
+            .ResultKeys.series,
+                                           heroContainer: heroContainer)
+        let heroEvents = try parseCategory(key: CodingKeys.DataKeys
+            .ResultKeys.events,
+                                           heroContainer: heroContainer)
+        let heroStories = try parseCategory(key: CodingKeys.DataKeys
+            .ResultKeys.stories,
+                                            heroContainer: heroContainer)
+        
+        let hero = Hero(name: heroName,
+                        description: heroDescription,
+                        imageURL: heroImageURL,
+                        heroComics: heroComics,
+                        heroEvents: heroEvents,
+                        heroStories: heroStories,
+                        heroSeries: heroSeries)
+        
+        heroes.append(hero)
+    }
+    
+    private mutating func parseHeroes(decoder: Decoder) {
+        do {
+            let rootContainer = try decoder.container(keyedBy: CodingKeys.self)
+            let dataContainer = try rootContainer
+                .nestedContainer(keyedBy: CodingKeys.DataKeys
                     .self,
-                                 forKey: .thumbnail)
-            let heroImagePath = try thumbnailContainer.decode(String.self,
-                                                              forKey: .path)
-            let heroImageExtension = try thumbnailContainer.decode(String.self,
-                                                                   forKey: .ext)
-            let heroImageURL = heroImagePath + "." + heroImageExtension
+                                 forKey: .data)
+            var resultsContainer = try dataContainer
+                .nestedUnkeyedContainer(forKey: .results)
             
-            let heroComics = try parseCategory(key: CodingKeys.DataKeys
-                .ResultKeys.comics,
-                                               heroContainer: heroContainer)
-            let heroSeries = try parseCategory(key: CodingKeys.DataKeys
-                .ResultKeys.series,
-                                               heroContainer: heroContainer)
-            let heroEvents = try parseCategory(key: CodingKeys.DataKeys
-                .ResultKeys.events,
-                                               heroContainer: heroContainer)
-            let heroStories = try parseCategory(key: CodingKeys.DataKeys
-                .ResultKeys.stories,
-                                                heroContainer: heroContainer)
-            
-            let hero = Hero(name: heroName,
-                            description: heroDescription,
-                            imageURL: heroImageURL,
-                            heroComics: heroComics,
-                            heroEvents: heroEvents,
-                            heroStories: heroStories,
-                            heroSeries: heroSeries)
-            
-            heroes.append(hero)
+            while resultsContainer.isAtEnd == false {
+                try parseHero(resultsContainer: &resultsContainer)
+            }
+        } catch {
+            print(error)
         }
+    }
+    
+    init(from decoder: Decoder) {
+        self.heroes = []
+        parseHeroes(decoder: decoder)
     }
 }

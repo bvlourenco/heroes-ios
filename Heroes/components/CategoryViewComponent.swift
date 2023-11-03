@@ -8,29 +8,27 @@
 import UIKit
 
 class CategoryViewComponent: UIView {
-    lazy var categoryLabel: UILabel = {
+    private lazy var categoryLabel: UILabel = {
         let label = UILabel()
         label.text = ""
         label.textAlignment = .center
         label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
         addSubview(label)
         label.sizeToFit()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width).isActive = true
+        label.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width)
+            .isActive = true
         return label
     }()
     
-    var nameLabels: [UILabel] = []
-    var descriptionLabels: [UILabel] = []
-    
-    var placeholderLabel: UILabel? = nil
+    private var nameLabels: [UILabel] = []
+    private var descriptionLabels: [UILabel] = []
+    private var placeholderLabel: UILabel? = nil
     
     init(frame: CGRect, categoryName: String) {
         super.init(frame: frame)
-        self.layer.borderWidth = 1
-        self.layer.borderColor = UIColor.systemGray2.cgColor
-        self.backgroundColor = UIColor.systemGray6
+        addBackgroundAndBordersToComponent()
         categoryLabel.text = categoryName
     }
     
@@ -41,9 +39,57 @@ class CategoryViewComponent: UIView {
     func addCategoryNameAndDescription(name: String, description: String) {
         let nameLabel = getNewLabel(textLabel: "Name: " + name)
         let descriptionLabel = getNewLabel(textLabel: "Description: " + description)
-        setupLabelConstraints(nameLabel, descriptionLabel)
+        setupLabelConstraints(nameLabel: nameLabel,
+                              descriptionLabel: descriptionLabel)
+        
+        // Forcing the views to update layout to avoid case where current view
+        // is smaller than its elements together
+        nameLabel.layoutIfNeeded()
+        descriptionLabel.layoutIfNeeded()
+        
         self.nameLabels.append(nameLabel)
         self.descriptionLabels.append(descriptionLabel)
+    }
+    
+    func setViewIntrinsicHeight() {
+        var totalHeight: CGFloat = categoryLabel.frame.size.height
+        + Constants.mediumPadding
+        
+        if let placeholderLabel = placeholderLabel {
+            totalHeight += placeholderLabel.frame.size.height + Constants.mediumPadding
+        } else {
+            for nameLabel in nameLabels {
+                totalHeight += nameLabel.frame.size.height + Constants.mediumPadding
+            }
+            for descriptionLabel in descriptionLabels {
+                totalHeight += descriptionLabel.frame.size.height + Constants.smallPadding
+            }
+        }
+        
+        // Adding a special "bottom padding" in each view to add some space
+        // between two CategoryViewComponent.
+        totalHeight += Constants.mediumPadding
+        
+        self.heightAnchor.constraint(equalToConstant: totalHeight)
+            .isActive = true
+    }
+    
+    func addPlaceholderView() {
+        let categoryName = categoryLabel.text ?? ""
+        let text = "No " + categoryName + " for this hero :("
+        self.placeholderLabel = getNewLabel(textLabel: text)
+        if let placeholderLabel = placeholderLabel {
+            addTopConstraint(currentLabel: placeholderLabel,
+                             topLabel: categoryLabel,
+                             paddingValue: Constants.mediumPadding)
+            addSideConstraintsToLabel(label: placeholderLabel)
+        }
+    }
+    
+    private func addBackgroundAndBordersToComponent() {
+        self.layer.borderWidth = 1
+        self.layer.borderColor = UIColor.systemGray2.cgColor
+        self.backgroundColor = UIColor.systemGray6
     }
     
     private func getNewLabel(textLabel: String) -> UILabel {
@@ -59,57 +105,40 @@ class CategoryViewComponent: UIView {
         return label
     }
     
-    private func setupLabelConstraints(_ nameLabel: UILabel,
-                                       _ descriptionLabel: UILabel) {
+    private func addSideConstraintsToLabel(label: UILabel) {
+        label.leadingAnchor.constraint(equalTo: self.leadingAnchor,
+                                       constant: Constants.smallPadding)
+        .isActive = true
+        
+        label.trailingAnchor.constraint(equalTo: self.trailingAnchor,
+                                        constant: -Constants.smallPadding)
+        .isActive = true
+    }
+    
+    private func addTopConstraint(currentLabel: UILabel, topLabel: UILabel,
+                                  paddingValue: CGFloat) {
+        currentLabel.topAnchor.constraint(equalTo: topLabel.bottomAnchor,
+                                          constant: paddingValue).isActive = true
+    }
+    
+    private func setupLabelConstraints(nameLabel: UILabel,
+                                       descriptionLabel: UILabel) {
         if descriptionLabels.count > 0 {
             let lastIndex = descriptionLabels.count - 1
-            nameLabel.topAnchor.constraint(equalTo: descriptionLabels[lastIndex]
-                                                    .bottomAnchor,
-                                           constant: 16).isActive = true
+            addTopConstraint(currentLabel: nameLabel,
+                             topLabel: descriptionLabels[lastIndex],
+                             paddingValue: Constants.mediumPadding)
         } else {
-            nameLabel.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor,
-                                           constant: 16).isActive = true
-        }
-        descriptionLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor,
-                                              constant: 8).isActive = true
-
-        nameLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8).isActive = true
-        descriptionLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8).isActive = true
-        nameLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8).isActive = true
-        descriptionLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8).isActive = true
-        
-        nameLabel.layoutIfNeeded()
-        descriptionLabel.layoutIfNeeded()
-    }
-    
-    func setViewIntrinsicHeight() {
-        var totalHeight: CGFloat = categoryLabel.frame.size.height + 16
-        for nameLabel in nameLabels {
-            totalHeight += nameLabel.frame.size.height + 16
-        }
-        for descriptionLabel in descriptionLabels {
-            totalHeight += descriptionLabel.frame.size.height + 8
+            addTopConstraint(currentLabel: nameLabel,
+                             topLabel: categoryLabel,
+                             paddingValue: Constants.mediumPadding)
         }
         
-        if let placeholderLabel = placeholderLabel {
-            totalHeight += placeholderLabel.frame.size.height + 16
-        }
-
-        // Adding a special "bottom padding" in each view to add some space
-        // between two CategoryViewComponent.
-        totalHeight += 16
+        addTopConstraint(currentLabel: descriptionLabel,
+                         topLabel: nameLabel,
+                         paddingValue: Constants.smallPadding)
         
-        self.heightAnchor.constraint(equalToConstant: totalHeight).isActive = true
-    }
-    
-    func addPlaceholderView() {
-        let categoryName = categoryLabel.text ?? ""
-        self.placeholderLabel = getNewLabel(textLabel: "No " + categoryName + " for this hero :(")
-        if let placeholderLabel = placeholderLabel {
-            placeholderLabel.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor,
-                                                  constant: 16).isActive = true
-            placeholderLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8).isActive = true
-            placeholderLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8).isActive = true
-        }
+        addSideConstraintsToLabel(label: nameLabel)
+        addSideConstraintsToLabel(label: descriptionLabel)
     }
 }

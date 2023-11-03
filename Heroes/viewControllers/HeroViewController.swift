@@ -8,8 +8,8 @@
 import UIKit
 
 class HeroViewController: UIViewController {
-    let heroView: HeroView
-    let hero: Hero
+    private let heroView: HeroView
+    private let hero: Hero
     
     init(hero: Hero) {
         self.hero = hero
@@ -46,8 +46,9 @@ class HeroViewController: UIViewController {
                     viewCategory: self.heroView.storiesView)
     }
     
-    func addCategory(categoryValues: Dictionary<String, HeroCategoryDetails>.Values,
-                     viewCategory: CategoryViewComponent) {
+    private func addCategory(categoryValues: Dictionary<String,
+                             HeroCategoryDetails>.Values,
+                             viewCategory: CategoryViewComponent) {
         if categoryValues.count == 0 {
             viewCategory.addPlaceholderView()
         } else {
@@ -58,9 +59,5 @@ class HeroViewController: UIViewController {
             }
         }
         viewCategory.setViewIntrinsicHeight()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
     }
 }
