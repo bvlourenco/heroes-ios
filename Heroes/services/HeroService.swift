@@ -21,9 +21,10 @@ class HeroService {
     let decoder = JSONDecoder()
     
     func getHeroes(offset: Int) async throws -> [Hero] {
-        let data = try await performRequest(resourceURL: 
-                            "http://gateway.marvel.com/v1/public/characters",
-                                            limit: 20, offset: offset)
+        let data = try await performRequest(resourceURL:
+                                            "http://gateway.marvel.com/v1/public/characters",
+                                            limit: Constants.numberOfHeroesPerRequest,
+                                            offset: offset)
         let heroes = try decoder.decode(Heroes.self, from: data)
         return heroes.heroes
     }

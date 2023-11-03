@@ -11,16 +11,13 @@ class HeroesTableViewController: UIViewController {
     private var heroes: [Hero] = []
     private let heroService = HeroService()
     lazy var heroesTableView = HeroesTableView()
+    var loadingData = false
     
     override func loadView() {
         heroesTableView.tableView.delegate = self
         heroesTableView.tableView.dataSource = self
         view = heroesTableView
         navigationItem.title = "All heroes"
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
         fetchHeroes(offset: 0)
     }
     
@@ -30,11 +27,14 @@ class HeroesTableViewController: UIViewController {
                 var additionalHeroes = try await self.heroService.getHeroes(offset: offset)
                 additionalHeroes = try await self.heroService.downloadImages(heroes: additionalHeroes)
                 self.heroes.append(contentsOf: additionalHeroes)
-                let indexPaths = (self.heroes.count - additionalHeroes.count ..< self.heroes.count)
+                let indexPaths = (self.heroes.count - Constants.numberOfHeroesPerRequest
+                                  ..< self.heroes.count)
                     .map { IndexPath(row: $0, section: 0) }
                 heroesTableView.tableView.beginUpdates()
+                heroesTableView.tableView.tableFooterView?.isHidden = true
                 heroesTableView.tableView.insertRows(at: indexPaths, with: .none)
                 heroesTableView.tableView.endUpdates()
+                loadingData = false
             } catch {
                 print(error)
             }
@@ -58,6 +58,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         } else {
             cell.imageView?.image = UIImage(named: "placeholder")
         }
+        cell.imageView?.contentMode = .scaleAspectFit
         cell.textLabel?.text = self.heroes[indexPath.row].name
 
         return cell
@@ -76,34 +77,12 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView,
                    willDisplay cell: UITableViewCell,
                    forRowAt indexPath: IndexPath) {
-        let lastSectionIndex = tableView.numberOfSections - 1
-        let lastRowIndex = tableView.numberOfRows(inSection:
-                                                    lastSectionIndex) - 1
-        if indexPath.section == lastSectionIndex
-            && indexPath.row == lastRowIndex {
-            let spinner = UIActivityIndicatorView(style: .medium)
-            spinner.startAnimating()
-            spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0),
-                                   width: tableView.bounds.width,
-                                   height: CGFloat(44))
-            
-            heroesTableView.tableView.tableFooterView = spinner
+        let lastRowIndex = tableView.numberOfRows(inSection: 0) - 1
+        let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
+        let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
+        if loadingData == false && indexPath.row >= rowIndexLoadMoreHeroes {
             heroesTableView.tableView.tableFooterView?.isHidden = false
-        } else {
-            heroesTableView.tableView.tableFooterView?.isHidden = true
-            heroesTableView.tableView.tableFooterView = nil
-        }
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, 
-                                  willDecelerate decelerate: Bool) {
-
-        // UITableView only moves in one direction, y axis
-        let currentOffset = scrollView.contentOffset.y
-        let maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height
-
-        // 30.0 is the distance from bottom
-        if maximumOffset - currentOffset <= 30.0 {
+            loadingData = true
             fetchHeroes(offset: self.heroes.count)
         }
     }

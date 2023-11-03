@@ -15,12 +15,14 @@ class HeroView: UIView {
         label.textColor = .black
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     lazy var heroImageView: UIImageView = {
         let placeholderImage = UIImage(named: "placeholder")
         let imageView = UIImageView(image: placeholderImage)
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     
@@ -77,13 +79,14 @@ class HeroView: UIView {
         scrollViewContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -8).isActive = true
         scrollViewContainer.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
         scrollViewContainer.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        
-        // Needed to avoid auto layout conflicts
-        heroDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        heroImageView.translatesAutoresizingMaskIntoConstraints = false
 
         heroDescriptionLabel.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 16).isActive = true
-        heroImageView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 16).isActive = true
-        heroImageView.heightAnchor.constraint(equalTo: heroImageView.widthAnchor).isActive = true
+        
+        // Used to remove white space inside scroll view with image view (when having images
+        // with aspect ratio of 1:1 approximately)
+        if let image = heroImageView.image {
+            let height = (heroImageView.frame.width * heroImageView.image!.size.height) /  heroImageView.image!.size.width
+            heroImageView.heightAnchor.constraint(equalToConstant: height).isActive = true
+        }
     }
 }

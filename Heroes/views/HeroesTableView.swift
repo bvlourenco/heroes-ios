@@ -12,6 +12,15 @@ class HeroesTableView: UIView {
         let tableView = UITableView(frame: CGRectZero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.startAnimating()
+        spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0),
+                               width: tableView.bounds.width,
+                               height: CGFloat(44))
+        tableView.tableFooterView = spinner
+        tableView.tableFooterView?.isHidden = true
+        
         return tableView
     }()
     
