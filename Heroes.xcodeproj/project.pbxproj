@@ -19,7 +19,6 @@
 		D940FDDE2AEABF73008424B3 /* HeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D940FDDD2AEABF73008424B3 /* HeroView.swift */; };
 		D9DF20492AEBDB6F00B81F12 /* CategoryViewComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DF20482AEBDB6F00B81F12 /* CategoryViewComponent.swift */; };
 		D9DFF5012AE950EA002E7B6A /* HeroesTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DFF5002AE950EA002E7B6A /* HeroesTableView.swift */; };
-		D9DFF5082AE96934002E7B6A /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DFF5072AE96934002E7B6A /* ImageCache.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,7 +36,6 @@
 		D940FDDD2AEABF73008424B3 /* HeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroView.swift; sourceTree = "<group>"; };
 		D9DF20482AEBDB6F00B81F12 /* CategoryViewComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewComponent.swift; sourceTree = "<group>"; };
 		D9DFF5002AE950EA002E7B6A /* HeroesTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTableView.swift; sourceTree = "<group>"; };
-		D9DFF5072AE96934002E7B6A /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,7 +128,6 @@
 			isa = PBXGroup;
 			children = (
 				D93F4FA12AE7BEDB00610761 /* HeroesTableViewController.swift */,
-				D9DFF5072AE96934002E7B6A /* ImageCache.swift */,
 				D940FDDB2AEABED0008424B3 /* HeroViewController.swift */,
 			);
 			path = viewControllers;
@@ -208,7 +205,6 @@
 			files = (
 				D93F4FB62AE7E12900610761 /* HeroService.swift in Sources */,
 				D93F4FA22AE7BEDB00610761 /* HeroesTableViewController.swift in Sources */,
-				D9DFF5082AE96934002E7B6A /* ImageCache.swift in Sources */,
 				D93F4F9E2AE7BEDB00610761 /* AppDelegate.swift in Sources */,
 				D940FDDE2AEABF73008424B3 /* HeroView.swift in Sources */,
 				D9DF20492AEBDB6F00B81F12 /* CategoryViewComponent.swift in Sources */,

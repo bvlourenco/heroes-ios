@@ -27,12 +27,13 @@ class HeroesTableViewController: UIViewController {
     private func fetchHeroes(offset: Int) {
         Task {
             do {
-                let additionalHeroes = try await self.heroService.getHeroes(offset: offset)
+                var additionalHeroes = try await self.heroService.getHeroes(offset: offset)
+                additionalHeroes = try await self.heroService.downloadImages(heroes: additionalHeroes)
                 self.heroes.append(contentsOf: additionalHeroes)
                 let indexPaths = (self.heroes.count - additionalHeroes.count ..< self.heroes.count)
                     .map { IndexPath(row: $0, section: 0) }
                 heroesTableView.tableView.beginUpdates()
-                heroesTableView.tableView.insertRows(at: indexPaths, with: .automatic)
+                heroesTableView.tableView.insertRows(at: indexPaths, with: .none)
                 heroesTableView.tableView.endUpdates()
             } catch {
                 print(error)
@@ -52,33 +53,13 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
                                                  for: indexPath)
         
-        // Since we are reusing cells, this instruction will remove the image
-        // associated to the reusable cell.
-        cell.imageView?.image = UIImage(named: "placeholder")
-        cell.textLabel?.text = self.heroes[indexPath.row].name
-        
-        // If imageURL points to a not available image, use a placeholder
-        if self.heroes[indexPath.row].imageURL
-            .hasSuffix("image_not_available.jpg") == false {
-            // Source: https://stackoverflow.com/a/52416497
-            ImageCache.imageForUrl(urlString:
-                                    self.heroes[indexPath.row].imageURL,
-                                   completionHandler: {
-                (image, url, isNotLoaded) in
-                if image != nil {
-                    cell.imageView!.alpha = 0
-                    cell.imageView?.image = image
-                    UIView.animate(withDuration: 1,
-                                   delay: 0,
-                                   options: UIView.AnimationOptions
-                        .showHideTransitionViews,
-                                   animations: { () -> Void in
-                        cell.imageView!.alpha = 1 }
-                    )
-                }
-            })
+        if let imageData = self.heroes[indexPath.row].imageData {
+            cell.imageView?.image = UIImage(data: imageData)
+        } else {
+            cell.imageView?.image = UIImage(named: "placeholder")
         }
-        
+        cell.textLabel?.text = self.heroes[indexPath.row].name
+
         return cell
     }
     

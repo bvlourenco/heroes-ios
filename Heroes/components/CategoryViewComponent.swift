@@ -21,7 +21,6 @@ class CategoryViewComponent: UIView {
         return label
     }()
     
-    // TODO: Refactor name and description labels
     var nameLabels: [UILabel] = []
     var descriptionLabels: [UILabel] = []
     

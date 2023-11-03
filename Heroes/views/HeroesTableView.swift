@@ -8,7 +8,6 @@
 import UIKit
 
 class HeroesTableView: UIView {
-    // 1. Creating the new element
     lazy var tableView: UITableView = {
         let tableView = UITableView(frame: CGRectZero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -27,7 +26,6 @@ class HeroesTableView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        // 2. Adding the new element into the view
         self.addSubview(tableView)
         setupConstraints()
     }

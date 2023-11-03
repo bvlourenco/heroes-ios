@@ -20,10 +20,15 @@ struct Hero: Decodable {
     let name: String
     let description: String
     let imageURL: String
+    var imageData: Data?
     var heroComics: [String: HeroCategoryDetails]
     var heroEvents: [String: HeroCategoryDetails]
     var heroStories: [String: HeroCategoryDetails]
     var heroSeries: [String: HeroCategoryDetails]
+    
+    mutating func setHeroImage(image: Data) {
+        self.imageData = image
+    }
 }
 
 struct Heroes: Decodable {

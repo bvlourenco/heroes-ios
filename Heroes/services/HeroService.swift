@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 enum NetworkError: Error {
     case badUrl, serverError, decodingError, resourceNotFound,
@@ -104,6 +105,35 @@ class HeroService {
                 }
             }
         })
+    }
+    
+    func downloadImages(heroes: [Hero]) async throws -> [Hero] {
+        return try await withThrowingTaskGroup(of: (Hero, Data?).self,
+                                        body: { group in
+            for hero in heroes {
+                group.addTask { [self] in
+                    return (hero, try await self.downloadImage(imageURL: hero.imageURL))
+                }
+            }
+            
+            var heroes: [Hero] = []
+            for try await (var hero, imageData) in group {
+                hero.imageData = imageData
+                heroes.append(hero)
+            }
+            return heroes
+        })
+    }
+    
+    func downloadImage(imageURL: String) async throws -> Data? {
+        if imageURL.hasSuffix("image_not_available.jpg") {
+            return nil
+        } else if let url = URL(string: imageURL) {
+            let (imageData, _) = try await URLSession.shared.data(from: url)
+            return imageData
+        } else {
+            throw NetworkError.badUrl
+        }
     }
     
     func performRequest(resourceURL url: String, limit: Int?, offset: Int?) 

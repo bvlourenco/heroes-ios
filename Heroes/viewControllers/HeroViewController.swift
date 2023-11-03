@@ -29,28 +29,7 @@ class HeroViewController: UIViewController {
             heroView.heroDescriptionLabel.text = self.hero.description
         }
         
-        // TODO: Improve handling of non-existant images
-        if self.hero.imageURL
-            .hasSuffix("image_not_available.jpg") == false {
-            // TODO: Repeated code
-            ImageCache.imageForUrl(urlString: self.hero.imageURL,
-                                   completionHandler: {
-                (image, url, isNotLoaded) in
-                if image != nil {
-                    self.heroView.heroImageView.alpha = 0
-                    self.heroView.heroImageView.image = image
-                    UIView.animate(withDuration: 1,
-                                   delay: 0,
-                                   options: UIView.AnimationOptions
-                        .showHideTransitionViews,
-                                   animations: { () -> Void in
-                        self.heroView.heroImageView.alpha = 1 }
-                    )
-                }
-            })
-        }
-        
-        addCategory(categoryValues: self.hero.heroComics.values, 
+        addCategory(categoryValues: self.hero.heroComics.values,
                     viewCategory: self.heroView.comicsView)
         
         addCategory(categoryValues: self.hero.heroEvents.values,

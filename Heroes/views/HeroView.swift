@@ -9,7 +9,6 @@ import UIKit
 
 class HeroView: UIView {
     lazy var heroDescriptionLabel: UILabel = {
-        // internal label, not the same as the external label
         let label = UILabel()
         label.text = "There is no description for this hero :("
         label.textAlignment = .left
@@ -67,6 +66,7 @@ class HeroView: UIView {
     }
     
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
+    // and: https://gist.github.com/moraei/08f1c1841f7bb73bb5c9e89ac428e027
     private func setupConstrains() {
         scrollView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor).isActive = true
