@@ -15,4 +15,5 @@ struct Constants {
     static let categoryTitleFontSize: CGFloat = 20
     static let smallPadding: CGFloat = 8
     static let mediumPadding: CGFloat = 16
+    static let tableViewImageHeight: CGFloat = 45
 }

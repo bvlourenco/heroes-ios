@@ -9,17 +9,12 @@ import UIKit
 
 class CategoryViewComponent: UIView {
     private lazy var categoryLabel: UILabel = {
-        let label = UILabel()
-        label.text = ""
-        label.textAlignment = .center
-        label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
-        addSubview(label)
-        label.sizeToFit()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width)
+        let categoryLabel = getNewLabel(textLabel: "",
+                                        alignment: .center)
+        categoryLabel.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
+        categoryLabel.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width)
             .isActive = true
-        return label
+        return categoryLabel
     }()
     
     private var nameLabels: [UILabel] = []
@@ -92,10 +87,11 @@ class CategoryViewComponent: UIView {
         self.backgroundColor = UIColor.systemGray6
     }
     
-    private func getNewLabel(textLabel: String) -> UILabel {
+    private func getNewLabel(textLabel: String,
+                             alignment: NSTextAlignment = .left) -> UILabel {
         let label = UILabel()
         label.text = textLabel
-        label.textAlignment = .left
+        label.textAlignment = alignment
         label.textColor = .black
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0

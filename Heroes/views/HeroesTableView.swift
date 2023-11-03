@@ -11,7 +11,7 @@ class HeroesTableView: UIView {
     let tableView: UITableView = {
         let tableView = UITableView(frame: CGRectZero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(HeroesTableViewCell.self, forCellReuseIdentifier: "cell")
         
         let spinner = UIActivityIndicatorView(style: .medium)
         spinner.startAnimating()

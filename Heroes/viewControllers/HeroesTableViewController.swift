@@ -29,19 +29,22 @@ class HeroesTableViewController: UIViewController {
                 additionalHeroes = try await self.heroService
                     .downloadImages(heroes: additionalHeroes)
                 self.heroes.append(contentsOf: additionalHeroes)
-                let indexPaths = (self.heroes.count -
-                                  Constants.numberOfHeroesPerRequest
-                                  ..< self.heroes.count)
-                    .map { IndexPath(row: $0, section: 0) }
-                heroesTableView.tableView.beginUpdates()
-                heroesTableView.tableView.tableFooterView?.isHidden = true
-                heroesTableView.tableView.insertRows(at: indexPaths, with: .none)
-                heroesTableView.tableView.endUpdates()
-                loadingData = false
+                addHeroesToTableView()
             } catch {
                 print(error)
             }
         }
+    }
+    
+    private func addHeroesToTableView() {
+        let indexPaths = (self.heroes.count - Constants.numberOfHeroesPerRequest
+                          ..< self.heroes.count)
+            .map { IndexPath(row: $0, section: 0) }
+        heroesTableView.tableView.beginUpdates()
+        heroesTableView.tableView.tableFooterView?.isHidden = true
+        heroesTableView.tableView.insertRows(at: indexPaths, with: .none)
+        heroesTableView.tableView.endUpdates()
+        loadingData = false
     }
 }
 
@@ -54,18 +57,18 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
-                                                 for: indexPath)
+                                                 for: indexPath) as! HeroesTableViewCell
         
         if let imageData = self.heroes[indexPath.row].imageData {
-            cell.imageView?.image = UIImage(data: imageData)
+            cell.heroImage.image = UIImage(data: imageData)
         } else {
-            cell.imageView?.image = UIImage(named: "placeholder")
+            cell.heroImage.image = UIImage(named: "placeholder")
         }
-        cell.textLabel?.text = self.heroes[indexPath.row].name
+        cell.heroName.text = self.heroes[indexPath.row].name
         
         return cell
     }
-
+    
     func tableView(_ tableView: UITableView,
                    didSelectRowAt indexPath: IndexPath) {
         
