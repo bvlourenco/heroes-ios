@@ -29,6 +29,10 @@ class HeroViewController: UIViewController {
             heroView.heroDescriptionLabel.text = self.hero.description
         }
         
+        if let imageData = self.hero.imageData {
+            heroView.heroImageView.image = UIImage(data: imageData)
+        }
+        
         addCategory(categoryValues: self.hero.heroComics.values,
                     viewCategory: self.heroView.comicsView)
         

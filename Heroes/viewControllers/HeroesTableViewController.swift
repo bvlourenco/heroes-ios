@@ -89,11 +89,22 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
             
             heroesTableView.tableView.tableFooterView = spinner
             heroesTableView.tableView.tableFooterView?.isHidden = false
-            
-            fetchHeroes(offset: self.heroes.count)
         } else {
             heroesTableView.tableView.tableFooterView?.isHidden = true
             heroesTableView.tableView.tableFooterView = nil
+        }
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, 
+                                  willDecelerate decelerate: Bool) {
+
+        // UITableView only moves in one direction, y axis
+        let currentOffset = scrollView.contentOffset.y
+        let maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height
+
+        // 30.0 is the distance from bottom
+        if maximumOffset - currentOffset <= 30.0 {
+            fetchHeroes(offset: self.heroes.count)
         }
     }
 }
