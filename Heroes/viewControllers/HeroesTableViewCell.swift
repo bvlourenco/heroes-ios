@@ -28,8 +28,8 @@ class HeroesTableViewCell: UITableViewCell {
         NSLayoutConstraint.activate([
             heroImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
                                                constant: Constants.mediumPadding),
-            heroImage.widthAnchor.constraint(equalToConstant: Constants.tableViewImageHeight),
-            heroImage.heightAnchor.constraint(equalTo: heroImage.widthAnchor),
+            heroImage.heightAnchor.constraint(equalToConstant: Constants.tableViewImageHeight),
+            heroImage.widthAnchor.constraint(equalTo: heroImage.heightAnchor),
             heroImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             heroName.leadingAnchor.constraint(equalTo: heroImage.trailingAnchor,
                                               constant: Constants.smallPadding),

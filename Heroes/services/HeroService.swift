@@ -49,6 +49,47 @@ class HeroService {
         })
     }
     
+    func getHeroDetails(hero: Hero) async throws -> Hero {
+        // Task group
+        return try await withThrowingTaskGroup(of: (String, String, String?).self,
+                                        body: { group in
+            
+            addTasksToTaskGroup(heroCategory: hero.heroComics,
+                                categoryType: CategoryTypes.comics,
+                                group: &group)
+            
+            addTasksToTaskGroup(heroCategory: hero.heroStories,
+                                categoryType: CategoryTypes.stories,
+                                group: &group)
+            
+            addTasksToTaskGroup(heroCategory: hero.heroSeries,
+                                categoryType: CategoryTypes.series,
+                                group: &group)
+            
+            addTasksToTaskGroup(heroCategory: hero.heroEvents,
+                                categoryType: CategoryTypes.events,
+                                group: &group)
+            
+            var hero = hero
+            for try await (resourceURL, type, category) in group {
+                switch type {
+                case CategoryTypes.comics.rawValue:
+                    hero.heroComics[resourceURL]!.description = category
+                case CategoryTypes.stories.rawValue:
+                    hero.heroStories[resourceURL]!.description = category
+                case CategoryTypes.series.rawValue:
+                    hero.heroSeries[resourceURL]!.description = category
+                case CategoryTypes.events.rawValue:
+                    hero.heroEvents[resourceURL]!.description = category
+                default:
+                    break
+                }
+            }
+            
+            return hero
+        })
+    }
+    
     private func downloadImage(imageURL: String) async throws -> Data? {
         if imageURL.hasSuffix("image_not_available.jpg") {
             return nil
@@ -78,44 +119,6 @@ class HeroService {
                                             limit: nil,
                                             offset: nil)
         return try getCategoryDescriptionFromJson(data: data)
-    }
-    
-    private func getHeroDetails(hero: inout Hero) async throws {
-        // Task group
-        try await withThrowingTaskGroup(of: (String, String, String?).self,
-                                        body: { group in
-            
-            addTasksToTaskGroup(heroCategory: hero.heroComics,
-                                categoryType: CategoryTypes.comics,
-                                group: &group)
-            
-            addTasksToTaskGroup(heroCategory: hero.heroStories,
-                                categoryType: CategoryTypes.stories,
-                                group: &group)
-            
-            addTasksToTaskGroup(heroCategory: hero.heroSeries,
-                                categoryType: CategoryTypes.series,
-                                group: &group)
-            
-            addTasksToTaskGroup(heroCategory: hero.heroEvents,
-                                categoryType: CategoryTypes.events,
-                                group: &group)
-            
-            for try await (resourceURL, type, category) in group {
-                switch type {
-                case CategoryTypes.comics.rawValue:
-                    hero.heroComics[resourceURL]!.description = category
-                case CategoryTypes.stories.rawValue:
-                    hero.heroStories[resourceURL]!.description = category
-                case CategoryTypes.series.rawValue:
-                    hero.heroSeries[resourceURL]!.description = category
-                case CategoryTypes.events.rawValue:
-                    hero.heroEvents[resourceURL]!.description = category
-                default:
-                    break
-                }
-            }
-        })
     }
     
     private func addTasksToTaskGroup(heroCategory: [String:HeroCategoryDetails],

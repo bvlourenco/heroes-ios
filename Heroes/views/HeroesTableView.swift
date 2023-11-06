@@ -17,7 +17,7 @@ class HeroesTableView: UIView {
         spinner.startAnimating()
         spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0),
                                width: tableView.bounds.width,
-                               height: CGFloat(44))
+                               height: CGFloat(Constants.spinnerHeight))
         tableView.tableFooterView = spinner
         tableView.tableFooterView?.isHidden = true
         

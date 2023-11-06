@@ -74,7 +74,8 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let destination = HeroViewController(hero: self.heroes[indexPath.row])
+        let destination = HeroViewController(hero: self.heroes[indexPath.row],
+                                             service: heroService)
         navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -90,5 +91,10 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
             loadingData = true
             fetchHeroes(offset: self.heroes.count)
         }
+    }
+    
+    func tableView(_ tableView: UITableView, 
+                   heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return Constants.tableViewImageHeight
     }
 }

@@ -17,6 +17,16 @@ class CategoryViewComponent: UIView {
         return categoryLabel
     }()
     
+    private lazy var spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.startAnimating()
+        spinner.frame = CGRect(x: CGFloat(0),
+                               y: CGFloat(Constants.categoryTitleFontSize),
+                               width: UIScreen.main.bounds.width,
+                               height: CGFloat(Constants.spinnerHeight))
+        return spinner
+    }()
+    
     private var nameLabels: [UILabel] = []
     private var descriptionLabels: [UILabel] = []
     private var placeholderLabel: UILabel? = nil
@@ -25,6 +35,11 @@ class CategoryViewComponent: UIView {
         super.init(frame: frame)
         addBackgroundAndBordersToComponent()
         categoryLabel.text = categoryName
+        addSubview(spinner)
+        
+        self.heightAnchor.constraint(equalToConstant: categoryLabel.frame.size.height
+                                     + spinner.frame.size.height
+                                     + Constants.spinnerHeight).isActive = true
     }
     
     required init?(coder: NSCoder) {
@@ -32,13 +47,14 @@ class CategoryViewComponent: UIView {
     }
     
     func addCategoryNameAndDescription(name: String, description: String) {
+        spinner.removeFromSuperview()
         let nameLabel = getNewLabel(textLabel: "Name: " + name)
         let descriptionLabel = getNewLabel(textLabel: "Description: " + description)
         setupLabelConstraints(nameLabel: nameLabel,
                               descriptionLabel: descriptionLabel)
         
-        // Forcing the views to update layout to avoid case where current view
-        // is smaller than its elements together
+        // Forcing the name/description view to update layout to recompute
+        // view height
         nameLabel.layoutIfNeeded()
         descriptionLabel.layoutIfNeeded()
         
@@ -61,15 +77,14 @@ class CategoryViewComponent: UIView {
             }
         }
         
-        // Adding a special "bottom padding" in each view to add some space
-        // between two CategoryViewComponent.
-        totalHeight += Constants.mediumPadding
-        
-        self.heightAnchor.constraint(equalToConstant: totalHeight)
-            .isActive = true
+        // Updating height constraint
+        if let constraint = (self.constraints.filter{$0.firstAttribute == .height}.first) {
+            constraint.constant = totalHeight
+        }
     }
     
     func addPlaceholderView() {
+        spinner.removeFromSuperview()
         let categoryName = categoryLabel.text ?? ""
         let text = "No " + categoryName + " for this hero :("
         self.placeholderLabel = getNewLabel(textLabel: text)

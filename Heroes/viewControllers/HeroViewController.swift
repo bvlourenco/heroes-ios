@@ -9,12 +9,15 @@ import UIKit
 
 class HeroViewController: UIViewController {
     private let heroView: HeroView
-    private let hero: Hero
+    private let heroService: HeroService
+    private var hero: Hero
     
-    init(hero: Hero) {
+    init(hero: Hero, service: HeroService) {
         self.hero = hero
         self.heroView = HeroView()
+        self.heroService = service
         super.init(nibName: "HeroViewController", bundle: Bundle.main)
+        getCategoriesDescriptions()
     }
     
     required init?(coder: NSCoder) {
@@ -32,18 +35,27 @@ class HeroViewController: UIViewController {
         if let imageData = self.hero.imageData {
             heroView.heroImageView.image = UIImage(data: imageData)
         }
-        
-        addCategory(categoryValues: self.hero.heroComics.values,
-                    viewCategory: self.heroView.comicsView)
-        
-        addCategory(categoryValues: self.hero.heroEvents.values,
-                    viewCategory: self.heroView.eventsView)
-        
-        addCategory(categoryValues: self.hero.heroSeries.values,
-                    viewCategory: self.heroView.seriesView)
-        
-        addCategory(categoryValues: self.hero.heroStories.values,
-                    viewCategory: self.heroView.storiesView)
+    }
+    
+    private func getCategoriesDescriptions() {
+        Task {
+            do {
+                self.hero = try await heroService.getHeroDetails(hero: self.hero)
+                addCategory(categoryValues: self.hero.heroComics.values,
+                            viewCategory: self.heroView.comicsView)
+                
+                addCategory(categoryValues: self.hero.heroEvents.values,
+                            viewCategory: self.heroView.eventsView)
+                
+                addCategory(categoryValues: self.hero.heroSeries.values,
+                            viewCategory: self.heroView.seriesView)
+                
+                addCategory(categoryValues: self.hero.heroStories.values,
+                            viewCategory: self.heroView.storiesView)
+            } catch {
+                print(error)
+            }
+        }
     }
     
     private func addCategory(categoryValues: Dictionary<String,

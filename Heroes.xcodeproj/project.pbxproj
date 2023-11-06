@@ -18,9 +18,20 @@
 		D93F4FBB2AE7FB5900610761 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93F4FBA2AE7FB5900610761 /* Constants.swift */; };
 		D940FDDC2AEABED0008424B3 /* HeroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D940FDDB2AEABED0008424B3 /* HeroViewController.swift */; };
 		D940FDDE2AEABF73008424B3 /* HeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D940FDDD2AEABF73008424B3 /* HeroView.swift */; };
+		D9BA0F082AF90189003D7DCC /* HeroesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BA0F072AF90189003D7DCC /* HeroesTests.swift */; };
 		D9DF20492AEBDB6F00B81F12 /* CategoryViewComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DF20482AEBDB6F00B81F12 /* CategoryViewComponent.swift */; };
 		D9DFF5012AE950EA002E7B6A /* HeroesTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DFF5002AE950EA002E7B6A /* HeroesTableView.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D9BA0F092AF90189003D7DCC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D93F4F922AE7BEDB00610761 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D93F4F992AE7BEDB00610761;
+			remoteInfo = Heroes;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		D935E07F2AF56658006F0D61 /* HeroesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTableViewCell.swift; sourceTree = "<group>"; };
@@ -36,12 +47,21 @@
 		D93F4FBA2AE7FB5900610761 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D940FDDB2AEABED0008424B3 /* HeroViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroViewController.swift; sourceTree = "<group>"; };
 		D940FDDD2AEABF73008424B3 /* HeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroView.swift; sourceTree = "<group>"; };
+		D9BA0F052AF90189003D7DCC /* HeroesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeroesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9BA0F072AF90189003D7DCC /* HeroesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTests.swift; sourceTree = "<group>"; };
 		D9DF20482AEBDB6F00B81F12 /* CategoryViewComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewComponent.swift; sourceTree = "<group>"; };
 		D9DFF5002AE950EA002E7B6A /* HeroesTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTableView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		D93F4F972AE7BEDB00610761 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9BA0F022AF90189003D7DCC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -55,6 +75,7 @@
 			isa = PBXGroup;
 			children = (
 				D93F4F9C2AE7BEDB00610761 /* Heroes */,
+				D9BA0F062AF90189003D7DCC /* HeroesTests */,
 				D93F4F9B2AE7BEDB00610761 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				D93F4F9A2AE7BEDB00610761 /* Heroes.app */,
+				D9BA0F052AF90189003D7DCC /* HeroesTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -107,6 +129,14 @@
 				D93F4FBA2AE7FB5900610761 /* Constants.swift */,
 			);
 			path = utils;
+			sourceTree = "<group>";
+		};
+		D9BA0F062AF90189003D7DCC /* HeroesTests */ = {
+			isa = PBXGroup;
+			children = (
+				D9BA0F072AF90189003D7DCC /* HeroesTests.swift */,
+			);
+			path = HeroesTests;
 			sourceTree = "<group>";
 		};
 		D9DF204A2AEC02FD00B81F12 /* components */ = {
@@ -156,6 +186,24 @@
 			productReference = D93F4F9A2AE7BEDB00610761 /* Heroes.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D9BA0F042AF90189003D7DCC /* HeroesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D9BA0F0B2AF90189003D7DCC /* Build configuration list for PBXNativeTarget "HeroesTests" */;
+			buildPhases = (
+				D9BA0F012AF90189003D7DCC /* Sources */,
+				D9BA0F022AF90189003D7DCC /* Frameworks */,
+				D9BA0F032AF90189003D7DCC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D9BA0F0A2AF90189003D7DCC /* PBXTargetDependency */,
+			);
+			name = HeroesTests;
+			productName = HeroesTests;
+			productReference = D9BA0F052AF90189003D7DCC /* HeroesTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -168,6 +216,10 @@
 				TargetAttributes = {
 					D93F4F992AE7BEDB00610761 = {
 						CreatedOnToolsVersion = 15.0.1;
+					};
+					D9BA0F042AF90189003D7DCC = {
+						CreatedOnToolsVersion = 15.0.1;
+						TestTargetID = D93F4F992AE7BEDB00610761;
 					};
 				};
 			};
@@ -185,6 +237,7 @@
 			projectRoot = "";
 			targets = (
 				D93F4F992AE7BEDB00610761 /* Heroes */,
+				D9BA0F042AF90189003D7DCC /* HeroesTests */,
 			);
 		};
 /* End PBXProject section */
@@ -196,6 +249,13 @@
 			files = (
 				D93F4FAA2AE7BEDD00610761 /* LaunchScreen.storyboard in Resources */,
 				D93F4FA72AE7BEDD00610761 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9BA0F032AF90189003D7DCC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,7 +280,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D9BA0F012AF90189003D7DCC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D9BA0F082AF90189003D7DCC /* HeroesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D9BA0F0A2AF90189003D7DCC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D93F4F992AE7BEDB00610761 /* Heroes */;
+			targetProxy = D9BA0F092AF90189003D7DCC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		D93F4FA82AE7BEDD00610761 /* LaunchScreen.storyboard */ = {
@@ -407,6 +483,42 @@
 			};
 			name = Release;
 		};
+		D9BA0F0C2AF90189003D7DCC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4KHU274RHC;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = farfetch.HeroesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Heroes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Heroes";
+			};
+			name = Debug;
+		};
+		D9BA0F0D2AF90189003D7DCC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4KHU274RHC;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = farfetch.HeroesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Heroes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Heroes";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -424,6 +536,15 @@
 			buildConfigurations = (
 				D93F4FAF2AE7BEDD00610761 /* Debug */,
 				D93F4FB02AE7BEDD00610761 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D9BA0F0B2AF90189003D7DCC /* Build configuration list for PBXNativeTarget "HeroesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D9BA0F0C2AF90189003D7DCC /* Debug */,
+				D9BA0F0D2AF90189003D7DCC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
