@@ -17,7 +17,7 @@ enum CategoryTypes: String {
     case comics, stories, series, events
 }
 
-class HeroService {
+class HeroService: HeroServiceProtocol {
     private let decoder = JSONDecoder()
     
     func getHeroes(offset: Int) async throws -> [Hero] {

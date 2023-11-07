@@ -9,10 +9,10 @@ import UIKit
 
 class HeroViewController: UIViewController {
     private let heroView: HeroView
-    private let heroService: HeroService
+    private let heroService: HeroServiceProtocol
     private var hero: Hero
     
-    init(hero: Hero, service: HeroService) {
+    init(hero: Hero, service: HeroServiceProtocol) {
         self.hero = hero
         self.heroView = HeroView()
         self.heroService = service

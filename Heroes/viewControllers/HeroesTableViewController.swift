@@ -9,9 +9,18 @@ import UIKit
 
 class HeroesTableViewController: UIViewController {
     private var heroes: [Hero] = []
-    private let heroService = HeroService()
     private var loadingData = false
     private lazy var heroesTableView = HeroesTableView()
+    private let heroService: HeroServiceProtocol
+    
+    init(heroService: HeroServiceProtocol = HeroService()) {
+        self.heroService = heroService
+        super.init(nibName: "HeroesTableViewController", bundle: Bundle.main)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         heroesTableView.tableView.delegate = self
@@ -37,9 +46,12 @@ class HeroesTableViewController: UIViewController {
     }
     
     private func addHeroesToTableView() {
-        let indexPaths = (self.heroes.count - Constants.numberOfHeroesPerRequest
-                          ..< self.heroes.count)
-            .map { IndexPath(row: $0, section: 0) }
+        var beginIndex = 0
+        if self.heroes.count >= Constants.numberOfHeroesPerRequest {
+            beginIndex = self.heroes.count - Constants.numberOfHeroesPerRequest
+        }
+        let indexPaths = (beginIndex..<self.heroes.count)
+                         .map { IndexPath(row: $0, section: 0) }
         heroesTableView.tableView.beginUpdates()
         heroesTableView.tableView.tableFooterView?.isHidden = true
         heroesTableView.tableView.insertRows(at: indexPaths, with: .none)
@@ -56,6 +68,11 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        if indexPath.row >= self.heroes.count {
+            return UITableViewCell()
+        }
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
                                                  for: indexPath) as! HeroesTableViewCell
         
@@ -72,6 +89,10 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView,
                    didSelectRowAt indexPath: IndexPath) {
         
+        if indexPath.row >= self.heroes.count {
+            return
+        }
+        
         tableView.deselectRow(at: indexPath, animated: true)
         
         let destination = HeroViewController(hero: self.heroes[indexPath.row],
@@ -83,10 +104,16 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView,
                    willDisplay cell: UITableViewCell,
                    forRowAt indexPath: IndexPath) {
+        
+        if self.heroes.count < Constants.numberOfHeroesPerRequest {
+            return
+        }
+        
         let lastRowIndex = tableView.numberOfRows(inSection: 0) - 1
         let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
         let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
-        if loadingData == false && indexPath.row >= rowIndexLoadMoreHeroes {
+        if loadingData == false
+            && indexPath.row >= rowIndexLoadMoreHeroes {
             heroesTableView.tableView.tableFooterView?.isHidden = false
             loadingData = true
             fetchHeroes(offset: self.heroes.count)
@@ -95,6 +122,11 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView, 
                    heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+        if indexPath.row >= self.heroes.count {
+            return 0
+        }
+        
         return Constants.tableViewImageHeight
     }
 }

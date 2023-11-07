@@ -18,7 +18,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        let viewController = HeroesTableViewController()
+        let viewController: HeroesTableViewController
+        if ProcessInfo.processInfo.arguments.contains("UITestingEnabled") {
+            viewController = HeroesTableViewController(heroService: HeroFakeServiceProtocol())
+        } else {
+            viewController = HeroesTableViewController()
+        }
         let navigationController = UINavigationController(rootViewController:
                                                           viewController)
         window.rootViewController = navigationController
