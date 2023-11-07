@@ -8,12 +8,11 @@
 import UIKit
 
 class HeroesTableViewController: UIViewController {
-    private let heroesTableViewModel = HeroesTableViewModel()
+    private let heroesTableViewModel: HeroesViewModel
     private lazy var heroesTableView = HeroesTableView()
-    private let heroService: HeroServiceProtocol
     
     init(heroService: HeroServiceProtocol = HeroService()) {
-        self.heroService = heroService
+        self.heroesTableViewModel = HeroesViewModel(heroService: heroService)
         super.init(nibName: "HeroesTableViewController", bundle: Bundle.main)
     }
     
@@ -41,7 +40,7 @@ class HeroesTableViewController: UIViewController {
         heroesTableView.tableView.tableFooterView?.isHidden = true
         heroesTableView.tableView.insertRows(at: indexPaths, with: .none)
         heroesTableView.tableView.endUpdates()
-        heroesTableViewModel.loadingData = false
+        heroesTableViewModel.changeLoadingDataStatus(status: false)
     }
 }
 
@@ -61,13 +60,14 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
                                                  for: indexPath) as! HeroesTableViewCell
+        let hero = heroesTableViewModel.getHeroAtIndex(index: indexPath.row)
         
-        if let imageData = heroesTableViewModel.heroes[indexPath.row].imageData {
+        if let imageData = hero.imageData {
             cell.heroImage.image = UIImage(data: imageData)
         } else {
             cell.heroImage.image = UIImage(named: "placeholder")
         }
-        cell.heroName.text = heroesTableViewModel.heroes[indexPath.row].name
+        cell.heroName.text = hero.name
         
         return cell
     }
@@ -82,10 +82,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let heroSelected = heroesTableViewModel.getHero(index: indexPath.row)
-        let destination = HeroViewController(hero: heroSelected,
-                                             service: heroService,
-                                             heroIndex: indexPath.row,
+        let destination = HeroViewController(heroIndex: indexPath.row,
                                              heroViewModel: heroesTableViewModel)
         navigationController?.pushViewController(destination, animated: true)
     }
@@ -103,10 +100,10 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         let lastRowIndex = tableView.numberOfRows(inSection: 0) - 1
         let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
         let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
-        if heroesTableViewModel.loadingData == false
+        if heroesTableViewModel.isLoadingData() == false
             && indexPath.row >= rowIndexLoadMoreHeroes {
             heroesTableView.tableView.tableFooterView?.isHidden = false
-            heroesTableViewModel.loadingData = true
+            heroesTableViewModel.changeLoadingDataStatus(status: true)
             heroesTableViewModel.fetchHeroes(addHeroesToTableView: addHeroesToTableView)
         }
     }

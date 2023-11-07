@@ -9,18 +9,15 @@ import UIKit
 
 class HeroViewController: UIViewController {
     private let heroView: HeroView
-    private let heroService: HeroServiceProtocol
     private var hero: Hero
-    private let heroViewModel: HeroesTableViewModel
+    private let heroViewModel: HeroesViewModel
     private let heroIndex: Int
     
-    init(hero: Hero, service: HeroServiceProtocol, 
-         heroIndex: Int, heroViewModel: HeroesTableViewModel) {
-        self.hero = hero
+    init(heroIndex: Int, heroViewModel: HeroesViewModel) {
+        self.hero = heroViewModel.getHeroAtIndex(index: heroIndex)
         self.heroIndex = heroIndex
         self.heroView = HeroView()
         self.heroViewModel = heroViewModel
-        self.heroService = service
         super.init(nibName: "HeroViewController", bundle: Bundle.main)
         getCategoriesDescriptions()
     }
@@ -44,15 +41,8 @@ class HeroViewController: UIViewController {
     
     private func getCategoriesDescriptions() {
         Task {
-            if self.hero.descriptionsLoaded == false {
-                do {
-                    self.hero = try await heroService.getHeroDetails(hero: self.hero)
-                    self.hero.descriptionsLoaded = true
-                    heroViewModel.setHero(index: self.heroIndex, hero: self.hero)
-                } catch {
-                    print(error)
-                }
-            }
+            self.hero = await heroViewModel.getDescriptions(heroIndex: heroIndex)
+            
             addCategory(categoryValues: self.hero.heroComics.values,
                         viewCategory: self.heroView.comicsView)
             
