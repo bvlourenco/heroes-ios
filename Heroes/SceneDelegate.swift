@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         let viewController: HeroesTableViewController
         if ProcessInfo.processInfo.arguments.contains("UITestingEnabled") {
-            viewController = HeroesTableViewController(heroService: HeroFakeServiceProtocol())
+            viewController = HeroesTableViewController(heroService: HeroFakeService())
         } else {
             viewController = HeroesTableViewController()
         }

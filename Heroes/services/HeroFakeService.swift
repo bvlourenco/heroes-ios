@@ -46,7 +46,25 @@ struct TestConstants {
     static let storyDescription = "story description"
 }
 
-class HeroFakeServiceProtocol: HeroServiceProtocol {
+enum HeroOptions {
+    case emptyArray
+    case error
+    case fetchHeroes
+}
+
+class HeroFakeService: HeroServiceProtocol {
+    
+    func simulateGetHeroesWithOption(offset: Int, 
+                                     option: HeroOptions) async throws -> [Hero] {
+        switch option {
+        case .emptyArray:
+            return []
+        case .error:
+            throw NetworkError.internalError
+        case .fetchHeroes:
+            return try await getHeroes(offset: offset)
+        }
+    }
     
     func getHeroes(offset: Int) async throws -> [Hero] {
         var heroes: [Hero] = []

@@ -9,19 +9,24 @@ import XCTest
 @testable import Heroes
 
 final class HeroesTests: XCTestCase {
+    var heroService: HeroFakeService?
     var heroesViewModel: HeroesViewModel?
     var expectation: XCTestExpectation?
     
     override func setUpWithError() throws {
         try super.setUpWithError()
-        let heroService = HeroFakeServiceProtocol()
-        heroesViewModel = HeroesViewModel(heroService: heroService)
+        heroService = HeroFakeService()
+        if let heroService = heroService {
+            heroesViewModel = HeroesViewModel(heroService: heroService)
+        }
         
         expectation = XCTestExpectation(description: "Fetch Heroes")
     }
 
     override func tearDownWithError() throws {
+        heroService = nil
         heroesViewModel = nil
+        expectation = nil
         try super.tearDownWithError()
     }
     
@@ -148,6 +153,27 @@ final class HeroesTests: XCTestCase {
             await fulfillment(of: [expectation], timeout: 10)
             
             XCTAssertEqual(heroesViewModel.numberOfHeroes(), 40)
+        }
+    }
+    
+    func testFetch0Heroes() async throws {
+        if let heroService = heroService {
+            let heroes = try await heroService.simulateGetHeroesWithOption(
+                offset: 0, option: HeroOptions.emptyArray)
+            
+            XCTAssertEqual(heroes.count, 0)
+        }
+    }
+    
+    func testFetchHeroesWithError() async throws {
+        if let heroService = heroService {
+            do {
+                let _ = try await heroService.simulateGetHeroesWithOption(
+                    offset: 0, option: HeroOptions.error)
+                XCTFail("No error was thrown.")
+            } catch {
+                XCTAssertEqual(error as! NetworkError, NetworkError.internalError)
+            }
         }
     }
 }
