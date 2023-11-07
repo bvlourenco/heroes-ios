@@ -49,6 +49,8 @@ struct TestConstants {
 class HeroFakeServiceProtocol: HeroServiceProtocol {
     
     func getHeroes(offset: Int) async throws -> [Hero] {
+        var heroes: [Hero] = []
+        
         let hero1Comics = ["comic": HeroCategoryDetails(name: TestConstants.comic1Name)]
         let hero2Comics = ["comic": HeroCategoryDetails(name: TestConstants.comic2Name)]
         let hero3Comics = ["comic": HeroCategoryDetails(name: TestConstants.comic3Name)]
@@ -65,63 +67,70 @@ class HeroFakeServiceProtocol: HeroServiceProtocol {
         let hero2Stories = ["story": HeroCategoryDetails(name: TestConstants.story2Name)]
         let hero3Stories = ["story": HeroCategoryDetails(name: TestConstants.story3Name)]
         
-        return [
-            Hero(name: TestConstants.hero1Name,
-                 description: TestConstants.hero1Description,
-                 imageURL: TestConstants.image1URL,
-                 heroComics: hero1Comics,
-                 heroEvents: hero1Events,
-                 heroStories: hero1Series,
-                 heroSeries: hero1Stories),
-            Hero(name: TestConstants.hero2Name,
-                 description: TestConstants.hero2Description,
-                 imageURL: TestConstants.image2URL,
-                 heroComics: hero2Comics,
-                 heroEvents: hero2Events,
-                 heroStories: hero2Series,
-                 heroSeries: hero2Stories),
-            Hero(name: TestConstants.hero3Name,
-                 description: TestConstants.hero3Description,
-                 imageURL: TestConstants.image3URL,
-                 heroComics: hero3Comics,
-                 heroEvents: hero3Events,
-                 heroStories: hero3Series,
-                 heroSeries: hero3Stories)
-        ]
+        var hero: Hero
+        for i in 0...19 {
+            if i % 3 == 0 {
+                hero = Hero(name: TestConstants.hero1Name,
+                            description: TestConstants.hero1Description,
+                            imageURL: TestConstants.image1URL,
+                            heroComics: hero1Comics,
+                            heroEvents: hero1Events,
+                            heroStories: hero1Stories,
+                            heroSeries: hero1Series)
+            } else if i % 3 == 1 {
+                hero = Hero(name: TestConstants.hero2Name,
+                            description: TestConstants.hero2Description,
+                            imageURL: TestConstants.image2URL,
+                            heroComics: hero2Comics,
+                            heroEvents: hero2Events,
+                            heroStories: hero2Stories,
+                            heroSeries: hero2Series)
+            } else {
+                hero = Hero(name: TestConstants.hero3Name,
+                            description: TestConstants.hero3Description,
+                            imageURL: TestConstants.image3URL,
+                            heroComics: hero3Comics,
+                            heroEvents: hero3Events,
+                            heroStories: hero3Stories,
+                            heroSeries: hero3Series)
+            }
+            heroes.append(hero)
+        }
+        return heroes
     }
     
     func downloadImages(heroes: [Hero]) async throws -> [Hero] {
         let placeholderImage = UIImage(named: "placeholder")!
         let imageData = placeholderImage.pngData()
         
+        var heroesWithImages: [Hero] = []
         for var hero in heroes {
             hero.imageData = imageData
+            heroesWithImages.append(hero)
         }
         
-        return heroes
+        return heroesWithImages
     }
     
     func getHeroDetails(hero: Hero) async throws -> Hero {
         
-        setCategoryDescription(categoryValues: hero.heroComics.values,
-                               description: TestConstants.comicDescription)
+        var hero = hero
+        for var (key, _) in hero.heroComics {
+            hero.heroComics[key]?.description = TestConstants.comicDescription
+        }
         
-        setCategoryDescription(categoryValues: hero.heroEvents.values,
-                               description: TestConstants.eventDescription)
+        for var (key, _) in hero.heroEvents {
+            hero.heroEvents[key]?.description = TestConstants.eventDescription
+        }
         
-        setCategoryDescription(categoryValues: hero.heroSeries.values,
-                               description: TestConstants.seriesDescription)
+        for var (key, _) in hero.heroSeries {
+            hero.heroSeries[key]?.description = TestConstants.seriesDescription
+        }
         
-        setCategoryDescription(categoryValues: hero.heroStories.values,
-                               description: TestConstants.storyDescription)
+        for var (key, _) in hero.heroStories {
+            hero.heroStories[key]?.description = TestConstants.storyDescription
+        }
         
         return hero
-    }
-    
-    private func setCategoryDescription(categoryValues: Dictionary<String, HeroCategoryDetails>.Values,
-                                        description: String) {
-        for var category in categoryValues {
-            category.description = description
-        }
     }
 }
