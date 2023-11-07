@@ -21,6 +21,7 @@ struct Hero: Decodable {
     let description: String
     let imageURL: String
     var imageData: Data?
+    var descriptionsLoaded: Bool = false
     var heroComics: [String: HeroCategoryDetails]
     var heroEvents: [String: HeroCategoryDetails]
     var heroStories: [String: HeroCategoryDetails]

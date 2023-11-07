@@ -37,4 +37,8 @@ class HeroesTableViewModel {
     func getHero(index: Int) -> Hero {
         return self.heroes[index]
     }
+    
+    func setHero(index: Int, hero: Hero) {
+        self.heroes[index] = hero
+    }
 }

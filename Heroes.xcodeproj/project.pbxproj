@@ -119,10 +119,10 @@
 		D93F4F9C2AE7BEDB00610761 /* Heroes */ = {
 			isa = PBXGroup;
 			children = (
-				D95AD9362AFA54CE00A34996 /* viewModels */,
 				D9DF204A2AEC02FD00B81F12 /* components */,
 				D9DFF5032AE952C5002E7B6A /* viewControllers */,
 				D9DFF5022AE952B2002E7B6A /* views */,
+				D95AD9362AFA54CE00A34996 /* viewModels */,
 				D93F4FB92AE7FB4800610761 /* utils */,
 				D93F4FB22AE7E0FC00610761 /* services */,
 				D93F4FB12AE7E0EE00610761 /* models */,

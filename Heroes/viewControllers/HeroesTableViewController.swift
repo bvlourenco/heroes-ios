@@ -84,7 +84,9 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         
         let heroSelected = heroesTableViewModel.getHero(index: indexPath.row)
         let destination = HeroViewController(hero: heroSelected,
-                                             service: heroService)
+                                             service: heroService,
+                                             heroIndex: indexPath.row,
+                                             heroViewModel: heroesTableViewModel)
         navigationController?.pushViewController(destination, animated: true)
     }
     
