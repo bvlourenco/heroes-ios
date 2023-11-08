@@ -133,19 +133,19 @@ class HeroFakeService: HeroServiceProtocol {
     func getHeroDetails(hero: Hero) async throws -> Hero {
         
         var hero = hero
-        for var (key, _) in hero.heroComics {
+        for (key, _) in hero.heroComics {
             hero.heroComics[key]?.description = TestConstants.comicDescription
         }
         
-        for var (key, _) in hero.heroEvents {
+        for (key, _) in hero.heroEvents {
             hero.heroEvents[key]?.description = TestConstants.eventDescription
         }
         
-        for var (key, _) in hero.heroSeries {
+        for (key, _) in hero.heroSeries {
             hero.heroSeries[key]?.description = TestConstants.seriesDescription
         }
         
-        for var (key, _) in hero.heroStories {
+        for (key, _) in hero.heroStories {
             hero.heroStories[key]?.description = TestConstants.storyDescription
         }
         

@@ -37,23 +37,35 @@ class HeroViewController: UIViewController {
         if let imageData = self.hero.imageData {
             heroView.heroImageView.image = UIImage(data: imageData)
         }
+        
+        addCategory(categoryValues: self.hero.heroComics.values,
+                    viewCategory: self.heroView.comicsView)
+        
+        addCategory(categoryValues: self.hero.heroEvents.values,
+                    viewCategory: self.heroView.eventsView)
+        
+        addCategory(categoryValues: self.hero.heroSeries.values,
+                    viewCategory: self.heroView.seriesView)
+        
+        addCategory(categoryValues: self.hero.heroStories.values,
+                    viewCategory: self.heroView.storiesView)
     }
     
     private func getCategoriesDescriptions() {
         Task {
             self.hero = await heroViewModel.getDescriptions(heroIndex: heroIndex)
             
-            addCategory(categoryValues: self.hero.heroComics.values,
-                        viewCategory: self.heroView.comicsView)
+            updateDescriptionInView(categoryValues: self.hero.heroComics.values,
+                                    viewCategory: self.heroView.comicsView)
             
-            addCategory(categoryValues: self.hero.heroEvents.values,
-                        viewCategory: self.heroView.eventsView)
+            updateDescriptionInView(categoryValues: self.hero.heroEvents.values,
+                                    viewCategory: self.heroView.eventsView)
             
-            addCategory(categoryValues: self.hero.heroSeries.values,
-                        viewCategory: self.heroView.seriesView)
+            updateDescriptionInView(categoryValues: self.hero.heroSeries.values,
+                                    viewCategory: self.heroView.seriesView)
             
-            addCategory(categoryValues: self.hero.heroStories.values,
-                        viewCategory: self.heroView.storiesView)
+            updateDescriptionInView(categoryValues: self.hero.heroStories.values,
+                                    viewCategory: self.heroView.storiesView)
         }
     }
     
@@ -64,11 +76,23 @@ class HeroViewController: UIViewController {
             viewCategory.addPlaceholderView()
         } else {
             for category in categoryValues {
-                let description = category.description ?? "No description :("
+                let description = "Loading..."
                 viewCategory.addCategoryNameAndDescription(name: category.name,
                                                            description: description)
             }
         }
         viewCategory.setViewIntrinsicHeight()
+    }
+    
+    private func updateDescriptionInView(categoryValues: Dictionary<String,
+                                         HeroCategoryDetails>.Values,
+                                         viewCategory: CategoryViewComponent) {
+        for (index, category) in categoryValues.enumerated() {
+            var description = category.description ?? "No description :("
+            if description == "" {
+                description = "No description :("
+            }
+            viewCategory.updateDescription(atIndex: index, description: description)
+        }
     }
 }

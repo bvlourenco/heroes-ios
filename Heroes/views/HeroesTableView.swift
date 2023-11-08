@@ -19,14 +19,14 @@ class HeroesTableView: UIView {
                                width: tableView.bounds.width,
                                height: CGFloat(Constants.spinnerHeight))
         tableView.tableFooterView = spinner
-        tableView.tableFooterView?.isHidden = true
+        tableView.tableFooterView?.isHidden = false
         
         return tableView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.addSubview(tableView)
+        addSubview(tableView)
         setupConstraints()
     }
     

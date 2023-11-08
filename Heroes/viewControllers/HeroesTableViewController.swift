@@ -8,24 +8,21 @@
 import UIKit
 
 class HeroesTableViewController: UIViewController {
-    private let heroesViewModel: HeroesViewModel
+    let heroesViewModel: HeroesViewModel
     private lazy var heroesTableView = HeroesTableView()
     
     init(heroService: HeroServiceProtocol = HeroService()) {
         self.heroesViewModel = HeroesViewModel(heroService: heroService)
         super.init(nibName: "HeroesTableViewController", bundle: Bundle.main)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func loadView() {
         heroesTableView.tableView.delegate = self
         heroesTableView.tableView.dataSource = self
         view = heroesTableView
         navigationItem.title = "All heroes"
         heroesViewModel.fetchHeroes(addHeroesToTableView: addHeroesToTableView)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func addHeroesToTableView() {
