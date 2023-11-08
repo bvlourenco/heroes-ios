@@ -26,17 +26,7 @@ class HeroesTableViewController: UIViewController {
     }
     
     private func addHeroesToTableView() {
-        var beginIndex = 0
-        let numberOfHeroes = heroesViewModel.numberOfHeroes()
-        if numberOfHeroes >= Constants.numberOfHeroesPerRequest {
-            beginIndex = numberOfHeroes - Constants.numberOfHeroesPerRequest
-        }
-        let indexPaths = (beginIndex..<numberOfHeroes)
-                         .map { IndexPath(row: $0, section: 0) }
-        heroesTableView.tableView.beginUpdates()
-        heroesTableView.tableView.tableFooterView?.isHidden = true
-        heroesTableView.tableView.insertRows(at: indexPaths, with: .none)
-        heroesTableView.tableView.endUpdates()
+        heroesTableView.tableView.reloadData()
         heroesViewModel.changeLoadingDataStatus(status: false)
     }
 }

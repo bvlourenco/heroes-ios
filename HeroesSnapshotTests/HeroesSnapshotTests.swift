@@ -31,7 +31,7 @@ final class HeroesSnapshotTests: XCTestCase {
     
     func testHeroesTableViewController() {
         if let navigationController = navigationController {
-            assertSnapshot(matching: navigationController, as: .image)
+            assertSnapshot(matching: navigationController, as: .wait(for: 5, on: .image))
         } else {
             XCTFail("Navigation controller was not initialized")
         }
@@ -42,9 +42,10 @@ final class HeroesSnapshotTests: XCTestCase {
            let heroesTableViewController = heroesTableViewController {
             let destination = HeroViewController(heroIndex: 0,
                                                  heroViewModel: heroesTableViewController.heroesViewModel)
-            navigationController.pushViewController(destination, animated: false)
+            destination.loadView()
+            navigationController.pushViewController(destination, animated: true)
             
-            assertSnapshot(matching: navigationController, as: .image)
+            assertSnapshot(matching: navigationController, as: .wait(for: 5, on: .image))
         } else {
             XCTFail("Navigation controller and/or heroes table view controller"
                     + "was not initialized")
