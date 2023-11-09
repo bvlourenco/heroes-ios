@@ -17,9 +17,11 @@ struct TestConstants {
     static let hero2Description = "description 2"
     static let hero3Description = "description 3"
     
-    static let image1URL = "url 1"
-    static let image2URL = "url 2"
-    static let image3URL = "url 3"
+    static let image1Path = "url 1"
+    static let image2Path = "url 2"
+    static let image3Path = "url 3"
+    
+    static let imageExtension = ".png"
     
     static let comic1Name = "comic 1 name"
     static let comic2Name = "comic 2 name"
@@ -54,7 +56,8 @@ enum HeroOptions {
 
 class HeroFakeService: HeroServiceProtocol {
     
-    func simulateGetHeroesWithOption(offset: Int, 
+    func simulateGetHeroesWithOption(offset: Int,
+                                     numberOfHeroesPerRequest: Int,
                                      option: HeroOptions) async throws -> [Hero] {
         switch option {
         case .emptyArray:
@@ -62,55 +65,92 @@ class HeroFakeService: HeroServiceProtocol {
         case .error:
             throw NetworkError.internalError
         case .fetchHeroes:
-            return try await getHeroes(offset: offset)
+            return try await getHeroes(offset: offset,
+                                       numberOfHeroesPerRequest: numberOfHeroesPerRequest)
         }
     }
     
-    func getHeroes(offset: Int) async throws -> [Hero] {
+    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async throws -> [Hero] {
         var heroes: [Hero] = []
         
-        let hero1Comics = ["comic": HeroCategoryDetails(name: TestConstants.comic1Name)]
-        let hero2Comics = ["comic": HeroCategoryDetails(name: TestConstants.comic2Name)]
-        let hero3Comics = ["comic": HeroCategoryDetails(name: TestConstants.comic3Name)]
+        let hero1Thumbnail = HeroThumbnail(path: TestConstants.image1Path,
+                                           extension: TestConstants.imageExtension)
+        let hero2Thumbnail = HeroThumbnail(path: TestConstants.image2Path,
+                                           extension: TestConstants.imageExtension)
+        let hero3Thumbnail = HeroThumbnail(path: TestConstants.image3Path,
+                                           extension: TestConstants.imageExtension)
         
-        let hero1Events = ["event": HeroCategoryDetails(name: TestConstants.event1Name)]
-        let hero2Events = ["event": HeroCategoryDetails(name: TestConstants.event2Name)]
-        let hero3Events = ["event": HeroCategoryDetails(name: TestConstants.event3Name)]
+        let hero1ComicItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.comic1Name)]
+        let hero2ComicItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.comic2Name)]
+        let hero3ComicItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.comic3Name)]
         
-        let hero1Series = ["series": HeroCategoryDetails(name: TestConstants.series1Name)]
-        let hero2Series = ["series": HeroCategoryDetails(name: TestConstants.series2Name)]
-        let hero3Series = ["series": HeroCategoryDetails(name: TestConstants.series3Name)]
+        let hero1EventItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.event1Name)]
+        let hero2EventItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.event2Name)]
+        let hero3EventItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.event3Name)]
         
-        let hero1Stories = ["story": HeroCategoryDetails(name: TestConstants.story1Name)]
-        let hero2Stories = ["story": HeroCategoryDetails(name: TestConstants.story2Name)]
-        let hero3Stories = ["story": HeroCategoryDetails(name: TestConstants.story3Name)]
+        let hero1SeriesItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.series1Name)]
+        let hero2SeriesItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.series2Name)]
+        let hero3SeriesItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.series3Name)]
         
+        let hero1StoryItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.story1Name)]
+        let hero2StoryItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.story2Name)]
+        let hero3StoryItems = [HeroCategory.Item(resourceURI: "",
+                                                 name: TestConstants.story3Name)]
+        
+        let hero1Comics = HeroCategory(items: hero1ComicItems)
+        let hero2Comics = HeroCategory(items: hero2ComicItems)
+        let hero3Comics = HeroCategory(items: hero3ComicItems)
+        
+        let hero1Events = HeroCategory(items: hero1EventItems)
+        let hero2Events = HeroCategory(items: hero2EventItems)
+        let hero3Events = HeroCategory(items: hero3EventItems)
+        
+        let hero1Series = HeroCategory(items: hero1SeriesItems)
+        let hero2Series = HeroCategory(items: hero2SeriesItems)
+        let hero3Series = HeroCategory(items: hero3SeriesItems)
+        
+        let hero1Stories = HeroCategory(items: hero1StoryItems)
+        let hero2Stories = HeroCategory(items: hero2StoryItems)
+        let hero3Stories = HeroCategory(items: hero3StoryItems)
+
         var hero: Hero
+        // TODO: Refactor this to allow me to choose the number of heroes!
         for i in 0...19 {
             if i % 3 == 0 {
                 hero = Hero(name: TestConstants.hero1Name,
                             description: TestConstants.hero1Description,
-                            imageURL: TestConstants.image1URL,
-                            heroComics: hero1Comics,
-                            heroEvents: hero1Events,
-                            heroStories: hero1Stories,
-                            heroSeries: hero1Series)
+                            thumbnail: hero1Thumbnail,
+                            stories: hero1Stories,
+                            comics: hero1Comics,
+                            events: hero1Events,
+                            series: hero1Series)
             } else if i % 3 == 1 {
                 hero = Hero(name: TestConstants.hero2Name,
                             description: TestConstants.hero2Description,
-                            imageURL: TestConstants.image2URL,
-                            heroComics: hero2Comics,
-                            heroEvents: hero2Events,
-                            heroStories: hero2Stories,
-                            heroSeries: hero2Series)
+                            thumbnail: hero2Thumbnail,
+                            stories: hero2Stories,
+                            comics: hero2Comics,
+                            events: hero2Events,
+                            series: hero2Series)
             } else {
                 hero = Hero(name: TestConstants.hero3Name,
                             description: TestConstants.hero3Description,
-                            imageURL: TestConstants.image3URL,
-                            heroComics: hero3Comics,
-                            heroEvents: hero3Events,
-                            heroStories: hero3Stories,
-                            heroSeries: hero3Series)
+                            thumbnail: hero3Thumbnail,
+                            stories: hero3Stories,
+                            comics: hero3Comics,
+                            events: hero3Events,
+                            series: hero3Series)
             }
             heroes.append(hero)
         }
@@ -133,20 +173,29 @@ class HeroFakeService: HeroServiceProtocol {
     func getHeroDetails(hero: Hero) async throws -> Hero {
         
         var hero = hero
-        for (key, _) in hero.heroComics {
-            hero.heroComics[key]?.description = TestConstants.comicDescription
+        
+        if let comics = hero.comics {
+            for index in 0..<comics.items.count {
+                hero.comics?.items[index].description = TestConstants.comicDescription
+            }
         }
         
-        for (key, _) in hero.heroEvents {
-            hero.heroEvents[key]?.description = TestConstants.eventDescription
+        if let events = hero.events {
+            for index in 0..<events.items.count {
+                hero.events?.items[index].description = TestConstants.eventDescription
+            }
         }
         
-        for (key, _) in hero.heroSeries {
-            hero.heroSeries[key]?.description = TestConstants.seriesDescription
+        if let series = hero.series {
+            for index in 0..<series.items.count {
+                hero.series?.items[index].description = TestConstants.seriesDescription
+            }
         }
         
-        for (key, _) in hero.heroStories {
-            hero.heroStories[key]?.description = TestConstants.storyDescription
+        if let stories = hero.stories {
+            for index in 0..<stories.items.count {
+                hero.stories?.items[index].description = TestConstants.storyDescription
+            }
         }
         
         return hero

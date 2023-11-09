@@ -10,45 +10,37 @@ import XCTest
 @testable import Heroes
 
 final class HeroesSnapshotTests: XCTestCase {
-    var navigationController: UINavigationController?
-    var heroesTableViewController: HeroesTableViewController?
-    
+
     override func setUpWithError() throws {
         try super.setUpWithError()
-        heroesTableViewController = HeroesTableViewController(heroService: HeroFakeService())
-        
-        if let heroesTableViewController = heroesTableViewController {
-            navigationController = UINavigationController(rootViewController:
-                                                            heroesTableViewController)
-        }
     }
     
     override func tearDownWithError() throws {
-        heroesTableViewController = nil
-        navigationController = nil
         try super.tearDownWithError()
     }
     
     func testHeroesTableViewController() {
-        if let navigationController = navigationController {
-            assertSnapshot(matching: navigationController, as: .wait(for: 5, on: .image))
-        } else {
-            XCTFail("Navigation controller was not initialized")
-        }
+        let heroesTableViewController = HeroesTableViewController(heroService: HeroFakeService())
+        let navigationController = UINavigationController(rootViewController:
+                                                        heroesTableViewController)
+        assertSnapshot(matching: navigationController, as: .wait(for: 5, on: .image))
     }
     
-    func testHeroViewController() {
-        if let navigationController = navigationController,
-           let heroesTableViewController = heroesTableViewController {
-            let destination = HeroViewController(heroIndex: 0,
-                                                 heroViewModel: heroesTableViewController.heroesViewModel)
-            destination.loadView()
-            navigationController.pushViewController(destination, animated: true)
-            
-            assertSnapshot(matching: navigationController, as: .wait(for: 5, on: .image))
-        } else {
-            XCTFail("Navigation controller and/or heroes table view controller"
-                    + "was not initialized")
+    func testHeroViewController() async {
+        let heroesViewModel = HeroesViewModel(heroService: HeroFakeService())
+        let expectation = XCTestExpectation(description: "Fetch Heroes")
+        heroesViewModel.fetchHeroes(addHeroesToTableView: {
+            expectation.fulfill()
+        })
+        
+        await fulfillment(of: [expectation], timeout: 5)
+        
+        let heroViewController = await HeroViewController(heroIndex: 0,
+                                                    heroViewModel: heroesViewModel)
+        await heroViewController.loadView()
+        
+        DispatchQueue.main.async {
+            assertSnapshot(matching: heroViewController, as: .wait(for: 5, on: .image))
         }
     }
 }

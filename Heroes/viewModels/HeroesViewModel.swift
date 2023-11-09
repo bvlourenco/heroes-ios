@@ -20,7 +20,8 @@ class HeroesViewModel {
         Task {
             do {
                 var additionalHeroes = try await self.heroService
-                    .getHeroes(offset: self.heroes.count)
+                    .getHeroes(offset: self.heroes.count,
+                               numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest)
                 additionalHeroes = try await self.heroService
                     .downloadImages(heroes: additionalHeroes)
                 self.heroes.append(contentsOf: additionalHeroes)

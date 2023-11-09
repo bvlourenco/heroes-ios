@@ -33,7 +33,8 @@ final class HeroesTests: XCTestCase {
     func validateHero(hero: Hero,
                       name: String,
                       description: String,
-                      imageURL: String,
+                      imagePath: String,
+                      imageExtension: String,
                       comicName: String,
                       eventName: String,
                       seriesName: String,
@@ -44,17 +45,18 @@ final class HeroesTests: XCTestCase {
                       numberOfStories: Int = 1) {
         XCTAssertEqual(hero.name, name)
         XCTAssertEqual(hero.description, description)
-        XCTAssertEqual(hero.imageURL, imageURL)
+        XCTAssertEqual(hero.thumbnail?.path, imagePath)
+        XCTAssertEqual(hero.thumbnail?.extension, imageExtension)
         
-        XCTAssertEqual(hero.heroComics.count, numberOfComics)
-        XCTAssertEqual(hero.heroEvents.count, numberOfEvents)
-        XCTAssertEqual(hero.heroSeries.count, numberOfSeries)
-        XCTAssertEqual(hero.heroStories.count, numberOfStories)
+        XCTAssertEqual(hero.comics?.items.count, numberOfComics)
+        XCTAssertEqual(hero.events?.items.count, numberOfEvents)
+        XCTAssertEqual(hero.series?.items.count, numberOfSeries)
+        XCTAssertEqual(hero.stories?.items.count, numberOfStories)
         
-        XCTAssertEqual(hero.heroComics["comic"]?.name, comicName)
-        XCTAssertEqual(hero.heroEvents["event"]?.name, eventName)
-        XCTAssertEqual(hero.heroSeries["series"]?.name, seriesName)
-        XCTAssertEqual(hero.heroStories["story"]?.name, storiesName)
+        XCTAssertEqual(hero.comics?.items[0].name, comicName)
+        XCTAssertEqual(hero.events?.items[0].name, eventName)
+        XCTAssertEqual(hero.series?.items[0].name, seriesName)
+        XCTAssertEqual(hero.stories?.items[0].name, storiesName)
     }
 
     func testFetch20Heroes() async throws {
@@ -78,7 +80,8 @@ final class HeroesTests: XCTestCase {
             validateHero(hero: hero1,
                          name: "name 1",
                          description: "description 1",
-                         imageURL: "url 1",
+                         imagePath: "url 1",
+                         imageExtension: ".png",
                          comicName: "comic 1 name",
                          eventName: "event 1 name",
                          seriesName: "series 1 name",
@@ -87,7 +90,8 @@ final class HeroesTests: XCTestCase {
             validateHero(hero: hero2,
                          name: "name 2",
                          description: "description 2",
-                         imageURL: "url 2",
+                         imagePath: "url 2",
+                         imageExtension: ".png",
                          comicName: "comic 2 name",
                          eventName: "event 2 name",
                          seriesName: "series 2 name",
@@ -96,7 +100,8 @@ final class HeroesTests: XCTestCase {
             validateHero(hero: hero3,
                          name: "name 3",
                          description: "description 3",
-                         imageURL: "url 3",
+                         imagePath: "url 3",
+                         imageExtension: ".png",
                          comicName: "comic 3 name",
                          eventName: "event 3 name",
                          seriesName: "series 3 name",
@@ -134,10 +139,10 @@ final class HeroesTests: XCTestCase {
             
             let hero = await heroesViewModel.getDescriptions(heroIndex: 0)
             
-            XCTAssertEqual(hero.heroComics["comic"]?.description, "comic description")
-            XCTAssertEqual(hero.heroEvents["event"]?.description, "event description")
-            XCTAssertEqual(hero.heroSeries["series"]?.description, "series description")
-            XCTAssertEqual(hero.heroStories["story"]?.description, "story description")
+            XCTAssertEqual(hero.comics?.items[0].description, "comic description")
+            XCTAssertEqual(hero.events?.items[0].description, "event description")
+            XCTAssertEqual(hero.series?.items[0].description, "series description")
+            XCTAssertEqual(hero.stories?.items[0].description, "story description")
         }
     }
     
@@ -159,7 +164,9 @@ final class HeroesTests: XCTestCase {
     func testFetch0Heroes() async throws {
         if let heroService = heroService {
             let heroes = try await heroService.simulateGetHeroesWithOption(
-                offset: 0, option: HeroOptions.emptyArray)
+                offset: 0, 
+                numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest,
+                option: HeroOptions.emptyArray)
             
             XCTAssertEqual(heroes.count, 0)
         }
@@ -169,7 +176,9 @@ final class HeroesTests: XCTestCase {
         if let heroService = heroService {
             do {
                 let _ = try await heroService.simulateGetHeroesWithOption(
-                    offset: 0, option: HeroOptions.error)
+                    offset: 0, 
+                    numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest,
+                    option: HeroOptions.error)
                 XCTFail("No error was thrown.")
             } catch {
                 XCTAssertEqual(error as! NetworkError, NetworkError.internalError)

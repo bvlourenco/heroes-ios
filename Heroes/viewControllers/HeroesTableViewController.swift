@@ -8,7 +8,7 @@
 import UIKit
 
 class HeroesTableViewController: UIViewController {
-    let heroesViewModel: HeroesViewModel
+    private let heroesViewModel: HeroesViewModel
     private lazy var heroesTableView = HeroesTableView()
     
     init(heroService: HeroServiceProtocol = HeroService()) {

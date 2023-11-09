@@ -20,13 +20,14 @@ enum CategoryTypes: String {
 class HeroService: HeroServiceProtocol {
     private let decoder = JSONDecoder()
     
-    func getHeroes(offset: Int) async throws -> [Hero] {
-        let data = try await performRequest(resourceURL:
+    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async throws -> [Hero] {
+        let jsonData = try await performRequest(resourceURL:
                                                 "http://gateway.marvel.com/v1/public/characters",
-                                            limit: Constants.numberOfHeroesPerRequest,
-                                            offset: offset)
-        let heroes = try decoder.decode(Heroes.self, from: data)
-        return heroes.heroes
+                                                limit: numberOfHeroesPerRequest,
+                                                offset: offset)
+        let response = try decoder.decode(HeroResponse.self, from: jsonData)
+        let heroes = limitNumberOfCategoryItems(heroesWithAllCategories: response.data.heroes)
+        return heroes
     }
     
     func downloadImages(heroes: [Hero]) async throws -> [Hero] {
@@ -35,7 +36,7 @@ class HeroService: HeroServiceProtocol {
             for hero in heroes {
                 group.addTask { [self] in
                     let imageData = try await self.downloadImage(imageURL:
-                                                                    hero.imageURL)
+                                                                    hero.thumbnail?.imageURL)
                     return (hero, imageData)
                 }
             }
@@ -54,19 +55,19 @@ class HeroService: HeroServiceProtocol {
         return try await withThrowingTaskGroup(of: (String, String, String?).self,
                                         body: { group in
             
-            addTasksToTaskGroup(heroCategory: hero.heroComics,
+            addTasksToTaskGroup(heroCategory: hero.comics,
                                 categoryType: CategoryTypes.comics,
                                 group: &group)
             
-            addTasksToTaskGroup(heroCategory: hero.heroStories,
+            addTasksToTaskGroup(heroCategory: hero.stories,
                                 categoryType: CategoryTypes.stories,
                                 group: &group)
             
-            addTasksToTaskGroup(heroCategory: hero.heroSeries,
+            addTasksToTaskGroup(heroCategory: hero.series,
                                 categoryType: CategoryTypes.series,
                                 group: &group)
             
-            addTasksToTaskGroup(heroCategory: hero.heroEvents,
+            addTasksToTaskGroup(heroCategory: hero.events,
                                 categoryType: CategoryTypes.events,
                                 group: &group)
             
@@ -74,13 +75,21 @@ class HeroService: HeroServiceProtocol {
             for try await (resourceURL, type, category) in group {
                 switch type {
                 case CategoryTypes.comics.rawValue:
-                    hero.heroComics[resourceURL]!.description = category
+                    if let index = hero.comics?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
+                        hero.comics?.items[index].description = category
+                    }
                 case CategoryTypes.stories.rawValue:
-                    hero.heroStories[resourceURL]!.description = category
+                    if let index = hero.stories?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
+                        hero.stories?.items[index].description = category
+                    }
                 case CategoryTypes.series.rawValue:
-                    hero.heroSeries[resourceURL]!.description = category
+                    if let index = hero.series?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
+                        hero.series?.items[index].description = category
+                    }
                 case CategoryTypes.events.rawValue:
-                    hero.heroEvents[resourceURL]!.description = category
+                    if let index = hero.events?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
+                        hero.events?.items[index].description = category
+                    }
                 default:
                     break
                 }
@@ -90,46 +99,67 @@ class HeroService: HeroServiceProtocol {
         })
     }
     
-    private func downloadImage(imageURL: String) async throws -> Data? {
-        if imageURL.hasSuffix("image_not_available.jpg") {
-            return nil
-        } else if let url = URL(string: imageURL) {
-            let (imageData, _) = try await URLSession.shared.data(from: url)
+    private func limitNumberOfCategoryItems(heroesWithAllCategories: [Hero]) -> [Hero] {
+        var heroes: [Hero] = []
+        for var hero in heroesWithAllCategories {
+            if hero.comics!.items.count > 3 {
+                let heroComics = Array(hero.comics!.items[0..<3])
+                hero.comics?.items = heroComics
+            }
+            if hero.series!.items.count > 3 {
+                let heroSeries = Array(hero.series!.items[0..<3])
+                hero.series?.items = heroSeries
+            }
+            if hero.stories!.items.count > 3 {
+                let heroStories = Array(hero.stories!.items[0..<3])
+                hero.stories?.items = heroStories
+            }
+            if hero.events!.items.count > 3 {
+                let heroEvents = Array(hero.events!.items[0..<3])
+                hero.events?.items = heroEvents
+            }
+
+            heroes.append(hero)
+        }
+        return heroes
+    }
+    
+    private func downloadImage(imageURL: URL?) async throws -> Data? {
+        guard let imageURL = imageURL else { return nil }
+        
+        do {
+            if imageURL.absoluteString.hasSuffix("image_not_available.jpg") {
+                return nil
+            }
+            
+            let (imageData, _) = try await URLSession.shared.data(from: imageURL)
             return imageData
-        } else {
+        } catch {
             throw NetworkError.badUrl
         }
     }
     
-    private func getCategoryDescriptionFromJson(data: Data) throws -> String? {
-        if let json = try JSONSerialization.jsonObject(with: data,
-                                                       options: []) as? [String: Any] {
-            if let data = json["data"] as? AnyObject,
-               let results = data["results"] as? AnyObject {
-                return (results[0] as AnyObject)["description"] as? String
-            }
-        }
-        throw NetworkError.decodingError
-    }
-    
     private func getCategoryDetails(resourceURL: String,
-                                    categoryDetail: HeroCategoryDetails)
+                                    categoryDetail: HeroCategory.Item)
     async throws -> String? {
-        let data = try await performRequest(resourceURL: resourceURL,
-                                            limit: nil,
-                                            offset: nil)
-        return try getCategoryDescriptionFromJson(data: data)
+        let jsonData = try await performRequest(resourceURL: resourceURL,
+                                                limit: nil,
+                                                offset: nil)
+        let response = try decoder.decode(DescriptionResponse.self, from: jsonData)
+        return response.data.results[0].description
     }
     
-    private func addTasksToTaskGroup(heroCategory: [String:HeroCategoryDetails],
+    private func addTasksToTaskGroup(heroCategory: HeroCategory?,
                                      categoryType: CategoryTypes,
                                      group: inout ThrowingTaskGroup<(String, String, String?), Error>) {
-        for (resourceURL, category) in heroCategory {
-            group.addTask { [self] in
-                return (resourceURL,
-                        categoryType.rawValue,
-                        try await self.getCategoryDetails(resourceURL: resourceURL,
-                                                          categoryDetail: category))
+        if let heroCategory = heroCategory {
+            for category in heroCategory.items {
+                group.addTask { [self] in
+                    return (category.resourceURI,
+                            categoryType.rawValue,
+                            try await self.getCategoryDetails(resourceURL: category.resourceURI,
+                                                              categoryDetail: category))
+                }
             }
         }
     }

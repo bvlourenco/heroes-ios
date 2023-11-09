@@ -7,161 +7,75 @@
 
 import Foundation
 
-struct HeroCategoryDetails: Decodable {
-    let name: String
-    var description: String?
-    
-    mutating func setDescription(_ description: String?) {
-        self.description = description
-    }
-}
+typealias Hero = HeroResponse.ResponseData.Hero
+typealias HeroCategory = HeroResponse.ResponseData.Hero.Category
+typealias HeroThumbnail = HeroResponse.ResponseData.Hero.Thumbnail
 
-struct Hero: Decodable {
-    let name: String
-    let description: String
-    let imageURL: String
-    var imageData: Data?
-    var descriptionsLoaded: Bool = false
-    var heroComics: [String: HeroCategoryDetails]
-    var heroEvents: [String: HeroCategoryDetails]
-    var heroStories: [String: HeroCategoryDetails]
-    var heroSeries: [String: HeroCategoryDetails]
+struct HeroResponse: Decodable {
+    let data: ResponseData
     
-    mutating func setHeroImage(image: Data) {
-        self.imageData = image
-    }
-}
-
-struct Heroes: Decodable {
-    var heroes: [Hero]
-    
-    enum CodingKeys: String, CodingKey {
-        case data
+    struct ResponseData: Decodable {
+        let heroes: [Hero]
         
-        enum DataKeys: String, CodingKey {
-            case results
+        private enum CodingKeys : String, CodingKey {
+            case heroes = "results"
+        }
+        
+        struct Hero: Decodable {
+            let name: String?
+            let description: String?
+            let thumbnail: Thumbnail?
+            var stories: Category?
+            var comics: Category?
+            var events: Category?
+            var series: Category?
             
-            enum ResultKeys: String, CodingKey {
-                case name, description, thumbnail, comics,
-                     series, stories, events
+            var imageData: Data?
+            var descriptionsLoaded: Bool = false
+            
+            private enum CodingKeys : String, CodingKey {
+                case name, description, thumbnail, stories, comics,
+                     events, series
+            }
+            
+            mutating func setHeroImage(image: Data) {
+                self.imageData = image
+            }
+            
+            struct Thumbnail: Decodable {
+                let path: String
+                let `extension`: String
                 
-                enum ThumbnailKeys: String, CodingKey {
-                    case path, ext = "extension"
+                var imageURL: URL {
+                    URL(string: "\(path).\(`extension`)")!
                 }
+            }
+            
+            struct Category: Decodable {
+                var items: [Item]
                 
-                enum CategoryKeys: String, CodingKey {
-                    case items
+                struct Item: Decodable {
+                    let resourceURI: String
+                    let name: String
+                    var description: String?
                     
-                    enum ItemsKeys: String, CodingKey {
-                        case resourceURI, name
+                    mutating func setDescription(_ description: String?) {
+                        self.description = description
                     }
                 }
             }
         }
     }
+}
+
+struct DescriptionResponse: Decodable {
+    let data: ResponseData
     
-    private func parseCategory(key: CodingKeys.DataKeys.ResultKeys,
-                               heroContainer: KeyedDecodingContainer<CodingKeys
-        .DataKeys.ResultKeys>)
-    throws -> [String:HeroCategoryDetails] {
-        var heroCategoryItems: [String:HeroCategoryDetails] = [:]
-        let categoryContainer = try heroContainer
-            .nestedContainer(keyedBy: CodingKeys
-                .DataKeys
-                .ResultKeys
-                .CategoryKeys
-                .self,
-                             forKey: key)
-        var categoryItemsContainer = try categoryContainer
-            .nestedUnkeyedContainer(forKey: .items)
+    struct ResponseData: Decodable {
+        let results: [HeroDetail]
         
-        var numItems = 0
-        while categoryItemsContainer.isAtEnd == false && numItems < 3 {
-            let itemContainer = try categoryItemsContainer
-                .nestedContainer(keyedBy: CodingKeys
-                    .DataKeys
-                    .ResultKeys
-                    .CategoryKeys
-                    .ItemsKeys.self)
-            let categoryName = try itemContainer.decode(String.self,
-                                                        forKey: .name)
-            let categoryURL = try itemContainer.decode(String.self,
-                                                       forKey: .resourceURI)
-            let heroCategory = HeroCategoryDetails(name: categoryName)
-            heroCategoryItems[categoryURL] = heroCategory
-            numItems += 1
+        struct HeroDetail: Decodable {
+            let description: String?
         }
-        return heroCategoryItems
-    }
-    
-    private mutating func parseHero(resultsContainer:
-                                    inout UnkeyedDecodingContainer) throws {
-        let heroContainer = try resultsContainer
-            .nestedContainer(keyedBy: CodingKeys
-                .DataKeys
-                .ResultKeys
-                .self)
-        let heroName = try heroContainer.decode(String.self, forKey: .name)
-        let heroDescription = try heroContainer.decode(String.self,
-                                                       forKey: .description)
-        
-        let thumbnailContainer = try heroContainer
-            .nestedContainer(keyedBy: CodingKeys
-                .DataKeys
-                .ResultKeys
-                .ThumbnailKeys
-                .self,
-                             forKey: .thumbnail)
-        let heroImagePath = try thumbnailContainer.decode(String.self,
-                                                          forKey: .path)
-        let heroImageExtension = try thumbnailContainer.decode(String.self,
-                                                               forKey: .ext)
-        let heroImageURL = heroImagePath + "." + heroImageExtension
-        
-        let heroComics = try parseCategory(key: CodingKeys.DataKeys
-            .ResultKeys.comics,
-                                           heroContainer: heroContainer)
-        let heroSeries = try parseCategory(key: CodingKeys.DataKeys
-            .ResultKeys.series,
-                                           heroContainer: heroContainer)
-        let heroEvents = try parseCategory(key: CodingKeys.DataKeys
-            .ResultKeys.events,
-                                           heroContainer: heroContainer)
-        let heroStories = try parseCategory(key: CodingKeys.DataKeys
-            .ResultKeys.stories,
-                                            heroContainer: heroContainer)
-        
-        let hero = Hero(name: heroName,
-                        description: heroDescription,
-                        imageURL: heroImageURL,
-                        heroComics: heroComics,
-                        heroEvents: heroEvents,
-                        heroStories: heroStories,
-                        heroSeries: heroSeries)
-        
-        heroes.append(hero)
-    }
-    
-    private mutating func parseHeroes(decoder: Decoder) {
-        do {
-            let rootContainer = try decoder.container(keyedBy: CodingKeys.self)
-            let dataContainer = try rootContainer
-                .nestedContainer(keyedBy: CodingKeys.DataKeys
-                    .self,
-                                 forKey: .data)
-            var resultsContainer = try dataContainer
-                .nestedUnkeyedContainer(forKey: .results)
-            
-            while resultsContainer.isAtEnd == false {
-                try parseHero(resultsContainer: &resultsContainer)
-            }
-        } catch {
-            print(error)
-        }
-    }
-    
-    init(from decoder: Decoder) {
-        self.heroes = []
-        parseHeroes(decoder: decoder)
     }
 }
