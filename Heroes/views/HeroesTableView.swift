@@ -8,20 +8,15 @@
 import UIKit
 
 class HeroesTableView: UIView {
-    // TODO: Should not know about spinner. Do in inits or in setup function
-    // TODO: Should be private
-    let tableView: UITableView = {
+    private let tableView: UITableView = {
         let tableView = UITableView(frame: CGRectZero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(HeroesTableViewCell.self, forCellReuseIdentifier: "cell")
         
-        let spinner = UIActivityIndicatorView(style: .medium)
-        spinner.startAnimating()
-        spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0),
-                               width: tableView.bounds.width,
-                               height: CGFloat(Constants.spinnerHeight))
-        tableView.tableFooterView = spinner
-        tableView.tableFooterView?.isHidden = false
+        // Assigning rowHeight property since a table view row initially does not have
+        // the image (because of loading) and so, estimatedRowHeight would produce a
+        // warning about suggesting a row height of 0
+        tableView.rowHeight = Constants.tableViewImageHeight
         
         return tableView
     }()
@@ -34,6 +29,27 @@ class HeroesTableView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setTableDataSourceAndDelegate(viewController: HeroesTableViewController) {
+        tableView.delegate = viewController
+        tableView.dataSource = viewController
+    }
+    
+    func update(indexPaths: [IndexPath]) {
+        tableView.beginUpdates()
+        tableView.tableFooterView?.isHidden = true
+        tableView.insertRows(at: indexPaths, with: .none)
+        tableView.endUpdates()
+    }
+    
+    func addSpinnerToBottom(spinner: UIActivityIndicatorView) {
+        tableView.tableFooterView = spinner
+        tableView.tableFooterView?.isHidden = false
+    }
+    
+    func isSpinnerHidden(to status: Bool) {
+        tableView.tableFooterView?.isHidden = status
     }
     
     private func setupConstraints() {
