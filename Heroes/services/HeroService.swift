@@ -10,7 +10,7 @@ import UIKit
 
 enum NetworkError: Error {
     case badUrl, serverError, decodingError, resourceNotFound,
-         badRequest, internalError
+         badRequest, appError
 }
 
 enum CategoryTypes: String {
@@ -20,40 +20,34 @@ enum CategoryTypes: String {
 class HeroService: HeroServiceProtocol {
     private let decoder = JSONDecoder()
     
-    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async throws -> [Hero] {
-        let jsonData = try await performRequest(resourceURL:
-                                                "http://gateway.marvel.com/v1/public/characters",
-                                                limit: numberOfHeroesPerRequest,
-                                                offset: offset)
-        let response = try decoder.decode(HeroResponse.self, from: jsonData)
-        let heroes = limitNumberOfCategoryItems(heroesWithAllCategories: response.data.heroes)
-        return heroes
-    }
-    
-    func downloadImages(heroes: [Hero]) async throws -> [Hero] {
-        return try await withThrowingTaskGroup(of: (Hero, Data?).self,
-                                               body: { group in
-            for hero in heroes {
-                group.addTask { [self] in
-                    let imageData = try await self.downloadImage(imageURL:
-                                                                    hero.thumbnail?.imageURL)
-                    return (hero, imageData)
+    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async -> [Hero] {
+        var heroes: [Hero] = []
+        
+        await performRequest(resourceURL: Constants.heroesURLRequest,
+                             limit: numberOfHeroesPerRequest,
+                             offset: offset) { result in
+            switch result {
+            case .success(let jsonData):
+                do {
+                    let response = try self.decoder.decode(HeroResponse.self, from: jsonData)
+                    let filteredHeroes = self.limitNumberOfCategoryItems(heroesWithAllCategories:
+                                                                         response.data.heroes)
+                    heroes.append(contentsOf: filteredHeroes)
+                } catch {
+                    print(error.localizedDescription)
                 }
+            case .failure(let error):
+                print(error.localizedDescription)
             }
-            
-            var heroes: [Hero] = []
-            for try await (var hero, imageData) in group {
-                hero.imageData = imageData
-                heroes.append(hero)
-            }
-            return heroes
-        })
+        }
+        
+        return heroes
     }
     
     func getHeroDetails(hero: Hero) async throws -> Hero {
         // Task group
         return try await withThrowingTaskGroup(of: (String, String, String?).self,
-                                        body: { group in
+                                               body: { group in
             
             addTasksToTaskGroup(heroCategory: hero.comics,
                                 categoryType: CategoryTypes.comics,
@@ -118,38 +112,37 @@ class HeroService: HeroServiceProtocol {
                 let heroEvents = Array(hero.events!.items[0..<3])
                 hero.events?.items = heroEvents
             }
-
+            
             heroes.append(hero)
         }
         return heroes
     }
     
-    private func downloadImage(imageURL: URL?) async throws -> Data? {
-        guard let imageURL = imageURL else { return nil }
-        
-        do {
-            if imageURL.absoluteString.hasSuffix("image_not_available.jpg") {
-                return nil
-            }
-            
-            let (imageData, _) = try await URLSession.shared.data(from: imageURL)
-            return imageData
-        } catch {
-            throw NetworkError.badUrl
-        }
-    }
-    
     private func getCategoryDetails(resourceURL: String,
-                                    categoryDetail: HeroCategory.Item)
-    async throws -> String? {
-        let jsonData = try await performRequest(resourceURL: resourceURL,
-                                                limit: nil,
-                                                offset: nil)
-        let response = try decoder.decode(DescriptionResponse.self, from: jsonData)
-        return response.data.results[0].description
+                                    categoryDetail: Category.Item)
+    async -> String? {
+        var description: String = ""
+        
+        await performRequest(resourceURL: resourceURL,
+                             limit: nil,
+                             offset: nil) { result in
+            switch result {
+            case .success(let jsonData):
+                do {
+                    let response = try self.decoder.decode(DescriptionResponse.self, from: jsonData)
+                    description = response.data.results[0].description ?? "No description :("
+                } catch {
+                    print(error.localizedDescription)
+                }
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+        
+        return description
     }
     
-    private func addTasksToTaskGroup(heroCategory: HeroCategory?,
+    private func addTasksToTaskGroup(heroCategory: Category?,
                                      categoryType: CategoryTypes,
                                      group: inout ThrowingTaskGroup<(String, String, String?), Error>) {
         if let heroCategory = heroCategory {
@@ -157,17 +150,21 @@ class HeroService: HeroServiceProtocol {
                 group.addTask { [self] in
                     return (category.resourceURI,
                             categoryType.rawValue,
-                            try await self.getCategoryDetails(resourceURL: category.resourceURI,
-                                                              categoryDetail: category))
+                            await self.getCategoryDetails(resourceURL: category.resourceURI,
+                                                          categoryDetail: category))
                 }
             }
         }
     }
     
-    private func performRequest(resourceURL url: String, limit: Int?, offset: Int?)
-    async throws -> Data {
+    private func performRequest(resourceURL url: String,
+                                limit: Int?,
+                                offset: Int?,
+                                completionHandler: @escaping (Result<Data, NetworkError>) -> Void)
+    async {
         guard var urlComponents = URLComponents(string: url) else {
-            throw NetworkError.badUrl
+            completionHandler(.failure(.badUrl))
+            return
         }
         
         urlComponents.queryItems = [
@@ -185,23 +182,26 @@ class HeroService: HeroServiceProtocol {
             urlComponents.queryItems?.append(queryItem)
         }
         
-        let (data, response) = try await URLSession.shared
-            .data(from: urlComponents.url!)
-        
-        let httpResponse = response as? HTTPURLResponse
-        switch httpResponse?.statusCode {
-        case 200:
-            break
-        case 400:
-            throw NetworkError.badRequest
-        case 404:
-            throw NetworkError.resourceNotFound
-        case 500:
-            throw NetworkError.serverError
-        default:
-            throw NetworkError.internalError
+        do {
+            let (data, response) = try await URLSession.shared
+                .data(from: urlComponents.url!)
+            
+            let httpResponse = response as? HTTPURLResponse
+            switch httpResponse?.statusCode {
+            case 200:
+                completionHandler(.success(data))
+            case 400:
+                completionHandler(.failure(.badRequest))
+            case 404:
+                completionHandler(.failure(.resourceNotFound))
+            case 500:
+                completionHandler(.failure(.serverError))
+            default:
+                completionHandler(.failure(.appError))
+            }
+            
+        } catch {
+            completionHandler(.failure(.appError))
         }
-        
-        return data
     }
 }

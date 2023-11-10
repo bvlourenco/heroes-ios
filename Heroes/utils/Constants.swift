@@ -11,6 +11,8 @@ struct Constants {
     static let apiKey = "19ebd69fcbd349517059711384948e26"
     static let hash = "5c8ac737e471fcf0b6f8486503f2656b"
     static let timestamp = "1698146291"
+    static let heroesURLRequest = "http://gateway.marvel.com/v1/public/characters"
+    static let notAvailableImageName = "image_not_available.jpg"
     static let numberOfHeroesPerRequest = 20
     static let categoryTitleFontSize: CGFloat = 20
     static let smallPadding: CGFloat = 8

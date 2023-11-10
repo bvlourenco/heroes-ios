@@ -8,6 +8,8 @@
 import UIKit
 
 class HeroesTableView: UIView {
+    // TODO: Should not know about spinner. Do in inits or in setup function
+    // TODO: Should be private
     let tableView: UITableView = {
         let tableView = UITableView(frame: CGRectZero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false

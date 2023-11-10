@@ -12,12 +12,14 @@ class HeroViewController: UIViewController {
     private var hero: Hero
     private let heroViewModel: HeroesViewModel
     private let heroIndex: Int
+    private let loader: ImageLoader
     
-    init(heroIndex: Int, heroViewModel: HeroesViewModel) {
+    init(heroIndex: Int, heroViewModel: HeroesViewModel, loader: ImageLoader) {
         self.hero = heroViewModel.getHeroAtIndex(index: heroIndex)
         self.heroIndex = heroIndex
         self.heroView = HeroView()
         self.heroViewModel = heroViewModel
+        self.loader = loader
         super.init(nibName: "HeroViewController", bundle: Bundle.main)
         getCategoriesDescriptions()
     }
@@ -36,8 +38,16 @@ class HeroViewController: UIViewController {
             }
         }
         
-        if let imageData = self.hero.imageData {
-            heroView.heroImageView.image = UIImage(data: imageData)
+        let imageURL = hero.thumbnail?.imageURL
+        
+        if let imageURL = imageURL {
+            if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
+                heroView.heroImageView.loadImage(at: imageURL)
+            } else {
+                heroView.heroImageView.image = UIImage(named: "placeholder")
+            }
+        } else {
+            heroView.heroImageView.image = UIImage(named: "placeholder")
         }
         
         addCategory(categoryValues: self.hero.comics,
@@ -71,7 +81,7 @@ class HeroViewController: UIViewController {
         }
     }
     
-    private func addCategory(categoryValues: HeroCategory?,
+    private func addCategory(categoryValues: Category?,
                              viewCategory: CategoryViewComponent) {
         if let categoryValues = categoryValues {
             if categoryValues.items.count == 0 {
@@ -87,7 +97,7 @@ class HeroViewController: UIViewController {
         }
     }
     
-    private func updateDescriptionInView(categoryValues: HeroCategory?,
+    private func updateDescriptionInView(categoryValues: Category?,
                                          viewCategory: CategoryViewComponent) {
         if let categoryValues = categoryValues {
             for (index, category) in categoryValues.items.enumerated() {

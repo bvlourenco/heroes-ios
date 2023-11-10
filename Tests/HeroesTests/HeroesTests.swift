@@ -11,7 +11,6 @@ import XCTest
 final class HeroesTests: XCTestCase {
     var heroService: HeroFakeService?
     var heroesViewModel: HeroesViewModel?
-    var expectation: XCTestExpectation?
     
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -19,14 +18,11 @@ final class HeroesTests: XCTestCase {
         if let heroService = heroService {
             heroesViewModel = HeroesViewModel(heroService: heroService)
         }
-        
-        expectation = XCTestExpectation(description: "Fetch Heroes")
     }
 
     override func tearDownWithError() throws {
         heroService = nil
         heroesViewModel = nil
-        expectation = nil
         try super.tearDownWithError()
     }
     
@@ -60,8 +56,9 @@ final class HeroesTests: XCTestCase {
     }
 
     func testFetch20Heroes() async throws {
-        if let heroesViewModel = heroesViewModel,
-           let expectation = expectation {
+        let expectation = XCTestExpectation(description: "Fetch Heroes")
+        
+        if let heroesViewModel = heroesViewModel {
             heroesViewModel.fetchHeroes(addHeroesToTableView: {
                 expectation.fulfill()
             })
@@ -80,8 +77,8 @@ final class HeroesTests: XCTestCase {
             validateHero(hero: hero1,
                          name: "name 1",
                          description: "description 1",
-                         imagePath: "url 1",
-                         imageExtension: ".png",
+                         imagePath: "https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
+                         imageExtension: "jpg",
                          comicName: "comic 1 name",
                          eventName: "event 1 name",
                          seriesName: "series 1 name",
@@ -90,8 +87,8 @@ final class HeroesTests: XCTestCase {
             validateHero(hero: hero2,
                          name: "name 2",
                          description: "description 2",
-                         imagePath: "url 2",
-                         imageExtension: ".png",
+                         imagePath: "https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
+                         imageExtension: "jpg",
                          comicName: "comic 2 name",
                          eventName: "event 2 name",
                          seriesName: "series 2 name",
@@ -100,8 +97,8 @@ final class HeroesTests: XCTestCase {
             validateHero(hero: hero3,
                          name: "name 3",
                          description: "description 3",
-                         imagePath: "url 3",
-                         imageExtension: ".png",
+                         imagePath: "https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
+                         imageExtension: "jpg",
                          comicName: "comic 3 name",
                          eventName: "event 3 name",
                          seriesName: "series 3 name",
@@ -109,26 +106,10 @@ final class HeroesTests: XCTestCase {
         }
     }
     
-    func testDownloadHeroImage() async throws {
-        if let heroesViewModel = heroesViewModel,
-           let expectation = expectation {
-            heroesViewModel.fetchHeroes(addHeroesToTableView: {
-                expectation.fulfill()
-            })
-            
-            await fulfillment(of: [expectation], timeout: 5)
-            
-            XCTAssertEqual(heroesViewModel.numberOfHeroes(), 20)
-            
-            let hero1 = heroesViewModel.getHero(index: 0)
-            
-            XCTAssertNotNil(hero1.imageData)
-        }
-    }
-    
     func testGetHeroCategoriesDescriptions() async throws {
-        if let heroesViewModel = heroesViewModel,
-           let expectation = expectation {
+        let expectation = XCTestExpectation(description: "Fetch Heroes")
+        
+        if let heroesViewModel = heroesViewModel {
             heroesViewModel.fetchHeroes(addHeroesToTableView: {
                 expectation.fulfill()
             })
@@ -147,15 +128,21 @@ final class HeroesTests: XCTestCase {
     }
     
     func testFetchMoreThan20Heroes() async throws {
-        if let heroesViewModel = heroesViewModel,
-           let expectation = expectation {
-            heroesViewModel.fetchHeroes(addHeroesToTableView: {})
-            
+        let expectation1 = XCTestExpectation(description: "Fetch first 20 heroes")
+        let expectation2 = XCTestExpectation(description: "Fetch more heroes")
+        
+        if let heroesViewModel = heroesViewModel {
             heroesViewModel.fetchHeroes(addHeroesToTableView: {
-                expectation.fulfill()
+                expectation1.fulfill()
             })
             
-            await fulfillment(of: [expectation], timeout: 10)
+            await fulfillment(of: [expectation1], timeout: 5)
+            
+            heroesViewModel.fetchHeroes(addHeroesToTableView: {
+                expectation2.fulfill()
+            })
+            
+            await fulfillment(of: [expectation2], timeout: 5)
             
             XCTAssertEqual(heroesViewModel.numberOfHeroes(), 40)
         }
@@ -181,7 +168,7 @@ final class HeroesTests: XCTestCase {
                     option: HeroOptions.error)
                 XCTFail("No error was thrown.")
             } catch {
-                XCTAssertEqual(error as! NetworkError, NetworkError.internalError)
+                XCTAssertEqual(error as! NetworkError, NetworkError.appError)
             }
         }
     }

@@ -9,6 +9,5 @@ import Foundation
 
 protocol HeroServiceProtocol {
     func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async throws -> [Hero]
-    func downloadImages(heroes: [Hero]) async throws -> [Hero]
     func getHeroDetails(hero: Hero) async throws -> Hero
 }

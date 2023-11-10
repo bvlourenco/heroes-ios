@@ -9,6 +9,7 @@ import Foundation
 
 class HeroesViewModel {
     private var heroes: [Hero] = []
+    private var descriptionsLoaded: [Bool] = []
     private let heroService: HeroServiceProtocol
     private var loadingData = false
     
@@ -19,12 +20,14 @@ class HeroesViewModel {
     func fetchHeroes(addHeroesToTableView: @escaping () -> Void) {
         Task {
             do {
-                var additionalHeroes = try await self.heroService
+                let additionalHeroes = try await self.heroService
                     .getHeroes(offset: self.heroes.count,
                                numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest)
-                additionalHeroes = try await self.heroService
-                    .downloadImages(heroes: additionalHeroes)
                 self.heroes.append(contentsOf: additionalHeroes)
+                
+                self.descriptionsLoaded.append(contentsOf:
+                                                repeatElement(false,
+                                                              count: additionalHeroes.count))
                 
                 DispatchQueue.main.async {
                     addHeroesToTableView()
@@ -38,13 +41,13 @@ class HeroesViewModel {
     func getDescriptions(heroIndex: Int) async -> Hero {
         var hero = self.heroes[heroIndex]
         
-        if hero.descriptionsLoaded == false {
+        if descriptionsLoaded[heroIndex] == false {
             do {
                 hero = try await self.heroService.getHeroDetails(hero: hero)
             } catch {
                 print(error)
             }
-            hero.descriptionsLoaded = true
+            descriptionsLoaded[heroIndex] = true
             setHero(index: heroIndex, hero: hero)
         }
         return hero
@@ -59,7 +62,11 @@ class HeroesViewModel {
     }
     
     func setHero(index: Int, hero: Hero) {
-        self.heroes[index] = hero
+        if index >= 0 && index < self.heroes.count {
+            self.heroes[index] = hero
+        } else if index >= 0 {
+            self.heroes.append(hero)
+        }
     }
     
     func isLoadingData() -> Bool {
