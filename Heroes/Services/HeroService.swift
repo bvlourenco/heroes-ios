@@ -23,7 +23,7 @@ class HeroService: HeroServiceProtocol {
     func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async -> [Hero] {
         var heroes: [Hero] = []
         
-        await performRequest(resourceURL: Constants.heroesURLRequest,
+        await performRequest(resourceURL: .heroesURLRequest,
                              limit: numberOfHeroesPerRequest,
                              offset: offset) { result in
             switch result {
@@ -66,24 +66,24 @@ class HeroService: HeroServiceProtocol {
                                 group: &group)
             
             var hero = hero
-            for try await (resourceURL, type, category) in group {
+            for try await (resourceURL, type, description) in group {
                 switch type {
                 case CategoryTypes.comics.rawValue:
-                    if let index = hero.comics?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
-                        hero.comics?.items[index].description = category
-                    }
+                    setItemDescription(category: &hero.comics, 
+                                       resourceURL: resourceURL,
+                                       description: description)
                 case CategoryTypes.stories.rawValue:
-                    if let index = hero.stories?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
-                        hero.stories?.items[index].description = category
-                    }
+                    setItemDescription(category: &hero.stories, 
+                                       resourceURL: resourceURL,
+                                       description: description)
                 case CategoryTypes.series.rawValue:
-                    if let index = hero.series?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
-                        hero.series?.items[index].description = category
-                    }
+                    setItemDescription(category: &hero.series, 
+                                       resourceURL: resourceURL,
+                                       description: description)
                 case CategoryTypes.events.rawValue:
-                    if let index = hero.events?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
-                        hero.events?.items[index].description = category
-                    }
+                    setItemDescription(category: &hero.events, 
+                                       resourceURL: resourceURL,
+                                       description: description)
                 default:
                     break
                 }
@@ -93,29 +93,30 @@ class HeroService: HeroServiceProtocol {
         })
     }
     
+    private func setItemDescription(category: inout Category?, resourceURL: String, description: String?) {
+        if let index = category?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
+            category?.items[index].description = description
+        }
+    }
+    
     private func limitNumberOfCategoryItems(heroesWithAllCategories: [Hero]) -> [Hero] {
         var heroes: [Hero] = []
         for var hero in heroesWithAllCategories {
-            if hero.comics!.items.count > 3 {
-                let heroComics = Array(hero.comics!.items[0..<3])
-                hero.comics?.items = heroComics
-            }
-            if hero.series!.items.count > 3 {
-                let heroSeries = Array(hero.series!.items[0..<3])
-                hero.series?.items = heroSeries
-            }
-            if hero.stories!.items.count > 3 {
-                let heroStories = Array(hero.stories!.items[0..<3])
-                hero.stories?.items = heroStories
-            }
-            if hero.events!.items.count > 3 {
-                let heroEvents = Array(hero.events!.items[0..<3])
-                hero.events?.items = heroEvents
-            }
-            
+            limitCategory(category: &hero.comics)
+            limitCategory(category: &hero.series)
+            limitCategory(category: &hero.stories)
+            limitCategory(category: &hero.events)
             heroes.append(hero)
         }
         return heroes
+    }
+    
+    private func limitCategory(category: inout Category?) {
+        if category != nil {
+            if category!.items.count > .numberOfItemsPerCategory {
+                category!.items = Array(category!.items[0..<Int.numberOfItemsPerCategory])
+            }
+        }
     }
     
     private func getCategoryDetails(resourceURL: String,
@@ -168,9 +169,9 @@ class HeroService: HeroServiceProtocol {
         }
         
         urlComponents.queryItems = [
-            URLQueryItem(name: "apikey", value: Constants.apiKey),
-            URLQueryItem(name: "hash", value: Constants.hash),
-            URLQueryItem(name: "ts", value: Constants.timestamp)
+            URLQueryItem(name: "apikey", value: .apiKey),
+            URLQueryItem(name: "hash", value: .hash),
+            URLQueryItem(name: "ts", value: .timestamp)
         ]
         
         if let limit = limit {
@@ -204,4 +205,15 @@ class HeroService: HeroServiceProtocol {
             completionHandler(.failure(.appError))
         }
     }
+}
+
+private extension String {
+    static let apiKey = "19ebd69fcbd349517059711384948e26"
+    static let hash = "5c8ac737e471fcf0b6f8486503f2656b"
+    static let timestamp = "1698146291"
+    static let heroesURLRequest = "http://gateway.marvel.com/v1/public/characters"
+}
+
+private extension Int {
+    static let numberOfItemsPerCategory = 3
 }

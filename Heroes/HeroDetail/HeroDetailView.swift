@@ -7,7 +7,7 @@
 
 import UIKit
 
-class HeroView: UIView {
+class HeroDetailView: UIView {
     var heroDescriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "There is no description for this hero :("

@@ -22,6 +22,10 @@ class HeroesTableViewCell: UITableViewCell {
         setupConstraints()
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func prepareForReuse() {
         heroImage.image = nil
         heroImage.cancelImageLoad()
@@ -41,9 +45,5 @@ class HeroesTableViewCell: UITableViewCell {
                                               constant: Constants.smallPadding),
             heroName.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

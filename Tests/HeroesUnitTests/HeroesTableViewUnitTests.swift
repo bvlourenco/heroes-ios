@@ -8,15 +8,17 @@
 import XCTest
 @testable import Heroes
 
-final class HeroesTests: XCTestCase {
+// TODO: Check mocks for tests
+// TODO: UI tests
+final class HeroesTableViewUnitTests: XCTestCase {
     var heroService: HeroFakeService?
-    var heroesViewModel: HeroesViewModel?
+    var heroesViewModel: HeroesTableViewModel?
     
     override func setUpWithError() throws {
         try super.setUpWithError()
         heroService = HeroFakeService()
         if let heroService = heroService {
-            heroesViewModel = HeroesViewModel(heroService: heroService)
+            heroesViewModel = HeroesTableViewModel(heroService: heroService)
         }
     }
 
@@ -70,9 +72,9 @@ final class HeroesTests: XCTestCase {
             // Only validating the first three heroes since the remaining ones
             // are either equal to hero1, hero2 or hero3.
             // List of heroes: [hero1, hero2, hero3, hero1, hero2, hero3, ...]
-            let hero1 = heroesViewModel.getHero(index: 0)
-            let hero2 = heroesViewModel.getHero(index: 1)
-            let hero3 = heroesViewModel.getHero(index: 2)
+            let hero1 = heroesViewModel.getHeroAtIndex(index: 0)
+            let hero2 = heroesViewModel.getHeroAtIndex(index: 1)
+            let hero3 = heroesViewModel.getHeroAtIndex(index: 2)
             
             validateHero(hero: hero1,
                          name: "name 1",
@@ -103,27 +105,6 @@ final class HeroesTests: XCTestCase {
                          eventName: "event 3 name",
                          seriesName: "series 3 name",
                          storiesName: "story 3 name")
-        }
-    }
-    
-    func testGetHeroCategoriesDescriptions() async throws {
-        let expectation = XCTestExpectation(description: "Fetch Heroes")
-        
-        if let heroesViewModel = heroesViewModel {
-            heroesViewModel.fetchHeroes(addHeroesToTableView: {
-                expectation.fulfill()
-            })
-            
-            await fulfillment(of: [expectation], timeout: 5)
-            
-            XCTAssertEqual(heroesViewModel.numberOfHeroes(), 20)
-            
-            let hero = await heroesViewModel.getDescriptions(heroIndex: 0)
-            
-            XCTAssertEqual(hero.comics?.items[0].description, "comic description")
-            XCTAssertEqual(hero.events?.items[0].description, "event description")
-            XCTAssertEqual(hero.series?.items[0].description, "series description")
-            XCTAssertEqual(hero.stories?.items[0].description, "story description")
         }
     }
     

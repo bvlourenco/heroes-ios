@@ -7,21 +7,25 @@
 
 import UIKit
 
-class HeroViewController: UIViewController {
-    private let heroView: HeroView
+class HeroDetailViewController: UIViewController {
+    private let heroView: HeroDetailView
     private var hero: Hero
-    private let heroViewModel: HeroesViewModel
     private let heroIndex: Int
+    private let heroViewModel: HeroDetailViewModel
     private let loader: ImageLoader
+    weak var delegate: HeroViewControllerDelegate?
     
-    init(heroIndex: Int, heroViewModel: HeroesViewModel, loader: ImageLoader) {
-        self.hero = heroViewModel.getHeroAtIndex(index: heroIndex)
-        self.heroIndex = heroIndex
-        self.heroView = HeroView()
-        self.heroViewModel = heroViewModel
+    init(hero: Hero, 
+         heroIndex: Int,
+         heroService: HeroServiceProtocol,
+         loader: ImageLoader) {
+        self.hero = hero
+        self.heroView = HeroDetailView()
+        self.heroViewModel = HeroDetailViewModel(heroService: heroService,
+                                           hero: hero)
         self.loader = loader
+        self.heroIndex = heroIndex
         super.init(nibName: "HeroViewController", bundle: Bundle.main)
-        getCategoriesDescriptions()
     }
     
     required init?(coder: NSCoder) {
@@ -30,6 +34,10 @@ class HeroViewController: UIViewController {
     
     override func loadView() {
         view = heroView
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         navigationItem.title = self.hero.name
         
         if let description = self.hero.description {
@@ -61,11 +69,14 @@ class HeroViewController: UIViewController {
         
         addCategory(categoryValues: self.hero.stories,
                     viewCategory: self.heroView.storiesView)
+        
+        getCategoriesDescriptions()
     }
     
     private func getCategoriesDescriptions() {
         Task {
-            self.hero = await heroViewModel.getDescriptions(heroIndex: heroIndex)
+            self.hero = await heroViewModel.getHeroDescriptions()
+            delegate?.updateHeroInTableView(heroIndex: heroIndex, hero: self.hero)
             
             updateDescriptionInView(categoryValues: self.hero.comics,
                                     viewCategory: self.heroView.comicsView)

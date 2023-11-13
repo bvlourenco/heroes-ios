@@ -4210,3 +4210,74 @@ let data = json.data(using: .utf8)!
 //} catch {
 //    print(error)
 //}
+
+// MARK: - Code from Nuno
+//protocol HeroServiceProtool2 {
+//    func getHeroes() async -> Result<Int, MyError>
+//}
+//
+//class HeroService1: HeroServiceProtool2 {
+//
+//}
+//
+//enum MyError: Error {
+//    case someError
+//}
+//
+//class HeroServiceMock: HeroServiceProtool2 {
+//
+//    var getHeroesStub: () -> Result<Hero, MyError> = { return .success(1) }
+//
+//    func getHeroes() async -> Result<Int, MyError> {
+//        self.getHeroesStub()
+//    }
+//}
+//
+//class VM {
+//
+//    private let service: HeroServiceProtool2
+//
+//    init(service: HeroServiceProtool2 = HeroService1()) {
+//        self.service = service
+//    }
+//
+//    func getHeroes() -> Result<Int, MyError> {
+//        Task {
+//            await self.service.getHeroes()
+//        }
+//    }
+//}
+//
+//func test() {
+//    let mock = HeroServiceMock()
+//    mock.getHeroesStub = { .success(1000) }
+//    let vm = VM(service: mock)
+//    let heros = await vm.getHeroes()
+//    XCTAssertEqual(heros, 1000)
+//
+//    mock.getHeroesStub = { .failure(.someError) }
+//    let heros = await vm.getHeroes()
+//    XCTAssertEqual(heros, MyError.someError)
+//
+//    mock.getHeroesStub = { .success(.mock(name: "batatas" )) }
+//
+//    let heros = await vm.getHeroes()
+//
+//    XCTAssertEqual(try? heros.get()?.name, "batata")
+//
+//}
+//
+//extension Hero {
+//    static func mock(
+//        name: String = "HroName",
+//        description: String = "description",
+//    ) -> Hero {
+//        Hero(name: name,
+//             description: description,
+//             imageURL: "",
+//             heroComics: [:],
+//             heroEvents: [:],
+//             heroStories: [:],
+//             heroSeries: [:])
+//    }
+//}
