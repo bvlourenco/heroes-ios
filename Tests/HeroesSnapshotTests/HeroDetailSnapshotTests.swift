@@ -12,16 +12,33 @@ import XCTest
 final class HeroDetailSnapshotTests: XCTestCase {
     func testHeroViewController() async {
         let heroService = HeroFakeService()
-        let hero = Hero.mock()
-        let heroDetailViewModel = HeroDetailViewModel(heroService: heroService, hero: hero)
-        let heroViewController = await HeroDetailViewController(hero: hero,
-                                                                heroIndex: 0,
-                                                                heroDetailViewModel: heroDetailViewModel,
-                                                                loader: ImageLoader())
-        await heroViewController.viewDidLoad()
-
-        DispatchQueue.main.async {
-            assertSnapshot(matching: heroViewController, as: .image)
+        
+        heroService.comicsDescription = ["comic description"]
+        heroService.eventsDescription = ["event description"]
+        heroService.storiesDescription = ["story description"]
+        heroService.seriesDescription = ["series description"]
+        
+        do {
+            let stories = try Hero.createCategoryMock(resourceURIs: [""], names: ["story 1 name"])
+            let comics = try Hero.createCategoryMock(resourceURIs: [""], names: ["comic 1 name"])
+            let events = try Hero.createCategoryMock(resourceURIs: [""], names: ["event 1 name"])
+            let series = try Hero.createCategoryMock(resourceURIs: [""], names: ["series 1 name"])
+            
+            var hero = Hero.mock(stories: stories, comics: comics, events: events, series: series)
+            let heroDetailViewModel = HeroDetailViewModel(heroService: heroService, hero: hero)
+            sleep(5)
+            hero = await heroDetailViewModel.getHeroDescriptions()
+            
+            let heroViewController = await HeroDetailViewController(hero: hero,
+                                                                    heroIndex: 0,
+                                                                    heroDetailViewModel: heroDetailViewModel,
+                                                                    loader: ImageLoader())
+            
+            DispatchQueue.main.async {
+                assertSnapshot(matching: heroViewController, as: .image)
+            }
+        } catch {
+            print(error)
         }
     }
 }

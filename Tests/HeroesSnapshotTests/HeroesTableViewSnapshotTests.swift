@@ -13,12 +13,26 @@ final class HeroesTableViewSnapshotTests: XCTestCase {
     func testHeroesTableViewController() {
         let heroService = HeroFakeService()
         
-        let hero = Hero.mock()
+        let thumbnail1 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/c/e0/535fecbbb9784",
+                                                      extension: "jpg")
+        let thumbnail2 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/c/e0/535fecbbb9784",
+                                                      extension: "jpg")
+        let thumbnail3 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec",
+                                                      extension: "jpg")
+        let hero1 = Hero.mock(thumbnail: thumbnail1)
+        let hero2 = Hero.mock(name: "name 2", description: "description 2", thumbnail: thumbnail2)
+        let hero3 = Hero.mock(name: "name 3", description: "description 3", thumbnail: thumbnail3)
         let numberOfHeroes = 20
         
         var heroes: [Hero] = []
-        for _ in 0..<numberOfHeroes {
-            heroes.append(hero)
+        for i in 0..<numberOfHeroes {
+            if i % 3 == 0 {
+                heroes.append(hero1)
+            } else if i % 3 == 1 {
+                heroes.append(hero2)
+            } else {
+                heroes.append(hero3)
+            }
         }
         
         heroService.getHeroesStub = { .success(heroes) }

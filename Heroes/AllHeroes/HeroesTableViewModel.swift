@@ -7,7 +7,6 @@
 
 import Foundation
 
-// TODO: Mock view model for unit tests
 class HeroesTableViewModel {
     private var heroes: [Hero] = []
     let heroService: HeroServiceProtocol
