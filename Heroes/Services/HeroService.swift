@@ -8,11 +8,6 @@
 import Foundation
 import UIKit
 
-enum NetworkError: Error {
-    case badUrl, serverError, decodingError, resourceNotFound,
-         badRequest, appError
-}
-
 enum CategoryTypes: String {
     case comics, stories, series, events
 }
@@ -20,77 +15,79 @@ enum CategoryTypes: String {
 class HeroService: HeroServiceProtocol {
     private let decoder = JSONDecoder()
     
-    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async -> [Hero] {
+    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async -> Result<[Hero], HeroError> {
         var heroes: [Hero] = []
         
-        await performRequest(resourceURL: .heroesURLRequest,
-                             limit: numberOfHeroesPerRequest,
-                             offset: offset) { result in
-            switch result {
-            case .success(let jsonData):
-                do {
-                    let response = try self.decoder.decode(HeroResponse.self, from: jsonData)
-                    let filteredHeroes = self.limitNumberOfCategoryItems(heroesWithAllCategories:
-                                                                         response.data.heroes)
-                    heroes.append(contentsOf: filteredHeroes)
-                } catch {
-                    print(error.localizedDescription)
-                }
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
+        let result = await performRequest(resourceURL: .heroesURLRequest,
+                                          limit: numberOfHeroesPerRequest,
+                                          offset: offset)
         
-        return heroes
+        switch result {
+        case .success(let jsonData):
+            do {
+                let response = try self.decoder.decode(HeroResponse.self, from: jsonData)
+                let filteredHeroes = self.limitNumberOfCategoryItems(allHeroes: response.data.heroes)
+                heroes.append(contentsOf: filteredHeroes)
+                return .success(heroes)
+            } catch {
+                return .failure(HeroError.decodingError)
+            }
+        case .failure(let error):
+            print(error)
+            return .failure(HeroError.networkError)
+        }
     }
     
-    func getHeroDetails(hero: Hero) async throws -> Hero {
-        // Task group
-        return try await withThrowingTaskGroup(of: (String, String, String?).self,
-                                               body: { group in
-            
-            addTasksToTaskGroup(heroCategory: hero.comics,
-                                categoryType: CategoryTypes.comics,
-                                group: &group)
-            
-            addTasksToTaskGroup(heroCategory: hero.stories,
-                                categoryType: CategoryTypes.stories,
-                                group: &group)
-            
-            addTasksToTaskGroup(heroCategory: hero.series,
-                                categoryType: CategoryTypes.series,
-                                group: &group)
-            
-            addTasksToTaskGroup(heroCategory: hero.events,
-                                categoryType: CategoryTypes.events,
-                                group: &group)
-            
-            var hero = hero
-            for try await (resourceURL, type, description) in group {
-                switch type {
-                case CategoryTypes.comics.rawValue:
-                    setItemDescription(category: &hero.comics, 
-                                       resourceURL: resourceURL,
-                                       description: description)
-                case CategoryTypes.stories.rawValue:
-                    setItemDescription(category: &hero.stories, 
-                                       resourceURL: resourceURL,
-                                       description: description)
-                case CategoryTypes.series.rawValue:
-                    setItemDescription(category: &hero.series, 
-                                       resourceURL: resourceURL,
-                                       description: description)
-                case CategoryTypes.events.rawValue:
-                    setItemDescription(category: &hero.events, 
-                                       resourceURL: resourceURL,
-                                       description: description)
-                default:
-                    break
+    func getHeroDetails(hero: Hero) async -> Result<Hero, HeroError> {
+        do {
+            return try await withThrowingTaskGroup(of: (String, String, String?).self,
+                                                   body: { group in
+                
+                addTasksToTaskGroup(heroCategory: hero.comics,
+                                    categoryType: CategoryTypes.comics,
+                                    group: &group)
+                
+                addTasksToTaskGroup(heroCategory: hero.stories,
+                                    categoryType: CategoryTypes.stories,
+                                    group: &group)
+                
+                addTasksToTaskGroup(heroCategory: hero.series,
+                                    categoryType: CategoryTypes.series,
+                                    group: &group)
+                
+                addTasksToTaskGroup(heroCategory: hero.events,
+                                    categoryType: CategoryTypes.events,
+                                    group: &group)
+                
+                var hero = hero
+                for try await (resourceURL, type, description) in group {
+                    switch type {
+                    case CategoryTypes.comics.rawValue:
+                        setItemDescription(category: &hero.comics,
+                                           resourceURL: resourceURL,
+                                           description: description)
+                    case CategoryTypes.stories.rawValue:
+                        setItemDescription(category: &hero.stories,
+                                           resourceURL: resourceURL,
+                                           description: description)
+                    case CategoryTypes.series.rawValue:
+                        setItemDescription(category: &hero.series,
+                                           resourceURL: resourceURL,
+                                           description: description)
+                    case CategoryTypes.events.rawValue:
+                        setItemDescription(category: &hero.events,
+                                           resourceURL: resourceURL,
+                                           description: description)
+                    default:
+                        break
+                    }
                 }
-            }
-            
-            return hero
-        })
+                
+                return .success(hero)
+            })
+        } catch {
+            return .failure(HeroError.taskGroupError)
+        }
     }
     
     private func setItemDescription(category: inout Category?, resourceURL: String, description: String?) {
@@ -99,9 +96,9 @@ class HeroService: HeroServiceProtocol {
         }
     }
     
-    private func limitNumberOfCategoryItems(heroesWithAllCategories: [Hero]) -> [Hero] {
+    private func limitNumberOfCategoryItems(allHeroes: [Hero]) -> [Hero] {
         var heroes: [Hero] = []
-        for var hero in heroesWithAllCategories {
+        for var hero in allHeroes {
             limitCategory(category: &hero.comics)
             limitCategory(category: &hero.series)
             limitCategory(category: &hero.stories)
@@ -119,53 +116,51 @@ class HeroService: HeroServiceProtocol {
         }
     }
     
-    private func getCategoryDetails(resourceURL: String,
-                                    categoryDetail: Category.Item)
-    async -> String? {
-        var description: String = ""
-        
-        await performRequest(resourceURL: resourceURL,
-                             limit: nil,
-                             offset: nil) { result in
-            switch result {
-            case .success(let jsonData):
-                do {
-                    let response = try self.decoder.decode(DescriptionResponse.self, from: jsonData)
-                    description = response.data.results[0].description ?? "No description :("
-                } catch {
-                    print(error.localizedDescription)
-                }
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
-        
-        return description
-    }
-    
     private func addTasksToTaskGroup(heroCategory: Category?,
                                      categoryType: CategoryTypes,
                                      group: inout ThrowingTaskGroup<(String, String, String?), Error>) {
         if let heroCategory = heroCategory {
             for category in heroCategory.items {
-                group.addTask { [self] in
+                group.addTask { [weak self] in
                     return (category.resourceURI,
                             categoryType.rawValue,
-                            await self.getCategoryDetails(resourceURL: category.resourceURI,
-                                                          categoryDetail: category))
+                            await self?.getCategoryDetails(resourceURL: category.resourceURI,
+                                                           categoryDetail: category))
                 }
             }
         }
     }
     
+    private func getCategoryDetails(resourceURL: String,
+                                    categoryDetail: Category.Item)
+    async -> String? {
+        var description: String = "No description :("
+        
+        let result = await performRequest(resourceURL: resourceURL,
+                                          limit: nil,
+                                          offset: nil)
+        
+        switch result {
+        case .success(let jsonData):
+            do {
+                let response = try self.decoder.decode(DescriptionResponse.self, from: jsonData)
+                description = response.data.results[0].description ?? description
+                return description
+            } catch {
+               print(HeroError.decodingError)
+            }
+        case .failure(let error):
+            print(error)
+        }
+        
+        return description
+    }
+    
     private func performRequest(resourceURL url: String,
                                 limit: Int?,
-                                offset: Int?,
-                                completionHandler: @escaping (Result<Data, NetworkError>) -> Void)
-    async {
+                                offset: Int?) async -> Result<Data, NetworkError> {
         guard var urlComponents = URLComponents(string: url) else {
-            completionHandler(.failure(.badUrl))
-            return
+            return .failure(.badUrl)
         }
         
         urlComponents.queryItems = [
@@ -187,22 +182,23 @@ class HeroService: HeroServiceProtocol {
             let (data, response) = try await URLSession.shared
                 .data(from: urlComponents.url!)
             
-            let httpResponse = response as? HTTPURLResponse
-            switch httpResponse?.statusCode {
-            case 200:
-                completionHandler(.success(data))
-            case 400:
-                completionHandler(.failure(.badRequest))
-            case 404:
-                completionHandler(.failure(.resourceNotFound))
-            case 500:
-                completionHandler(.failure(.serverError))
+            guard let httpResponse = response as? HTTPURLResponse else { return .failure(.appError) }
+            
+            switch httpResponse.statusCode {
+            case .httpStatusCodeOk:
+                return .success(data)
+            case .httpStatusCodeBadRequest:
+                return .failure(.badRequest)
+            case .httpStatusCodeNotFound:
+                return .failure(.resourceNotFound)
+            case .httpStatusCodeInternalServerError:
+                return .failure(.serverError)
             default:
-                completionHandler(.failure(.appError))
+                return .failure(.appError)
             }
             
         } catch {
-            completionHandler(.failure(.appError))
+            return .failure(.appError)
         }
     }
 }
@@ -216,4 +212,9 @@ private extension String {
 
 private extension Int {
     static let numberOfItemsPerCategory = 3
+    
+    static let httpStatusCodeOk = 200
+    static let httpStatusCodeBadRequest = 400
+    static let httpStatusCodeNotFound = 404
+    static let httpStatusCodeInternalServerError = 500
 }

@@ -9,19 +9,19 @@ import SnapshotTesting
 import XCTest
 @testable import Heroes
 
-// TODO: this snapshot test is weird. Always passing...
 final class HeroDetailSnapshotTests: XCTestCase {
     func testHeroViewController() async {
         let heroService = HeroFakeService()
-        let hero = heroService.getHeroIndex(heroIndex: 0)
+        let hero = Hero.mock()
+        let heroDetailViewModel = HeroDetailViewModel(heroService: heroService, hero: hero)
         let heroViewController = await HeroDetailViewController(hero: hero,
                                                                 heroIndex: 0,
-                                                                heroService: heroService,
+                                                                heroDetailViewModel: heroDetailViewModel,
                                                                 loader: ImageLoader())
         await heroViewController.viewDidLoad()
 
         DispatchQueue.main.async {
-            assertSnapshot(matching: heroViewController, as: .wait(for: 10, on: .image))
+            assertSnapshot(matching: heroViewController, as: .image)
         }
     }
 }

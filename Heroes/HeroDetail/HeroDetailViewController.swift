@@ -17,12 +17,11 @@ class HeroDetailViewController: UIViewController {
     
     init(hero: Hero, 
          heroIndex: Int,
-         heroService: HeroServiceProtocol,
+         heroDetailViewModel: HeroDetailViewModel,
          loader: ImageLoader) {
         self.hero = hero
         self.heroView = HeroDetailView()
-        self.heroViewModel = HeroDetailViewModel(heroService: heroService,
-                                           hero: hero)
+        self.heroViewModel = heroDetailViewModel
         self.loader = loader
         self.heroIndex = heroIndex
         super.init(nibName: "HeroViewController", bundle: Bundle.main)

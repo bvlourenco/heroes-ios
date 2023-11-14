@@ -8,39 +8,37 @@
 import XCTest
 @testable import Heroes
 
-// TODO: Check mocks for tests
-// TODO: UI tests
 final class HeroesTableViewUnitTests: XCTestCase {
     var heroService: HeroFakeService?
-    var heroesViewModel: HeroesTableViewModel?
+    var heroesTableViewModel: HeroesTableViewModel?
     
     override func setUpWithError() throws {
         try super.setUpWithError()
         heroService = HeroFakeService()
         if let heroService = heroService {
-            heroesViewModel = HeroesTableViewModel(heroService: heroService)
+            heroesTableViewModel = HeroesTableViewModel(heroService: heroService)
         }
     }
 
     override func tearDownWithError() throws {
         heroService = nil
-        heroesViewModel = nil
+        heroesTableViewModel = nil
         try super.tearDownWithError()
     }
     
     func validateHero(hero: Hero,
-                      name: String,
-                      description: String,
-                      imagePath: String,
-                      imageExtension: String,
-                      comicName: String,
-                      eventName: String,
-                      seriesName: String,
-                      storiesName: String,
-                      numberOfComics: Int = 1,
-                      numberOfEvents: Int = 1,
-                      numberOfSeries: Int = 1,
-                      numberOfStories: Int = 1) {
+                      name: String = "name 1",
+                      description: String = "description 1",
+                      imagePath: String = Hero.notFoundImagePath,
+                      imageExtension: String = Hero.notFoundImageExtension,
+                      comicNames: [String] = [],
+                      eventNames: [String] = [],
+                      seriesNames: [String] = [],
+                      storyNames: [String] = [],
+                      numberOfComics: Int = 0,
+                      numberOfEvents: Int = 0,
+                      numberOfSeries: Int = 0,
+                      numberOfStories: Int = 0) {
         XCTAssertEqual(hero.name, name)
         XCTAssertEqual(hero.description, description)
         XCTAssertEqual(hero.thumbnail?.path, imagePath)
@@ -51,106 +49,128 @@ final class HeroesTableViewUnitTests: XCTestCase {
         XCTAssertEqual(hero.series?.items.count, numberOfSeries)
         XCTAssertEqual(hero.stories?.items.count, numberOfStories)
         
-        XCTAssertEqual(hero.comics?.items[0].name, comicName)
-        XCTAssertEqual(hero.events?.items[0].name, eventName)
-        XCTAssertEqual(hero.series?.items[0].name, seriesName)
-        XCTAssertEqual(hero.stories?.items[0].name, storiesName)
+        for index in 0..<numberOfComics {
+            XCTAssertEqual(hero.comics?.items[index].name, comicNames[index])
+        }
+        
+        for index in 0..<numberOfEvents {
+            XCTAssertEqual(hero.events?.items[index].name, eventNames[index])
+        }
+        
+        for index in 0..<numberOfStories {
+            XCTAssertEqual(hero.stories?.items[index].name, storyNames[index])
+        }
+        
+        for index in 0..<numberOfSeries {
+            XCTAssertEqual(hero.series?.items[index].name, seriesNames[index])
+        }
     }
 
     func testFetch20Heroes() async throws {
-        let expectation = XCTestExpectation(description: "Fetch Heroes")
-        
-        if let heroesViewModel = heroesViewModel {
-            heroesViewModel.fetchHeroes(addHeroesToTableView: {
+        if let heroService = heroService,
+           let heroesTableViewModel = heroesTableViewModel {
+            let numberOfHeroes = 20
+            let expectation = XCTestExpectation(description: "Fetch Heroes")
+            
+            let hero = Hero.mock()
+            
+            var heroes: [Hero] = []
+            for _ in 0..<numberOfHeroes {
+                heroes.append(hero)
+            }
+            
+            heroService.getHeroesStub = { .success(heroes) }
+            
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
                 expectation.fulfill()
             })
             
             await fulfillment(of: [expectation], timeout: 5)
             
-            XCTAssertEqual(heroesViewModel.numberOfHeroes(), 20)
+            XCTAssertEqual(heroesTableViewModel.numberOfHeroes(), 20)
             
-            // Only validating the first three heroes since the remaining ones
-            // are either equal to hero1, hero2 or hero3.
-            // List of heroes: [hero1, hero2, hero3, hero1, hero2, hero3, ...]
-            let hero1 = heroesViewModel.getHeroAtIndex(index: 0)
-            let hero2 = heroesViewModel.getHeroAtIndex(index: 1)
-            let hero3 = heroesViewModel.getHeroAtIndex(index: 2)
-            
-            validateHero(hero: hero1,
-                         name: "name 1",
-                         description: "description 1",
-                         imagePath: "https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
-                         imageExtension: "jpg",
-                         comicName: "comic 1 name",
-                         eventName: "event 1 name",
-                         seriesName: "series 1 name",
-                         storiesName: "story 1 name")
-            
-            validateHero(hero: hero2,
-                         name: "name 2",
-                         description: "description 2",
-                         imagePath: "https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
-                         imageExtension: "jpg",
-                         comicName: "comic 2 name",
-                         eventName: "event 2 name",
-                         seriesName: "series 2 name",
-                         storiesName: "story 2 name")
-            
-            validateHero(hero: hero3,
-                         name: "name 3",
-                         description: "description 3",
-                         imagePath: "https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
-                         imageExtension: "jpg",
-                         comicName: "comic 3 name",
-                         eventName: "event 3 name",
-                         seriesName: "series 3 name",
-                         storiesName: "story 3 name")
+            for index in 0..<numberOfHeroes {
+                validateHero(hero: heroesTableViewModel.getHeroAtIndex(index: index))
+            }
         }
     }
     
     func testFetchMoreThan20Heroes() async throws {
-        let expectation1 = XCTestExpectation(description: "Fetch first 20 heroes")
-        let expectation2 = XCTestExpectation(description: "Fetch more heroes")
-        
-        if let heroesViewModel = heroesViewModel {
-            heroesViewModel.fetchHeroes(addHeroesToTableView: {
+        if let heroService = heroService,
+           let heroesTableViewModel = heroesTableViewModel {
+            let numberOfHeroes = 20
+            let expectation1 = XCTestExpectation(description: "Fetch first 20 heroes")
+            let expectation2 = XCTestExpectation(description: "Fetch more heroes")
+            
+            let hero = Hero.mock()
+            
+            var heroes: [Hero] = []
+            for _ in 0..<numberOfHeroes {
+                heroes.append(hero)
+            }
+            
+            heroService.getHeroesStub = { .success(heroes) }
+            
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
                 expectation1.fulfill()
             })
             
             await fulfillment(of: [expectation1], timeout: 5)
             
-            heroesViewModel.fetchHeroes(addHeroesToTableView: {
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
                 expectation2.fulfill()
             })
             
             await fulfillment(of: [expectation2], timeout: 5)
             
-            XCTAssertEqual(heroesViewModel.numberOfHeroes(), 40)
-        }
-    }
-    
-    func testFetch0Heroes() async throws {
-        if let heroService = heroService {
-            let heroes = try await heroService.simulateGetHeroesWithOption(
-                offset: 0, 
-                numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest,
-                option: HeroOptions.emptyArray)
+            let totalNumberOfHeroes = heroesTableViewModel.numberOfHeroes()
             
-            XCTAssertEqual(heroes.count, 0)
+            XCTAssertEqual(totalNumberOfHeroes, 40)
+            
+            for index in 0..<numberOfHeroes {
+                validateHero(hero: heroesTableViewModel.getHeroAtIndex(index: index))
+            }
         }
     }
-    
+
+    func testFetch0Heroes() async throws {
+        if let heroService = heroService,
+           let heroesTableViewModel = heroesTableViewModel {
+            let expectation = XCTestExpectation(description: "Fetch Heroes")
+            
+            heroService.getHeroesStub = { .success([]) }
+            
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
+                expectation.fulfill()
+            })
+            
+            await fulfillment(of: [expectation], timeout: 5)
+            
+            XCTAssertEqual(heroesTableViewModel.numberOfHeroes(), 0)
+        }
+    }
+
     func testFetchHeroesWithError() async throws {
-        if let heroService = heroService {
+        if let heroService = heroService,
+           let heroesTableViewModel = heroesTableViewModel {
+            let expectation = XCTestExpectation(description: "Fetch Heroes")
+            
+            heroService.getHeroesStub = { .failure(HeroError.serverError) }
+            
             do {
-                let _ = try await heroService.simulateGetHeroesWithOption(
-                    offset: 0, 
-                    numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest,
-                    option: HeroOptions.error)
+                let heroes = try await heroService.getHeroes(offset: 0, numberOfHeroesPerRequest: 20).get()
                 XCTFail("No error was thrown.")
             } catch {
-                XCTAssertEqual(error as! NetworkError, NetworkError.appError)
+                XCTAssertEqual(error as! HeroError, HeroError.serverError)
             }
+            
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
+                expectation.fulfill()
+            })
+            
+            await fulfillment(of: [expectation], timeout: 5)
+            
+            XCTAssertEqual(heroesTableViewModel.numberOfHeroes(), 0)
         }
     }
 }

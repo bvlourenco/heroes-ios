@@ -18,17 +18,14 @@ class HeroesTableViewModel {
     
     func fetchHeroes(addHeroesToTableView: @escaping () -> Void) {
         Task {
-            do {
-                let additionalHeroes = try await self.heroService
-                    .getHeroes(offset: self.heroes.count,
-                               numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest)
+            let result = await self.heroService.getHeroes(offset: self.heroes.count,
+                                                     numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest)
+            if let additionalHeroes = try? result.get() {
                 self.heroes.append(contentsOf: additionalHeroes)
-                
-                DispatchQueue.main.async {
-                    addHeroesToTableView()
-                }
-            } catch {
-                print(error)
+            }
+            
+            DispatchQueue.main.async {
+                addHeroesToTableView()
             }
         }
     }

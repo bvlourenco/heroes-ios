@@ -7,7 +7,16 @@
 
 import Foundation
 
+enum HeroError: Error {
+    case networkError, decodingError, taskGroupError, serverError
+}
+
+enum NetworkError: Error {
+    case badUrl, serverError, resourceNotFound,
+         badRequest, appError
+}
+
 protocol HeroServiceProtocol {
-    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async throws -> [Hero]
-    func getHeroDetails(hero: Hero) async throws -> Hero
+    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async -> Result<[Hero], HeroError>
+    func getHeroDetails(hero: Hero) async -> Result<Hero, HeroError>
 }

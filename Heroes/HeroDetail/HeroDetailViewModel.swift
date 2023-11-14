@@ -20,10 +20,9 @@ class HeroDetailViewModel {
         let descriptionLoaded = isHeroDescriptionsLoaded()
         
         if descriptionLoaded == false {
-            do {
-                self.hero = try await self.heroService.getHeroDetails(hero: hero)
-            } catch {
-                print(error)
+            let result = await self.heroService.getHeroDetails(hero: hero)
+            if let hero = try? result.get() {
+                self.hero = hero
             }
         }
         return hero

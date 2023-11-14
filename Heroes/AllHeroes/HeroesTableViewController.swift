@@ -109,11 +109,12 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         tableView.deselectRow(at: indexPath, animated: true)
         
         let hero = heroesTableViewModel.getHeroAtIndex(index: indexPath.row)
+        let heroDetailViewModel = HeroDetailViewModel(heroService: heroesTableViewModel.heroService, hero: hero)
         
         let destination = HeroDetailViewController(hero: hero,
-                                             heroIndex: indexPath.row,
-                                             heroService: heroesTableViewModel.heroService,
-                                             loader: loader)
+                                                   heroIndex: indexPath.row,
+                                                   heroDetailViewModel: heroDetailViewModel,
+                                                   loader: loader)
         destination.delegate = self
         navigationController?.pushViewController(destination, animated: true)
     }

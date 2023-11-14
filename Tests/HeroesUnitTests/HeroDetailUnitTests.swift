@@ -16,12 +16,19 @@ final class HeroDetailUnitTests: XCTestCase {
         try super.setUpWithError()
         heroService = HeroFakeService()
         if let heroService = heroService {
-            let hero = heroService.getHeroIndex(heroIndex: 0)
-            heroDetailViewModel = HeroDetailViewModel(heroService: heroService,
-                                                      hero: hero)
+            do {
+                let stories = try Hero.createCategoryMock(resourceURIs: [""], names: ["story 1 name"])
+                let comics = try Hero.createCategoryMock(resourceURIs: [""], names: ["comic 1 name"])
+                let events = try Hero.createCategoryMock(resourceURIs: [""], names: ["event 1 name"])
+                let series = try Hero.createCategoryMock(resourceURIs: [""], names: ["series 1 name"])
+                let hero = Hero.mock(stories: stories, comics: comics, events: events, series: series)
+                heroDetailViewModel = HeroDetailViewModel(heroService: heroService, hero: hero)
+            } catch {
+                print(error)
+            }
         }
     }
-
+    
     override func tearDownWithError() throws {
         heroService = nil
         heroDetailViewModel = nil
@@ -29,9 +36,13 @@ final class HeroDetailUnitTests: XCTestCase {
     }
     
     func testGetHeroCategoriesDescriptions() async throws {
-        let expectation = XCTestExpectation(description: "Fetch Heroes")
-        
-        if let heroDetailViewModel = heroDetailViewModel {
+        if let heroService = heroService,
+           let heroDetailViewModel = heroDetailViewModel {
+            heroService.comicsDescription = ["comic description"]
+            heroService.eventsDescription = ["event description"]
+            heroService.storiesDescription = ["story description"]
+            heroService.seriesDescription = ["series description"]
+            
             let hero = await heroDetailViewModel.getHeroDescriptions()
             
             XCTAssertEqual(hero.comics?.items[0].description, "comic description")
