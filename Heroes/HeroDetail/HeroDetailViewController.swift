@@ -8,6 +8,7 @@
 import UIKit
 
 class HeroDetailViewController: UIViewController {
+    
     private let heroView: HeroDetailView
     private var hero: Hero
     private let heroIndex: Int
@@ -41,7 +42,7 @@ class HeroDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = self.hero.name
+        navigationItem.titleView = createTitleLabel()
         
         if let description = self.hero.description {
             if description.isEmpty == false {
@@ -74,6 +75,18 @@ class HeroDetailViewController: UIViewController {
                     viewCategory: self.heroView.storiesView)
         
         getCategoriesDescriptions()
+    }
+    
+    private func createTitleLabel() -> UILabel {
+        let label = UILabel(frame: CGRect(x: CGFloat(0), y: CGFloat(0),
+                                          width: UIScreen.main.bounds.width,
+                                          height: CGFloat(Constants.navigationTitleFrameSize)))
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.textAlignment = .center
+        label.font = UIFont.boldSystemFont(ofSize: label.font.pointSize)
+        label.text = self.hero.name
+        return label
     }
     
     private func getCategoriesDescriptions() {

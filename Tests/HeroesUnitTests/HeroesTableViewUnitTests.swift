@@ -81,7 +81,7 @@ final class HeroesTableViewUnitTests: XCTestCase {
             
             heroService.getHeroesStub = { .success(heroes) }
             
-            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: { numberOfHeroes in
                 expectation.fulfill()
             })
             
@@ -111,13 +111,13 @@ final class HeroesTableViewUnitTests: XCTestCase {
             
             heroService.getHeroesStub = { .success(heroes) }
             
-            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: { numberOfHeroes in
                 expectation1.fulfill()
             })
             
             await fulfillment(of: [expectation1], timeout: 5)
             
-            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: { numberOfHeroes in
                 expectation2.fulfill()
             })
             
@@ -140,7 +140,7 @@ final class HeroesTableViewUnitTests: XCTestCase {
             
             heroService.getHeroesStub = { .success([]) }
             
-            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: { numberOfHeroes in
                 expectation.fulfill()
             })
             
@@ -164,7 +164,7 @@ final class HeroesTableViewUnitTests: XCTestCase {
                 XCTAssertEqual(error as! HeroError, HeroError.serverError)
             }
             
-            heroesTableViewModel.fetchHeroes(addHeroesToTableView: {
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: { _ in
                 expectation.fulfill()
             })
             

@@ -9,8 +9,8 @@ import UIKit
 
 class HeroesTableViewCell: UITableViewCell {
     
-    let heroName = UILabel()
-    let heroImage = UIImageView()
+    private let heroName = UILabel()
+    private let heroImage = UIImageView()
     var onReuse: () -> Void = {}
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -29,6 +29,22 @@ class HeroesTableViewCell: UITableViewCell {
     override func prepareForReuse() {
         heroImage.image = nil
         heroImage.cancelImageLoad()
+    }
+    
+    func loadImage(imageURL: URL?) {
+        if let imageURL = imageURL {
+            if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
+                heroImage.loadImage(at: imageURL)
+            } else {
+                heroImage.image = UIImage(named: "placeholder")
+            }
+        } else {
+            heroImage.image = UIImage(named: "placeholder")
+        }
+    }
+    
+    func setName(name: String?) {
+        heroName.text = name
     }
     
     private func setupConstraints() {

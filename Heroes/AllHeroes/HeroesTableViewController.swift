@@ -34,8 +34,8 @@ class HeroesTableViewController: UIViewController {
         heroesTableView.setTableDataSourceAndDelegate(viewController: self)
         navigationItem.title = "All heroes"
         
-        heroesTableViewModel.fetchHeroes(addHeroesToTableView: { [weak self] in
-            self?.addHeroesToTableView()
+        heroesTableViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
+            self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
         })
     }
     
@@ -43,11 +43,11 @@ class HeroesTableViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func addHeroesToTableView() {
+    private func addHeroesToTableView(numberOfNewHeroes: Int) {
         var beginIndex = 0
         let numberOfHeroes = heroesTableViewModel.numberOfHeroes()
         if numberOfHeroes >= Constants.numberOfHeroesPerRequest {
-            beginIndex = numberOfHeroes - Constants.numberOfHeroesPerRequest
+            beginIndex = numberOfHeroes - numberOfNewHeroes
         }
         let indexPaths = (beginIndex..<numberOfHeroes)
                             .map { IndexPath(row: $0, section: 0) }
@@ -79,21 +79,11 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
                                                  for: indexPath) as! HeroesTableViewCell
+        
         let hero = heroesTableViewModel.getHeroAtIndex(index: indexPath.row)
         
-        let imageURL = hero.thumbnail?.imageURL
-        
-        if let imageURL = imageURL {
-            if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
-                cell.heroImage.loadImage(at: imageURL)
-            } else {
-                cell.heroImage.image = UIImage(named: "placeholder")
-            }
-        } else {
-            cell.heroImage.image = UIImage(named: "placeholder")
-        }
-        
-        cell.heroName.text = hero.name
+        cell.loadImage(imageURL: hero.thumbnail?.imageURL)
+        cell.setName(name: hero.name)
         
         return cell
     }
@@ -135,8 +125,8 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         if self.isLoadingData == false && indexPath.row >= rowIndexLoadMoreHeroes {
             heroesTableView.isSpinnerHidden(to: false)
             self.isLoadingData = true
-            heroesTableViewModel.fetchHeroes(addHeroesToTableView: { [weak self] in
-                self?.addHeroesToTableView()
+            heroesTableViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
+                self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
             })
         }
     }
