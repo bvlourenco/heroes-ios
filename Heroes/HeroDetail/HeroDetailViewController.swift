@@ -13,17 +13,21 @@ class HeroDetailViewController: UIViewController {
     private let heroIndex: Int
     private let heroViewModel: HeroDetailViewModel
     private let loader: ImageLoader
+    // TODO: Try to remove the distinction between snapshot test and normal program execution
+    private let isSnapshotTest: Bool
     weak var delegate: HeroViewControllerDelegate?
     
     init(hero: Hero, 
          heroIndex: Int,
          heroDetailViewModel: HeroDetailViewModel,
-         loader: ImageLoader) {
+         loader: ImageLoader,
+         isSnapshotTest: Bool = false) {
         self.hero = hero
         self.heroView = HeroDetailView()
         self.heroViewModel = heroDetailViewModel
         self.loader = loader
         self.heroIndex = heroIndex
+        self.isSnapshotTest = isSnapshotTest
         super.init(nibName: "HeroViewController", bundle: Bundle.main)
     }
     
@@ -77,18 +81,28 @@ class HeroDetailViewController: UIViewController {
             self.hero = await heroViewModel.getHeroDescriptions()
             delegate?.updateHeroInTableView(heroIndex: heroIndex, hero: self.hero)
             
-            updateDescriptionInView(categoryValues: self.hero.comics,
-                                    viewCategory: self.heroView.comicsView)
-            
-            updateDescriptionInView(categoryValues: self.hero.events,
-                                    viewCategory: self.heroView.eventsView)
-            
-            updateDescriptionInView(categoryValues: self.hero.series,
-                                    viewCategory: self.heroView.seriesView)
-            
-            updateDescriptionInView(categoryValues: self.hero.stories,
-                                    viewCategory: self.heroView.storiesView)
+            if isSnapshotTest == false {
+                self.updateAllDescriptions()
+            }
         }
+        
+        if isSnapshotTest {
+            self.updateAllDescriptions()
+        }
+    }
+    
+    private func updateAllDescriptions() {
+        updateDescriptionInView(categoryValues: self.hero.comics,
+                                viewCategory: self.heroView.comicsView)
+        
+        updateDescriptionInView(categoryValues: self.hero.events,
+                                viewCategory: self.heroView.eventsView)
+        
+        updateDescriptionInView(categoryValues: self.hero.series,
+                                viewCategory: self.heroView.seriesView)
+        
+        updateDescriptionInView(categoryValues: self.hero.stories,
+                                viewCategory: self.heroView.storiesView)
     }
     
     private func addCategory(categoryValues: Category?,

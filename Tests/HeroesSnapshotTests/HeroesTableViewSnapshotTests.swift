@@ -10,14 +10,15 @@ import XCTest
 @testable import Heroes
 
 final class HeroesTableViewSnapshotTests: XCTestCase {
+    
     func testHeroesTableViewController() {
         let heroService = HeroFakeService()
         
-        let thumbnail1 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/c/e0/535fecbbb9784",
+        let thumbnail1 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
                                                       extension: "jpg")
-        let thumbnail2 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/c/e0/535fecbbb9784",
+        let thumbnail2 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
                                                       extension: "jpg")
-        let thumbnail3 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec",
+        let thumbnail3 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
                                                       extension: "jpg")
         let hero1 = Hero.mock(thumbnail: thumbnail1)
         let hero2 = Hero.mock(name: "name 2", description: "description 2", thumbnail: thumbnail2)
@@ -40,6 +41,7 @@ final class HeroesTableViewSnapshotTests: XCTestCase {
         let heroesViewModel = HeroesTableViewModel(heroService: heroService)
         let heroesTableViewController = HeroesTableViewController(heroesTableViewModel: heroesViewModel)
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
+        
         assertSnapshot(matching: navigationController, as: .image)
     }
 }

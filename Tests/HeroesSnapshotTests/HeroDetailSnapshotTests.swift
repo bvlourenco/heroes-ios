@@ -10,6 +10,8 @@ import XCTest
 @testable import Heroes
 
 final class HeroDetailSnapshotTests: XCTestCase {
+    
+    @MainActor
     func testHeroViewController() async {
         let heroService = HeroFakeService()
         
@@ -26,17 +28,16 @@ final class HeroDetailSnapshotTests: XCTestCase {
             
             var hero = Hero.mock(stories: stories, comics: comics, events: events, series: series)
             let heroDetailViewModel = HeroDetailViewModel(heroService: heroService, hero: hero)
-            sleep(5)
+
             hero = await heroDetailViewModel.getHeroDescriptions()
             
-            let heroViewController = await HeroDetailViewController(hero: hero,
-                                                                    heroIndex: 0,
-                                                                    heroDetailViewModel: heroDetailViewModel,
-                                                                    loader: ImageLoader())
+            let heroViewController = HeroDetailViewController(hero: hero,
+                                                              heroIndex: 0,
+                                                              heroDetailViewModel: heroDetailViewModel,
+                                                              loader: ImageLoader(),
+                                                              isSnapshotTest: true)
             
-            DispatchQueue.main.async {
-                assertSnapshot(matching: heroViewController, as: .image)
-            }
+            assertSnapshot(matching: heroViewController, as: .image)
         } catch {
             print(error)
         }
