@@ -37,8 +37,10 @@ class HeroesTableView: UIView {
     }
     
     func update(indexPaths: [IndexPath]) {
-        tableView.reloadData()
+        tableView.beginUpdates()
         tableView.tableFooterView?.isHidden = true
+        tableView.insertRows(at: indexPaths, with: .none)
+        tableView.endUpdates()
     }
     
     func addSpinnerToBottom(spinner: UIActivityIndicatorView) {
