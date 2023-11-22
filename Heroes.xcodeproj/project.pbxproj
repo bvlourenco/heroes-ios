@@ -15,6 +15,7 @@
 		D90E71D42B0CBD860041AAAE /* HeroesGridViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D32B0CBD860041AAAE /* HeroesGridViewCell.swift */; };
 		D90E71D62B0CBD920041AAAE /* HeroesGridViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D52B0CBD920041AAAE /* HeroesGridViewController.swift */; };
 		D90E71D82B0CD04C0041AAAE /* HeroesGridFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D72B0CD04C0041AAAE /* HeroesGridFooter.swift */; };
+		D90E71DA2B0E28790041AAAE /* ImageResize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D92B0E28790041AAAE /* ImageResize.swift */; };
 		D935E0802AF56658006F0D61 /* HeroesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D935E07F2AF56658006F0D61 /* HeroesTableViewCell.swift */; };
 		D937F9C32AFBFC4B007BCB5D /* HeroFakeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BA0F102AF936C0003D7DCC /* HeroFakeService.swift */; };
 		D93F4F9E2AE7BEDB00610761 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93F4F9D2AE7BEDB00610761 /* AppDelegate.swift */; };
@@ -75,6 +76,7 @@
 		D90E71D32B0CBD860041AAAE /* HeroesGridViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridViewCell.swift; sourceTree = "<group>"; };
 		D90E71D52B0CBD920041AAAE /* HeroesGridViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridViewController.swift; sourceTree = "<group>"; };
 		D90E71D72B0CD04C0041AAAE /* HeroesGridFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridFooter.swift; sourceTree = "<group>"; };
+		D90E71D92B0E28790041AAAE /* ImageResize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageResize.swift; sourceTree = "<group>"; };
 		D935E07F2AF56658006F0D61 /* HeroesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTableViewCell.swift; sourceTree = "<group>"; };
 		D93F4F9A2AE7BEDB00610761 /* Heroes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heroes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D93F4F9D2AE7BEDB00610761 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 			isa = PBXGroup;
 			children = (
 				D93F4FBA2AE7FB5900610761 /* Constants.swift */,
+				D90E71D92B0E28790041AAAE /* ImageResize.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -554,6 +557,7 @@
 				D90E71D22B0CBD770041AAAE /* HeroesGridView.swift in Sources */,
 				D9BA0F0F2AF93651003D7DCC /* ServiceProtocol.swift in Sources */,
 				D940FDDE2AEABF73008424B3 /* HeroDetailView.swift in Sources */,
+				D90E71DA2B0E28790041AAAE /* ImageResize.swift in Sources */,
 				D9DF20492AEBDB6F00B81F12 /* CategoryViewComponent.swift in Sources */,
 				D94112252AFE4D4D0006C291 /* ResponseModel.swift in Sources */,
 				D940FDDC2AEABED0008424B3 /* HeroDetailViewController.swift in Sources */,

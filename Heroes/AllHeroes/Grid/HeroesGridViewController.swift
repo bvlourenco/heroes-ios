@@ -39,7 +39,11 @@ class HeroesGridViewController: AllHeroesViewController {
             self?.addHeroesToGridView(numberOfNewHeroes: numberOfNewHeroes)
         })
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Table View",
+        var image = UIImage(named: "icons8-list-50")
+        image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
+                                                 height: Constants.iconHeightSize))
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: image,
                                                                  style: .plain,
                                                                  target: self,
                                                                  action: #selector(changeViewController))

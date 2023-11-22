@@ -16,4 +16,6 @@ struct Constants {
     static let tableViewImageHeight: CGFloat = 45
     static let spinnerHeight: CGFloat = 20
     static let navigationTitleFrameSize = 50
+    static let iconWidthSize = 28
+    static let iconHeightSize = 28
 }
