@@ -7,22 +7,18 @@
 
 import UIKit
 
-class HeroesTableViewController: UIViewController {
-    private let heroesTableViewModel: HeroesTableViewModel
-    private let loader: ImageLoader = ImageLoader()
+class HeroesTableViewController: AllHeroesViewController {
     private let heroesTableView = HeroesTableView()
-    private let spinner: UIActivityIndicatorView
-    private var isLoadingData: Bool = false
+    private let heroesViewModel: HeroesViewModel
+
+    override init(heroesViewModel: HeroesViewModel) {
+        self.heroesViewModel = heroesViewModel
+        super.init(heroesViewModel: heroesViewModel)
+        heroesTableView.addSpinnerToBottom(spinner: super.getSpinner())
+    }
     
-    init(heroesTableViewModel: HeroesTableViewModel) {
-        self.heroesTableViewModel = heroesTableViewModel
-        self.spinner = UIActivityIndicatorView(style: .medium)
-        self.spinner.startAnimating()
-        self.spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0),
-                                    width: UIScreen.main.bounds.width,
-                                    height: CGFloat(Constants.spinnerHeight))
-        heroesTableView.addSpinnerToBottom(spinner: spinner)
-        super.init(nibName: nil, bundle: nil)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func loadView() {
@@ -30,22 +26,29 @@ class HeroesTableViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
         heroesTableView.setTableDataSourceAndDelegate(viewController: self)
-        navigationItem.title = "All heroes"
+        super.viewDidLoad()
         
-        heroesTableViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
+        heroesViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
             self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
         })
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Grid View",
+                                                                 style: .plain,
+                                                                 target: self,
+                                                                 action: #selector(changeViewController))
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    @objc
+    func changeViewController(sender: UIBarButtonItem) {
+        let viewControllers = [HeroesGridViewController(heroesViewModel: heroesViewModel)]
+        self.navigationController?.setViewControllers(viewControllers, animated: true)
     }
     
     private func addHeroesToTableView(numberOfNewHeroes: Int) {
         var beginIndex = 0
-        let numberOfHeroes = heroesTableViewModel.numberOfHeroes()
+        
+        let numberOfHeroes = heroesViewModel.numberOfHeroes()
         if numberOfHeroes >= Constants.numberOfHeroesPerRequest {
             beginIndex = numberOfHeroes - numberOfNewHeroes
         }
@@ -53,26 +56,20 @@ class HeroesTableViewController: UIViewController {
                             .map { IndexPath(row: $0, section: 0) }
         heroesTableView.update(indexPaths: indexPaths)
         heroesTableView.isSpinnerHidden(to: true)
-        self.isLoadingData = false
-    }
-}
-
-extension HeroesTableViewController: HeroViewControllerDelegate {
-    func updateHeroInTableView(heroIndex: Int, hero: Hero) {
-        heroesTableViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
+        super.updateLoading(to: false)
     }
 }
 
 extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
-        return heroesTableViewModel.numberOfHeroes()
+        return heroesViewModel.numberOfHeroes()
     }
     
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let numberOfHeroes = heroesTableViewModel.numberOfHeroes()
+        let numberOfHeroes = heroesViewModel.numberOfHeroes()
         if indexPath.row >= numberOfHeroes {
             return UITableViewCell()
         }
@@ -80,7 +77,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
                                                  for: indexPath) as! HeroesTableViewCell
         
-        let hero = heroesTableViewModel.getHeroAtIndex(index: indexPath.row)
+        let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
         
         cell.loadImage(imageURL: hero.thumbnail?.imageURL)
         cell.setName(name: hero.name)
@@ -91,20 +88,20 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView,
                    didSelectRowAt indexPath: IndexPath) {
         
-        let numberOfHeroes = heroesTableViewModel.numberOfHeroes()
+        let numberOfHeroes = heroesViewModel.numberOfHeroes()
         if indexPath.row >= numberOfHeroes {
             return
         }
         
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let hero = heroesTableViewModel.getHeroAtIndex(index: indexPath.row)
-        let heroDetailViewModel = HeroDetailViewModel(heroService: heroesTableViewModel.heroService, hero: hero)
+        let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
+        let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
         
         let destination = HeroDetailViewController(hero: hero,
                                                    heroIndex: indexPath.row,
                                                    heroDetailViewModel: heroDetailViewModel,
-                                                   loader: loader)
+                                                   loader: super.getLoader())
         destination.delegate = self
         navigationController?.pushViewController(destination, animated: true)
     }
@@ -114,7 +111,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                    willDisplay cell: UITableViewCell,
                    forRowAt indexPath: IndexPath) {
         
-        let numberOfHeroes = heroesTableViewModel.numberOfHeroes()
+        let numberOfHeroes = heroesViewModel.numberOfHeroes()
         if numberOfHeroes < Constants.numberOfHeroesPerRequest {
             return
         }
@@ -122,10 +119,10 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         let lastRowIndex = tableView.numberOfRows(inSection: 0) - 1
         let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
         let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
-        if self.isLoadingData == false && indexPath.row >= rowIndexLoadMoreHeroes {
+        if super.loadingStatus() == false && indexPath.row >= rowIndexLoadMoreHeroes {
             heroesTableView.isSpinnerHidden(to: false)
-            self.isLoadingData = true
-            heroesTableViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
+            super.updateLoading(to: true)
+            heroesViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
                 self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
             })
         }

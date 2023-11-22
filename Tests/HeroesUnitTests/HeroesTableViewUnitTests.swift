@@ -10,13 +10,13 @@ import XCTest
 
 final class HeroesTableViewUnitTests: XCTestCase {
     var heroService: HeroFakeService?
-    var heroesTableViewModel: HeroesTableViewModel?
+    var heroesTableViewModel: HeroesViewModel?
     
     override func setUpWithError() throws {
         try super.setUpWithError()
         heroService = HeroFakeService()
         if let heroService = heroService {
-            heroesTableViewModel = HeroesTableViewModel(heroService: heroService)
+            heroesTableViewModel = HeroesViewModel(heroService: heroService)
         }
     }
 

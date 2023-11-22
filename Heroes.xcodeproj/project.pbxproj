@@ -10,6 +10,11 @@
 		0B72B243F25F5DFECEE189CA /* Pods_Heroes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9D2A5273B45C15132A19067 /* Pods_Heroes.framework */; };
 		4D2E2AE7E388E5952497B615 /* Pods_Heroes_HeroesSnapshotTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48E9408DB0AA21EE5691B8ED /* Pods_Heroes_HeroesSnapshotTests.framework */; };
 		BCAF2AEBBBA6D39EC8B52DC5 /* Pods_HeroesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44C68D3DE64273DCC49D3F77 /* Pods_HeroesTests.framework */; };
+		D90E71CE2B0CB7230041AAAE /* AllHeroesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71CD2B0CB7230041AAAE /* AllHeroesViewController.swift */; };
+		D90E71D22B0CBD770041AAAE /* HeroesGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D12B0CBD770041AAAE /* HeroesGridView.swift */; };
+		D90E71D42B0CBD860041AAAE /* HeroesGridViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D32B0CBD860041AAAE /* HeroesGridViewCell.swift */; };
+		D90E71D62B0CBD920041AAAE /* HeroesGridViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D52B0CBD920041AAAE /* HeroesGridViewController.swift */; };
+		D90E71D82B0CD04C0041AAAE /* HeroesGridFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D72B0CD04C0041AAAE /* HeroesGridFooter.swift */; };
 		D935E0802AF56658006F0D61 /* HeroesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D935E07F2AF56658006F0D61 /* HeroesTableViewCell.swift */; };
 		D937F9C32AFBFC4B007BCB5D /* HeroFakeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BA0F102AF936C0003D7DCC /* HeroFakeService.swift */; };
 		D93F4F9E2AE7BEDB00610761 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93F4F9D2AE7BEDB00610761 /* AppDelegate.swift */; };
@@ -25,7 +30,7 @@
 		D94112202AFE340A0006C291 /* UIImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941121F2AFE340A0006C291 /* UIImageLoader.swift */; };
 		D94112232AFE4C610006C291 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94112222AFE4C610006C291 /* Category.swift */; };
 		D94112252AFE4D4D0006C291 /* ResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94112242AFE4D4D0006C291 /* ResponseModel.swift */; };
-		D95AD9382AFA54E400A34996 /* HeroesTableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95AD9372AFA54E400A34996 /* HeroesTableViewModel.swift */; };
+		D95AD9382AFA54E400A34996 /* HeroesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95AD9372AFA54E400A34996 /* HeroesViewModel.swift */; };
 		D9767CC62AFBAA1C00D3CD4C /* HeroesTableViewSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9767CC52AFBAA1C00D3CD4C /* HeroesTableViewSnapshotTests.swift */; };
 		D98B20772B021EC60095C81E /* HeroDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D98B20762B021EC60095C81E /* HeroDetailViewModel.swift */; };
 		D98B207C2B02345F0095C81E /* HeroViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D98B207B2B02345F0095C81E /* HeroViewControllerDelegate.swift */; };
@@ -65,6 +70,11 @@
 		BA962DB1900849549FEC46AE /* Pods-Heroes-HeroesSnapshotTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Heroes-HeroesSnapshotTests.debug.xcconfig"; path = "Target Support Files/Pods-Heroes-HeroesSnapshotTests/Pods-Heroes-HeroesSnapshotTests.debug.xcconfig"; sourceTree = "<group>"; };
 		CA89F45A74E7FD9A8725F9B9 /* Pods-Heroes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Heroes.release.xcconfig"; path = "Target Support Files/Pods-Heroes/Pods-Heroes.release.xcconfig"; sourceTree = "<group>"; };
 		D20566C3E1BE38DD4B7E2BFB /* Pods-Heroes-HeroesUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Heroes-HeroesUITests.debug.xcconfig"; path = "Target Support Files/Pods-Heroes-HeroesUITests/Pods-Heroes-HeroesUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		D90E71CD2B0CB7230041AAAE /* AllHeroesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllHeroesViewController.swift; sourceTree = "<group>"; };
+		D90E71D12B0CBD770041AAAE /* HeroesGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridView.swift; sourceTree = "<group>"; };
+		D90E71D32B0CBD860041AAAE /* HeroesGridViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridViewCell.swift; sourceTree = "<group>"; };
+		D90E71D52B0CBD920041AAAE /* HeroesGridViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridViewController.swift; sourceTree = "<group>"; };
+		D90E71D72B0CD04C0041AAAE /* HeroesGridFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridFooter.swift; sourceTree = "<group>"; };
 		D935E07F2AF56658006F0D61 /* HeroesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTableViewCell.swift; sourceTree = "<group>"; };
 		D93F4F9A2AE7BEDB00610761 /* Heroes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heroes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D93F4F9D2AE7BEDB00610761 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -81,7 +91,7 @@
 		D941121F2AFE340A0006C291 /* UIImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageLoader.swift; sourceTree = "<group>"; };
 		D94112222AFE4C610006C291 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		D94112242AFE4D4D0006C291 /* ResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseModel.swift; sourceTree = "<group>"; };
-		D95AD9372AFA54E400A34996 /* HeroesTableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTableViewModel.swift; sourceTree = "<group>"; };
+		D95AD9372AFA54E400A34996 /* HeroesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesViewModel.swift; sourceTree = "<group>"; };
 		D9767CC32AFBAA1C00D3CD4C /* HeroesSnapshotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeroesSnapshotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9767CC52AFBAA1C00D3CD4C /* HeroesTableViewSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTableViewSnapshotTests.swift; sourceTree = "<group>"; };
 		D98B20762B021EC60095C81E /* HeroDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroDetailViewModel.swift; sourceTree = "<group>"; };
@@ -141,6 +151,27 @@
 				0330F3992A54DF955C564BC6 /* Pods-HeroesTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D90E71CF2B0CB7990041AAAE /* Table */ = {
+			isa = PBXGroup;
+			children = (
+				D93F4FA12AE7BEDB00610761 /* HeroesTableViewController.swift */,
+				D9DFF5002AE950EA002E7B6A /* HeroesTableView.swift */,
+				D935E07F2AF56658006F0D61 /* HeroesTableViewCell.swift */,
+			);
+			path = Table;
+			sourceTree = "<group>";
+		};
+		D90E71D02B0CB7A80041AAAE /* Grid */ = {
+			isa = PBXGroup;
+			children = (
+				D90E71D12B0CBD770041AAAE /* HeroesGridView.swift */,
+				D90E71D32B0CBD860041AAAE /* HeroesGridViewCell.swift */,
+				D90E71D52B0CBD920041AAAE /* HeroesGridViewController.swift */,
+				D90E71D72B0CD04C0041AAAE /* HeroesGridFooter.swift */,
+			);
+			path = Grid;
 			sourceTree = "<group>";
 		};
 		D93F4F912AE7BEDB00610761 = {
@@ -232,10 +263,10 @@
 		D98B20782B0227330095C81E /* AllHeroes */ = {
 			isa = PBXGroup;
 			children = (
-				D9DFF5002AE950EA002E7B6A /* HeroesTableView.swift */,
-				D935E07F2AF56658006F0D61 /* HeroesTableViewCell.swift */,
-				D93F4FA12AE7BEDB00610761 /* HeroesTableViewController.swift */,
-				D95AD9372AFA54E400A34996 /* HeroesTableViewModel.swift */,
+				D90E71D02B0CB7A80041AAAE /* Grid */,
+				D90E71CF2B0CB7990041AAAE /* Table */,
+				D95AD9372AFA54E400A34996 /* HeroesViewModel.swift */,
+				D90E71CD2B0CB7230041AAAE /* AllHeroesViewController.swift */,
 			);
 			path = AllHeroes;
 			sourceTree = "<group>";
@@ -511,12 +542,16 @@
 				D9D259912AFD4D9200D11555 /* ImageLoader.swift in Sources */,
 				D98B20772B021EC60095C81E /* HeroDetailViewModel.swift in Sources */,
 				D937F9C32AFBFC4B007BCB5D /* HeroFakeService.swift in Sources */,
+				D90E71D82B0CD04C0041AAAE /* HeroesGridFooter.swift in Sources */,
+				D90E71CE2B0CB7230041AAAE /* AllHeroesViewController.swift in Sources */,
 				D93F4FB62AE7E12900610761 /* HeroService.swift in Sources */,
-				D95AD9382AFA54E400A34996 /* HeroesTableViewModel.swift in Sources */,
+				D95AD9382AFA54E400A34996 /* HeroesViewModel.swift in Sources */,
 				D93F4FA22AE7BEDB00610761 /* HeroesTableViewController.swift in Sources */,
 				D98B207C2B02345F0095C81E /* HeroViewControllerDelegate.swift in Sources */,
 				D93F4F9E2AE7BEDB00610761 /* AppDelegate.swift in Sources */,
 				D94112202AFE340A0006C291 /* UIImageLoader.swift in Sources */,
+				D90E71D42B0CBD860041AAAE /* HeroesGridViewCell.swift in Sources */,
+				D90E71D22B0CBD770041AAAE /* HeroesGridView.swift in Sources */,
 				D9BA0F0F2AF93651003D7DCC /* ServiceProtocol.swift in Sources */,
 				D940FDDE2AEABF73008424B3 /* HeroDetailView.swift in Sources */,
 				D9DF20492AEBDB6F00B81F12 /* CategoryViewComponent.swift in Sources */,
@@ -525,6 +560,7 @@
 				D94112232AFE4C610006C291 /* Category.swift in Sources */,
 				D9DFF5012AE950EA002E7B6A /* HeroesTableView.swift in Sources */,
 				D93F4FA02AE7BEDB00610761 /* SceneDelegate.swift in Sources */,
+				D90E71D62B0CBD920041AAAE /* HeroesGridViewController.swift in Sources */,
 				D93F4FB42AE7E11900610761 /* Hero.swift in Sources */,
 				D93F4FBB2AE7FB5900610761 /* Constants.swift in Sources */,
 				D935E0802AF56658006F0D61 /* HeroesTableViewCell.swift in Sources */,

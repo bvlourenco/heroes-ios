@@ -38,8 +38,8 @@ final class HeroesTableViewSnapshotTests: XCTestCase {
         
         heroService.getHeroesStub = { .success(heroes) }
         
-        let heroesViewModel = HeroesTableViewModel(heroService: heroService)
-        let heroesTableViewController = HeroesTableViewController(heroesTableViewModel: heroesViewModel)
+        let heroesViewModel = HeroesViewModel(heroService: heroService)
+        let heroesTableViewController = HeroesTableViewController(heroesViewModel: heroesViewModel)
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
         
         assertSnapshot(matching: navigationController, as: .image)

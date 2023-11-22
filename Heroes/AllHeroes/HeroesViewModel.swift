@@ -1,5 +1,5 @@
 //
-//  HeroesTableViewModel.swift
+//  HeroesViewModel.swift
 //  Heroes
 //
 //  Created by Bernardo Vala Lourenço on 06/11/2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class HeroesTableViewModel {
+class HeroesViewModel {
     private var heroes: [Hero] = []
     let heroService: HeroServiceProtocol
     
