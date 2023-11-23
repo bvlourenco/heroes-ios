@@ -29,6 +29,16 @@ class UIImageLoader {
                 let image = try result.get()
                 DispatchQueue.main.async {
                     imageView.image = image
+                    
+                    if self.imageLoader.isFirstTimeLoading(url: url) {
+                        imageView.alpha = 0
+                        UIView.animate(withDuration: 0.5,
+                                       delay: 0,
+                                       options: UIView.AnimationOptions.showHideTransitionViews,
+                                       animations: { () -> Void in
+                            imageView.alpha = 1
+                        })
+                    }
                 }
             } catch {
                 print(error)

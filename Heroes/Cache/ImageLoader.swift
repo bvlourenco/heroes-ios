@@ -12,10 +12,12 @@ import UIKit
 class ImageLoader {
     private var loadedImages = [URL: UIImage]()
     private var runningRequests = [UUID: URLSessionDataTask]()
+    private var firstTimeLoading = [URL: Bool]()
     
     func loadImage(_ url: URL, _ completion: @escaping (Result<UIImage, Error>) -> Void) -> UUID? {
         
         if let image = loadedImages[url] {
+            self.firstTimeLoading[url] = false
             completion(.success(image))
             return nil
         }
@@ -28,6 +30,7 @@ class ImageLoader {
             // Load and return image
             if let data = data, let image = UIImage(data: data) {
                 self.loadedImages[url] = image
+                self.firstTimeLoading[url] = true
                 completion(.success(image))
                 return
             }
@@ -51,5 +54,9 @@ class ImageLoader {
     func cancelLoad(_ uuid: UUID) {
         runningRequests[uuid]?.cancel()
         runningRequests.removeValue(forKey: uuid)
+    }
+    
+    func isFirstTimeLoading(url: URL) -> Bool {
+        return self.firstTimeLoading[url] == true
     }
 }

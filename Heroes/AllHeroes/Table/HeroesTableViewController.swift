@@ -72,7 +72,6 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let numberOfHeroes = heroesViewModel.numberOfHeroes()
         if indexPath.row >= numberOfHeroes {
             return UITableViewCell()
