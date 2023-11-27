@@ -12,7 +12,7 @@ class HeroesGridViewController: AllHeroesViewController {
     private enum CollectionViewConstants {
         static let leftPadding: CGFloat = 10
         static let rightPadding: CGFloat = 10
-        static let cellHeight: CGFloat = 300
+        static let cellHeight: CGFloat = 250
     }
     
     private let heroesGridView = HeroesGridView()

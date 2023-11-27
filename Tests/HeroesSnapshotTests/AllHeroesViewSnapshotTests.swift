@@ -9,9 +9,9 @@ import SnapshotTesting
 import XCTest
 @testable import Heroes
 
-final class HeroesTableViewSnapshotTests: XCTestCase {
+final class AllHeroesViewSnapshotTests: XCTestCase {
     
-    func testHeroesTableViewController() {
+    private func makeHeroes() -> HeroesViewModel {
         let heroService = HeroFakeService()
         
         let thumbnail1 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
@@ -39,8 +39,21 @@ final class HeroesTableViewSnapshotTests: XCTestCase {
         heroService.getHeroesStub = { .success(heroes) }
         
         let heroesViewModel = HeroesViewModel(heroService: heroService)
+        return heroesViewModel
+    }
+    
+    func testHeroesTableViewController() {
+        let heroesViewModel = makeHeroes()
         let heroesTableViewController = HeroesTableViewController(heroesViewModel: heroesViewModel)
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
+        
+        assertSnapshot(matching: navigationController, as: .image)
+    }
+    
+    func testHeroesGridViewController() {
+        let heroesViewModel = makeHeroes()
+        let heroesGridViewController = HeroesGridViewController(heroesViewModel: heroesViewModel)
+        let navigationController = UINavigationController(rootViewController: heroesGridViewController)
         
         assertSnapshot(matching: navigationController, as: .image)
     }
