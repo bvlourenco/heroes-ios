@@ -10,6 +10,15 @@ import UIKit
 class HeroesTableViewController: AllHeroesViewController {
     private let heroesTableView = HeroesTableView()
     private let heroesViewModel: HeroesViewModel
+    
+    private var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.showsCancelButton = true
+        searchBar.sizeToFit()
+        return searchBar
+    }()
+    
+    private var rightBarButtonItems: [UIBarButtonItem] = []
 
     override init(heroesViewModel: HeroesViewModel) {
         self.heroesViewModel = heroesViewModel
@@ -37,16 +46,25 @@ class HeroesTableViewController: AllHeroesViewController {
         image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
                                                  height: Constants.iconHeightSize))
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: image,
-                                                                 style: .plain,
-                                                                 target: self,
-                                                                 action: #selector(changeViewController))
+        let searchButton = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(displaySearchController))
+        let gridButton =  UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(changeViewController))
+        
+        self.rightBarButtonItems = [gridButton, searchButton]
+        navigationItem.rightBarButtonItems = self.rightBarButtonItems
+        
+        searchBar.delegate = self
     }
     
     @objc
     func changeViewController(sender: UIBarButtonItem) {
         let viewControllers = [HeroesGridViewController(heroesViewModel: heroesViewModel)]
         self.navigationController?.setViewControllers(viewControllers, animated: true)
+    }
+    
+    @objc
+    func displaySearchController() {
+        navigationItem.titleView = searchBar
+        navigationItem.rightBarButtonItems = []
     }
     
     private func addHeroesToTableView(numberOfNewHeroes: Int) {
@@ -129,5 +147,17 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                 self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
             })
         }
+    }
+}
+
+extension HeroesTableViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        // TODO: API call to search for heroes (depends on the possibility of using Combine or not)
+    }
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = ""
+        navigationItem.titleView = nil
+        navigationItem.rightBarButtonItems = self.rightBarButtonItems
     }
 }
