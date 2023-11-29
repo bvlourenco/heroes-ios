@@ -5,6 +5,7 @@
 //  Created by Bernardo Vala Lourenço on 24/10/2023.
 //
 
+import Combine
 import UIKit
 
 class HeroesTableViewController: AllHeroesViewController {
@@ -17,6 +18,11 @@ class HeroesTableViewController: AllHeroesViewController {
         searchBar.sizeToFit()
         return searchBar
     }()
+    
+    @Published
+    private var searchQuery = ""
+    
+    private var cancellables: Set<AnyCancellable> = []
     
     private var rightBarButtonItems: [UIBarButtonItem] = []
 
@@ -38,9 +44,9 @@ class HeroesTableViewController: AllHeroesViewController {
         heroesTableView.setTableDataSourceAndDelegate(viewController: self)
         super.viewDidLoad()
         
-        heroesViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
+        heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
             self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
-        })
+        }
         
         var image = UIImage(named: "icons8-grid-2-50")
         image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
@@ -53,6 +59,15 @@ class HeroesTableViewController: AllHeroesViewController {
         navigationItem.rightBarButtonItems = self.rightBarButtonItems
         
         searchBar.delegate = self
+        
+        $searchQuery
+            .debounce(for: .seconds(5), scheduler: DispatchQueue.main)
+            .filter { $0.count > 2 }
+            .removeDuplicates()
+            .sink { [weak self] text in
+                self?.searchForHeroes(searchQuery: text)
+            }
+            .store(in: &cancellables)
     }
     
     @objc
@@ -67,96 +82,149 @@ class HeroesTableViewController: AllHeroesViewController {
         navigationItem.rightBarButtonItems = []
     }
     
-    private func addHeroesToTableView(numberOfNewHeroes: Int) {
-        var beginIndex = 0
-        
-        let numberOfHeroes = heroesViewModel.numberOfHeroes()
-        if numberOfHeroes >= Constants.numberOfHeroesPerRequest {
-            beginIndex = numberOfHeroes - numberOfNewHeroes
+    private func searchForHeroes(searchQuery text: String) {
+        heroesViewModel.clearHeroesInSearch()
+        heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] numberOfNewHeroes in
+            self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
         }
-        let indexPaths = (beginIndex..<numberOfHeroes)
-                            .map { IndexPath(row: $0, section: 0) }
-        heroesTableView.update(indexPaths: indexPaths)
+    }
+    
+    private func addHeroesToTableView(numberOfNewHeroes: Int) {
+        reloadTableViewData()
         heroesTableView.isSpinnerHidden(to: true)
         super.updateLoading(to: false)
+    }
+    
+    private func reloadTableViewData() {
+        heroesTableView.update()
     }
 }
 
 extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView,
-                   numberOfRowsInSection section: Int) -> Int {
-        return heroesViewModel.numberOfHeroes()
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 0 {
+            return heroesViewModel.numberOfHeroesInSearch() > 0 ? "Heroes Search Result" : nil
+        } else {
+            return heroesViewModel.numberOfHeroes() > 0 ? "All Heroes": nil
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 {
+            return heroesViewModel.numberOfHeroesInSearch()
+        } else {
+            return heroesViewModel.numberOfHeroes()
+        }
     }
     
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let numberOfHeroes = heroesViewModel.numberOfHeroes()
-        if indexPath.row >= numberOfHeroes {
-            return UITableViewCell()
+        if indexPath.section == 0 {
+            let numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
+            if indexPath.row >= numberOfHeroes {
+                return UITableViewCell()
+            }
+            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
+                                                     for: indexPath) as! HeroesTableViewCell
+            
+            let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
+            
+            cell.loadImage(imageURL: hero.thumbnail?.imageURL)
+            cell.setName(name: hero.name)
+            
+            return cell
+        } else {
+            let numberOfHeroes = heroesViewModel.numberOfHeroes()
+            if indexPath.row >= numberOfHeroes {
+                return UITableViewCell()
+            }
+            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
+                                                     for: indexPath) as! HeroesTableViewCell
+            
+            let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
+            
+            cell.loadImage(imageURL: hero.thumbnail?.imageURL)
+            cell.setName(name: hero.name)
+            
+            return cell
         }
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
-                                                 for: indexPath) as! HeroesTableViewCell
-        
-        let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
-        
-        cell.loadImage(imageURL: hero.thumbnail?.imageURL)
-        cell.setName(name: hero.name)
-        
-        return cell
     }
     
     func tableView(_ tableView: UITableView,
                    didSelectRowAt indexPath: IndexPath) {
-        
-        let numberOfHeroes = heroesViewModel.numberOfHeroes()
-        if indexPath.row >= numberOfHeroes {
-            return
+        if indexPath.section == 1 {
+            let numberOfHeroes = heroesViewModel.numberOfHeroes()
+            if indexPath.row >= numberOfHeroes {
+                return
+            }
+            
+            tableView.deselectRow(at: indexPath, animated: true)
+            
+            let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
+            let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
+            
+            let destination = HeroDetailViewController(hero: hero,
+                                                       heroIndex: indexPath.row,
+                                                       heroDetailViewModel: heroDetailViewModel,
+                                                       loader: super.getLoader())
+            destination.delegate = self
+            navigationController?.pushViewController(destination, animated: true)
         }
-        
-        tableView.deselectRow(at: indexPath, animated: true)
-        
-        let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
-        let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
-        
-        let destination = HeroDetailViewController(hero: hero,
-                                                   heroIndex: indexPath.row,
-                                                   heroDetailViewModel: heroDetailViewModel,
-                                                   loader: super.getLoader())
-        destination.delegate = self
-        navigationController?.pushViewController(destination, animated: true)
     }
     
     // From: https://stackoverflow.com/a/42457571
     func tableView(_ tableView: UITableView,
                    willDisplay cell: UITableViewCell,
                    forRowAt indexPath: IndexPath) {
-        
-        let numberOfHeroes = heroesViewModel.numberOfHeroes()
-        if numberOfHeroes < Constants.numberOfHeroesPerRequest {
-            return
-        }
-        
-        let lastRowIndex = tableView.numberOfRows(inSection: 0) - 1
-        let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
-        let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
-        if super.loadingStatus() == false && indexPath.row >= rowIndexLoadMoreHeroes {
-            heroesTableView.isSpinnerHidden(to: false)
-            super.updateLoading(to: true)
-            heroesViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
-                self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
-            })
+        if indexPath.section == 1 {
+            let numberOfHeroes = heroesViewModel.numberOfHeroes()
+            if numberOfHeroes < Constants.numberOfHeroesPerRequest {
+                return
+            }
+            
+            let lastRowIndex = tableView.numberOfRows(inSection: 1) - 1
+            let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
+            let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
+            if super.loadingStatus() == false && indexPath.row >= rowIndexLoadMoreHeroes {
+                heroesTableView.isSpinnerHidden(to: false)
+                super.updateLoading(to: true)
+                heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
+                    self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
+                }
+            }
         }
     }
 }
 
 extension HeroesTableViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        // TODO: API call to search for heroes (depends on the possibility of using Combine or not)
+        self.searchQuery = searchText
+        
+        if searchText == "" {
+            heroesViewModel.clearHeroesInSearch()
+            reloadTableViewData()
+        }
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let text = searchBar.text ?? ""
+        if text.isEmpty == false && text.count > 2 {
+            searchBar.resignFirstResponder()
+            searchForHeroes(searchQuery: text)
+        }
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = ""
+        self.searchQuery = ""
+        heroesViewModel.clearHeroesInSearch()
+        reloadTableViewData()
         navigationItem.titleView = nil
         navigationItem.rightBarButtonItems = self.rightBarButtonItems
     }

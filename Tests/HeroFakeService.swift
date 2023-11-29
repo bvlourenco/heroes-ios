@@ -16,7 +16,7 @@ class HeroFakeService: HeroServiceProtocol {
     var storiesDescription: [String] = []
     var seriesDescription: [String] = []
     
-    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async -> Result<[Hero], HeroError> {
+    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int, searchQuery: String?) async -> Result<[Hero], HeroError> {
         return self.getHeroesStub()
     }
 

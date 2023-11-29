@@ -17,6 +17,6 @@ enum NetworkError: Error {
 }
 
 protocol HeroServiceProtocol {
-    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async -> Result<[Hero], HeroError>
+    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int, searchQuery: String?) async -> Result<[Hero], HeroError>
     func getHeroDetails(hero: Hero) async -> Result<Hero, HeroError>
 }

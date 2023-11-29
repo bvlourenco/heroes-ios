@@ -35,9 +35,9 @@ class HeroesGridViewController: AllHeroesViewController {
         heroesGridView.setGridDataSourceAndDelegate(viewController: self)
         super.viewDidLoad()
         
-        heroesViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
+        heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
             self?.addHeroesToGridView(numberOfNewHeroes: numberOfNewHeroes)
-        })
+        }
         
         var image = UIImage(named: "icons8-list-50")
         image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
@@ -125,9 +125,9 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
         let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
         if super.loadingStatus() == false && indexPath.row >= rowIndexLoadMoreHeroes {
             super.updateLoading(to: true)
-            heroesViewModel.fetchHeroes(addHeroesToTableView: { [weak self] numberOfNewHeroes in
+            heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
                 self?.addHeroesToGridView(numberOfNewHeroes: numberOfNewHeroes)
-            })
+            }
         }
     }
     

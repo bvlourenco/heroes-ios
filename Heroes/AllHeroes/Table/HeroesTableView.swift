@@ -36,7 +36,7 @@ class HeroesTableView: UIView {
         tableView.dataSource = viewController
     }
     
-    func update(indexPaths: [IndexPath]) {
+    func update() {
         tableView.reloadData()
         tableView.tableFooterView?.isHidden = true
     }

@@ -15,12 +15,15 @@ enum CategoryTypes: String {
 class HeroService: HeroServiceProtocol {
     private let decoder = JSONDecoder()
     
-    func getHeroes(offset: Int, numberOfHeroesPerRequest: Int) async -> Result<[Hero], HeroError> {
+    func getHeroes(offset: Int,
+                   numberOfHeroesPerRequest: Int,
+                   searchQuery: String?) async -> Result<[Hero], HeroError> {
         var heroes: [Hero] = []
         
         let result = await performRequest(resourceURL: .heroesURLRequest,
                                           limit: numberOfHeroesPerRequest,
-                                          offset: offset)
+                                          offset: offset,
+                                          searchQuery: searchQuery)
         
         switch result {
         case .success(let jsonData):
@@ -138,7 +141,8 @@ class HeroService: HeroServiceProtocol {
         
         let result = await performRequest(resourceURL: resourceURL,
                                           limit: nil,
-                                          offset: nil)
+                                          offset: nil,
+                                          searchQuery: nil)
         
         switch result {
         case .success(let jsonData):
@@ -158,7 +162,8 @@ class HeroService: HeroServiceProtocol {
     
     private func performRequest(resourceURL url: String,
                                 limit: Int?,
-                                offset: Int?) async -> Result<Data, NetworkError> {
+                                offset: Int?,
+                                searchQuery: String?) async -> Result<Data, NetworkError> {
         guard var urlComponents = URLComponents(string: url) else {
             return .failure(.badUrl)
         }
@@ -175,6 +180,10 @@ class HeroService: HeroServiceProtocol {
         }
         if let offset = offset {
             let queryItem = URLQueryItem(name: "offset", value: String(offset))
+            urlComponents.queryItems?.append(queryItem)
+        }
+        if let searchQuery = searchQuery {
+            let queryItem = URLQueryItem(name: "nameStartsWith", value: searchQuery)
             urlComponents.queryItems?.append(queryItem)
         }
         
