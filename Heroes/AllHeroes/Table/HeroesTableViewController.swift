@@ -176,8 +176,9 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         
         let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
         
+        let heroIndex = indexPath.section == 0 ? -1 : indexPath.row
         let destination = HeroDetailViewController(hero: hero,
-                                                   heroIndex: indexPath.row,
+                                                   heroIndex: heroIndex,
                                                    heroDetailViewModel: heroDetailViewModel,
                                                    loader: super.getLoader())
         destination.delegate = self

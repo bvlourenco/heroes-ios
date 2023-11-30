@@ -13,7 +13,7 @@ typealias Comics = Category
 typealias Events = Category
 typealias Series = Category
 
-struct Hero: Decodable {
+struct Hero: Decodable, Equatable {
     let name: String?
     let description: String?
     let thumbnail: Thumbnail?
@@ -34,6 +34,10 @@ struct Hero: Decodable {
         var imageURL: URL {
             URL(string: "\(path).\(`extension`)")!
         }
+    }
+    
+    static func ==(hero1: Hero, hero2: Hero) -> Bool {
+        return hero1.name == hero2.name && hero1.description == hero2.description
     }
 }
 

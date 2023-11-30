@@ -59,7 +59,13 @@ class HeroesViewModel {
     }
     
     func setHeroAtIndex(at index: Int, hero: Hero) {
-        self.heroes[index] = hero
+        if index >= 0 {
+            self.heroes[index] = hero
+        } else {
+            guard let index = self.heroes.firstIndex(of: hero) else { return }
+            self.heroes.remove(at: index)
+            self.heroes.insert(hero, at: 0)
+        }
     }
     
     func clearHeroesInSearch() {
