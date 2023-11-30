@@ -158,24 +158,30 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView,
                    didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 1 {
-            let numberOfHeroes = heroesViewModel.numberOfHeroes()
-            if indexPath.row >= numberOfHeroes {
-                return
-            }
-            
-            tableView.deselectRow(at: indexPath, animated: true)
-            
-            let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
-            let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
-            
-            let destination = HeroDetailViewController(hero: hero,
-                                                       heroIndex: indexPath.row,
-                                                       heroDetailViewModel: heroDetailViewModel,
-                                                       loader: super.getLoader())
-            destination.delegate = self
-            navigationController?.pushViewController(destination, animated: true)
+        let numberOfHeroes: Int
+        let hero: Hero
+        if indexPath.section == 0 {
+            numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
+            hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
+        } else {
+            numberOfHeroes = heroesViewModel.numberOfHeroes()
+            hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
         }
+        
+        if indexPath.row >= numberOfHeroes {
+            return
+        }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
+        
+        let destination = HeroDetailViewController(hero: hero,
+                                                   heroIndex: indexPath.row,
+                                                   heroDetailViewModel: heroDetailViewModel,
+                                                   loader: super.getLoader())
+        destination.delegate = self
+        navigationController?.pushViewController(destination, animated: true)
     }
     
     // From: https://stackoverflow.com/a/42457571
