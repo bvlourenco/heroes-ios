@@ -41,7 +41,7 @@ class HeroesGridView: UIView {
         collectionView.dataSource = viewController
     }
     
-    func update(indexPaths: [IndexPath]) {
+    func update() {
         collectionView.reloadData()
     }
     
@@ -61,6 +61,9 @@ class HeroesGridView: UIView {
         collectionView.register(HeroesGridFooter.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: "footer")
+        collectionView.register(HeroesGridHeader.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: "header")
         collectionView.backgroundColor = UIColor.white
         
         addSubview(collectionView)
