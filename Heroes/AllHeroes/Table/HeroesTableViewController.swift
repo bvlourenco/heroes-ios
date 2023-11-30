@@ -11,6 +11,9 @@ import UIKit
 class HeroesTableViewController: AllHeroesViewController {
     private let heroesTableView = HeroesTableView()
     private let heroesViewModel: HeroesViewModel
+    private var cancellables: Set<AnyCancellable> = []
+    private var rightBarButtonItems: [UIBarButtonItem] = []
+    private var isInSearch: Bool = false
     
     private var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
@@ -21,10 +24,6 @@ class HeroesTableViewController: AllHeroesViewController {
     
     @Published
     private var searchQuery = ""
-    
-    private var cancellables: Set<AnyCancellable> = []
-    
-    private var rightBarButtonItems: [UIBarButtonItem] = []
 
     override init(heroesViewModel: HeroesViewModel) {
         self.heroesViewModel = heroesViewModel
@@ -86,6 +85,7 @@ class HeroesTableViewController: AllHeroesViewController {
         heroesViewModel.clearHeroesInSearch()
         heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] numberOfNewHeroes in
             self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
+            self?.isInSearch = false
         }
     }
     
@@ -107,7 +107,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
-            return heroesViewModel.numberOfHeroesInSearch() > 0 ? "Heroes Search Result" : nil
+            return isInSearch || heroesViewModel.numberOfHeroesInSearch() > 0 ? "Heroes Search Result" : nil
         } else {
             return heroesViewModel.numberOfHeroes() > 0 ? "All Heroes": nil
         }
@@ -115,7 +115,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return heroesViewModel.numberOfHeroesInSearch()
+            return isInSearch ? max(1, heroesViewModel.numberOfHeroesInSearch()) : heroesViewModel.numberOfHeroesInSearch()
         } else {
             return heroesViewModel.numberOfHeroes()
         }
@@ -124,20 +124,24 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
-            let numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
-            if indexPath.row >= numberOfHeroes {
-                return UITableViewCell()
+            if isInSearch {
+                return LoadingTableViewCell()
+            } else {
+                let numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
+                if indexPath.row >= numberOfHeroes {
+                    return UITableViewCell()
+                }
+                
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
+                                                         for: indexPath) as! HeroesTableViewCell
+                
+                let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
+                
+                cell.loadImage(imageURL: hero.thumbnail?.imageURL)
+                cell.setName(name: hero.name)
+                
+                return cell
             }
-            
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
-                                                     for: indexPath) as! HeroesTableViewCell
-            
-            let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
-            
-            cell.loadImage(imageURL: hero.thumbnail?.imageURL)
-            cell.setName(name: hero.name)
-            
-            return cell
         } else {
             let numberOfHeroes = heroesViewModel.numberOfHeroes()
             if indexPath.row >= numberOfHeroes {
@@ -211,9 +215,15 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
 
 extension HeroesTableViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if self.isInSearch == false {
+            self.isInSearch = true
+            heroesTableView.update()
+        }
+        
         self.searchQuery = searchText
         
         if searchText == "" {
+            self.isInSearch = false
             heroesViewModel.clearHeroesInSearch()
             reloadTableViewData()
         }
@@ -231,8 +241,9 @@ extension HeroesTableViewController: UISearchBarDelegate {
         searchBar.text = ""
         self.searchQuery = ""
         heroesViewModel.clearHeroesInSearch()
-        reloadTableViewData()
         navigationItem.titleView = nil
         navigationItem.rightBarButtonItems = self.rightBarButtonItems
+        self.isInSearch = false
+        reloadTableViewData()
     }
 }

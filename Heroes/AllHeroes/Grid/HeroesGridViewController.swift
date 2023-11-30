@@ -19,6 +19,9 @@ class HeroesGridViewController: AllHeroesViewController {
     
     private let heroesGridView = HeroesGridView()
     private let heroesViewModel: HeroesViewModel
+    private var cancellables: Set<AnyCancellable> = []
+    private var rightBarButtonItems: [UIBarButtonItem] = []
+    private var isInSearch: Bool = false
     
     private var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
@@ -29,8 +32,6 @@ class HeroesGridViewController: AllHeroesViewController {
     
     @Published
     private var searchQuery = ""
-    private var cancellables: Set<AnyCancellable> = []
-    private var rightBarButtonItems: [UIBarButtonItem] = []
     
     override init(heroesViewModel: HeroesViewModel) {
         self.heroesViewModel = heroesViewModel
@@ -91,6 +92,7 @@ class HeroesGridViewController: AllHeroesViewController {
         heroesViewModel.clearHeroesInSearch()
         heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] numberOfNewHeroes in
             self?.addHeroesToGridView(numberOfNewHeroes: numberOfNewHeroes)
+            self?.isInSearch = false
         }
     }
     
@@ -111,7 +113,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
-            return heroesViewModel.numberOfHeroesInSearch()
+            return isInSearch ? max(1, heroesViewModel.numberOfHeroesInSearch()) : heroesViewModel.numberOfHeroesInSearch()
         } else {
             return heroesViewModel.numberOfHeroes()
         }
@@ -120,20 +122,27 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
-            let numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
-            if indexPath.row >= numberOfHeroes {
-                return UICollectionViewCell()
+            if isInSearch && heroesViewModel.numberOfHeroesInSearch() == 0 {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "loadingCell",
+                                                              for: indexPath) as! LoadingGridViewCell
+                cell.animateSpinner()
+                return cell
+            } else {
+                let numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
+                if indexPath.row >= numberOfHeroes {
+                    return UICollectionViewCell()
+                }
+                
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell",
+                                                              for: indexPath) as! HeroesGridViewCell
+                
+                let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
+                
+                cell.loadImage(imageURL: hero.thumbnail?.imageURL)
+                cell.setName(name: hero.name)
+                
+                return cell
             }
-            
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell",
-                                                          for: indexPath) as! HeroesGridViewCell
-            
-            let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
-            
-            cell.loadImage(imageURL: hero.thumbnail?.imageURL)
-            cell.setName(name: hero.name)
-            
-            return cell
         } else {
             let numberOfHeroes = heroesViewModel.numberOfHeroes()
             if indexPath.row >= numberOfHeroes {
@@ -155,6 +164,11 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let numberOfHeroes: Int
         let hero: Hero
+        
+        if isInSearch && indexPath.section == 0 {
+            return
+        }
+        
         if indexPath.section == 0 {
             numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
             hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
@@ -206,9 +220,14 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let cellHeight: CGFloat = CollectionViewConstants.cellHeight
         
-        let cellWidth = collectionView.frame.width / 2 - (
-                        CollectionViewConstants.leftPadding +
-                        CollectionViewConstants.rightPadding)
+        let cellWidth: CGFloat
+        if indexPath.section == 0 && isInSearch && heroesViewModel.numberOfHeroesInSearch() == 0 {
+            cellWidth = collectionView.frame.width
+        } else {
+            cellWidth = collectionView.frame.width / 2 - (
+                CollectionViewConstants.leftPadding +
+                CollectionViewConstants.rightPadding)
+        }
         
         return CGSize(width: cellWidth, height: cellHeight)
     }
@@ -218,7 +237,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                         at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            if indexPath.section == 0 && heroesViewModel.numberOfHeroesInSearch() == 0 {
+            if indexPath.section == 0 && heroesViewModel.numberOfHeroesInSearch() == 0 && isInSearch == false {
                 return UICollectionReusableView()
             }
             
@@ -257,7 +276,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
-        if section == 0 && heroesViewModel.numberOfHeroesInSearch() == 0 {
+        if section == 0 && heroesViewModel.numberOfHeroesInSearch() == 0 && isInSearch == false {
             return CGSize(width: 0, height: 0)
         } else {
             return CGSize(width: collectionView.frame.width, height: CollectionViewConstants.headingHeight)
@@ -267,9 +286,15 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
 
 extension HeroesGridViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if self.isInSearch == false {
+            self.isInSearch = true
+            reloadGridViewData()
+        }
+        
         self.searchQuery = searchText
         
         if searchText == "" {
+            self.isInSearch = false
             heroesViewModel.clearHeroesInSearch()
             reloadGridViewData()
         }
@@ -287,8 +312,9 @@ extension HeroesGridViewController: UISearchBarDelegate {
         searchBar.text = ""
         self.searchQuery = ""
         heroesViewModel.clearHeroesInSearch()
-        reloadGridViewData()
+        self.isInSearch = false
         navigationItem.titleView = nil
         navigationItem.rightBarButtonItems = self.rightBarButtonItems
+        reloadGridViewData()
     }
 }

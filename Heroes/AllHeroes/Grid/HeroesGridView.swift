@@ -58,6 +58,7 @@ class HeroesGridView: UIView {
     
     private func configureCollectionView() {
         collectionView.register(HeroesGridViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.register(LoadingGridViewCell.self, forCellWithReuseIdentifier: "loadingCell")
         collectionView.register(HeroesGridFooter.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: "footer")
