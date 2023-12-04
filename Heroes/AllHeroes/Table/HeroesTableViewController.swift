@@ -44,7 +44,7 @@ class HeroesTableViewController: AllHeroesViewController {
         super.viewDidLoad()
         
         heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
-            self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
+            self?.addHeroesToTableView()
         }
         
         var image = UIImage(named: "icons8-grid-2-50")
@@ -84,12 +84,12 @@ class HeroesTableViewController: AllHeroesViewController {
     private func searchForHeroes(searchQuery text: String) {
         heroesViewModel.clearHeroesInSearch()
         heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] numberOfNewHeroes in
-            self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
             self?.isInSearch = false
+            self?.addHeroesToTableView()
         }
     }
     
-    private func addHeroesToTableView(numberOfNewHeroes: Int) {
+    private func addHeroesToTableView() {
         reloadTableViewData()
         heroesTableView.isSpinnerHidden(to: true)
         super.updateLoading(to: false)
@@ -206,7 +206,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                 heroesTableView.isSpinnerHidden(to: false)
                 super.updateLoading(to: true)
                 heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
-                    self?.addHeroesToTableView(numberOfNewHeroes: numberOfNewHeroes)
+                    self?.addHeroesToTableView()
                 }
             }
         }
