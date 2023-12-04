@@ -7,11 +7,12 @@
 
 import UIKit
 
-class AllHeroesViewController: UIViewController {
+class AllHeroesViewController: UIViewController, UINavigationControllerDelegate {
     private let heroesViewModel: HeroesViewModel
     private let loader: ImageLoader = ImageLoader()
     private let spinner: UIActivityIndicatorView
     private var isLoadingData: Bool = false
+    private let transition = Transition()
     
     init(heroesViewModel: HeroesViewModel) {
         self.heroesViewModel = heroesViewModel
@@ -26,10 +27,26 @@ class AllHeroesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "All heroes"
+        navigationController?.delegate = self
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func navigationController(_ navigationController: UINavigationController,
+                              animationControllerFor operation: UINavigationController.Operation,
+                              from fromVC: UIViewController,
+                              to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        switch operation {
+        case .push:
+            return transition
+        case .pop:
+            return nil
+        default:
+            return nil
+        }
+        
     }
     
     func getSpinner() -> UIActivityIndicatorView {

@@ -16,6 +16,7 @@
 		D90E71D62B0CBD920041AAAE /* HeroesGridViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D52B0CBD920041AAAE /* HeroesGridViewController.swift */; };
 		D90E71D82B0CD04C0041AAAE /* HeroesGridFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D72B0CD04C0041AAAE /* HeroesGridFooter.swift */; };
 		D90E71DA2B0E28790041AAAE /* ImageResize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D92B0E28790041AAAE /* ImageResize.swift */; };
+		D92C15A72B1DDA1100E1DEC3 /* Transition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92C15A62B1DDA1100E1DEC3 /* Transition.swift */; };
 		D935E0802AF56658006F0D61 /* HeroesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D935E07F2AF56658006F0D61 /* HeroesTableViewCell.swift */; };
 		D937F9C32AFBFC4B007BCB5D /* HeroFakeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BA0F102AF936C0003D7DCC /* HeroFakeService.swift */; };
 		D93F4F9E2AE7BEDB00610761 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93F4F9D2AE7BEDB00610761 /* AppDelegate.swift */; };
@@ -80,6 +81,7 @@
 		D90E71D52B0CBD920041AAAE /* HeroesGridViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridViewController.swift; sourceTree = "<group>"; };
 		D90E71D72B0CD04C0041AAAE /* HeroesGridFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridFooter.swift; sourceTree = "<group>"; };
 		D90E71D92B0E28790041AAAE /* ImageResize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageResize.swift; sourceTree = "<group>"; };
+		D92C15A62B1DDA1100E1DEC3 /* Transition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transition.swift; sourceTree = "<group>"; };
 		D935E07F2AF56658006F0D61 /* HeroesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTableViewCell.swift; sourceTree = "<group>"; };
 		D93F4F9A2AE7BEDB00610761 /* Heroes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heroes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D93F4F9D2AE7BEDB00610761 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -185,6 +187,14 @@
 			path = Grid;
 			sourceTree = "<group>";
 		};
+		D92C15A52B1DD9F000E1DEC3 /* CustomTransitions */ = {
+			isa = PBXGroup;
+			children = (
+				D92C15A62B1DDA1100E1DEC3 /* Transition.swift */,
+			);
+			path = CustomTransitions;
+			sourceTree = "<group>";
+		};
 		D93F4F912AE7BEDB00610761 = {
 			isa = PBXGroup;
 			children = (
@@ -210,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				D98B20782B0227330095C81E /* AllHeroes */,
+				D92C15A52B1DD9F000E1DEC3 /* CustomTransitions */,
 				D98B20792B0227440095C81E /* HeroDetail */,
 				D9D2598F2AFD4D8300D11555 /* Cache */,
 				D98B207A2B0234470095C81E /* Delegates */,
@@ -551,6 +562,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D92C15A72B1DDA1100E1DEC3 /* Transition.swift in Sources */,
 				D9D259912AFD4D9200D11555 /* ImageLoader.swift in Sources */,
 				D98B20772B021EC60095C81E /* HeroDetailViewModel.swift in Sources */,
 				D937F9C32AFBFC4B007BCB5D /* HeroFakeService.swift in Sources */,
