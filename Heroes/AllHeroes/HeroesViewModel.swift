@@ -25,14 +25,21 @@ class HeroesViewModel {
                                                           searchQuery: searchQuery)
             if let additionalHeroes = try? result.get() {
                 
-                if searchQuery != nil {
-                    self.heroesInSearch.append(contentsOf: additionalHeroes)
-                } else {
-                    self.heroes.append(contentsOf: additionalHeroes)
-                }
-                
                 DispatchQueue.main.async {
-                    addHeroesToTableView(additionalHeroes.count)
+                    var count = 0
+                    if searchQuery != nil {
+                        self.heroesInSearch.append(contentsOf: additionalHeroes)
+                        count = additionalHeroes.count
+                    } else {
+                        for hero in additionalHeroes {
+                            if self.heroes.contains(hero) == false {
+                                self.heroes.append(hero)
+                                count += 1
+                            }
+                        }
+                    }
+                    
+                    addHeroesToTableView(count)
                 }
             } else {
                 DispatchQueue.main.async {
@@ -70,5 +77,9 @@ class HeroesViewModel {
     
     func clearHeroesInSearch() {
         self.heroesInSearch = []
+    }
+    
+    func addHeroes(hero: Hero) {
+        self.heroes.append(hero)
     }
 }

@@ -13,6 +13,7 @@ class HeroesTableViewController: AllHeroesViewController {
     private let heroesViewModel: HeroesViewModel
     private var cancellables: Set<AnyCancellable> = []
     private var rightBarButtonItems: [UIBarButtonItem] = []
+    private let encoder = JSONEncoder()
     private var isInSearch: Bool = false
     
     private var searchBar: UISearchBar = {
@@ -42,6 +43,18 @@ class HeroesTableViewController: AllHeroesViewController {
     override func viewDidLoad() {
         heroesTableView.setTableDataSourceAndDelegate(viewController: self)
         super.viewDidLoad()
+        
+        let decoder = JSONDecoder()
+        for heroName in UserDefaults.standard.dictionaryRepresentation().keys {
+            do {
+                if let data = UserDefaults.standard.data(forKey: heroName) {
+                    let newHero = try decoder.decode(Hero.self, from: data)
+                    heroesViewModel.addHeroes(hero: newHero)
+                }
+            } catch {
+                print(error)
+            }
+        }
         
         heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
             self?.addHeroesToTableView()
@@ -137,8 +150,16 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                 let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
                 
                 cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
-                cell.moveRowActionBlock = { aCell in
-                    self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
+                cell.storeHero = { aCell in
+                    guard let name = hero.name else { return }
+                    
+                    if UserDefaults.standard.data(forKey: name) != nil {
+                        UserDefaults.standard.removeObject(forKey: name)
+                    } else {
+                        let data = try self.encoder.encode(hero)
+                        UserDefaults.standard.set(data, forKey: name)
+                        self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
+                    }
                 }
                 
                 return cell
@@ -155,10 +176,18 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
             let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
             
             cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
-            cell.moveRowActionBlock = { aCell in
-                let actualIndexPath = tableView.indexPath(for: aCell)!
-                self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
-                tableView.moveRow(at: actualIndexPath, to: IndexPath(row: 0, section: 1))
+            cell.storeHero = { aCell in
+                guard let name = hero.name else { return }
+                
+                if UserDefaults.standard.data(forKey: name) != nil {
+                    UserDefaults.standard.removeObject(forKey: name)
+                } else {
+                    let data = try self.encoder.encode(hero)
+                    UserDefaults.standard.set(data, forKey: name)
+                    let actualIndexPath = tableView.indexPath(for: aCell)!
+                    self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
+                    tableView.moveRow(at: actualIndexPath, to: IndexPath(row: 0, section: 1))
+                }
             }
             
             return cell

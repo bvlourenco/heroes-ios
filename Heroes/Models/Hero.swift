@@ -13,7 +13,7 @@ typealias Comics = Category
 typealias Events = Category
 typealias Series = Category
 
-struct Hero: Decodable, Equatable {
+struct Hero: Codable, Equatable {
     let name: String?
     let description: String?
     let thumbnail: Thumbnail?
@@ -27,17 +27,34 @@ struct Hero: Decodable, Equatable {
              events, series
     }
     
-    struct Thumbnail: Decodable {
+    struct Thumbnail: Codable {
         let path: String
         let `extension`: String
         
         var imageURL: URL {
             URL(string: "\(path).\(`extension`)")!
         }
+        
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(path, forKey: .path)
+            try container.encode(`extension`, forKey: .extension)
+        }
     }
     
     static func ==(hero1: Hero, hero2: Hero) -> Bool {
         return hero1.name == hero2.name && hero1.description == hero2.description
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(description, forKey: .description)
+        try container.encode(thumbnail, forKey: .thumbnail)
+        try container.encode(stories, forKey: .stories)
+        try container.encode(comics, forKey: .comics)
+        try container.encode(events, forKey: .events)
+        try container.encode(series, forKey: .series)
     }
 }
 

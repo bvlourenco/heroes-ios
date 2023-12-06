@@ -13,7 +13,7 @@ class HeroesTableViewCell: UITableViewCell {
     private let heroImage = UIImageView()
     
     var onReuse: () -> Void = {}
-    var moveRowActionBlock: ((UITableViewCell) -> Void)?
+    var storeHero: ((UITableViewCell) throws -> Void)?
     
     private let heroFavouriteButton = {
         let button = UIButton()
@@ -64,19 +64,10 @@ class HeroesTableViewCell: UITableViewCell {
     private func loadStarImage(name: String?) {
         guard let name = name else { return }
         
-        if UserDefaults.standard.bool(forKey: name) {
+        if UserDefaults.standard.data(forKey: name) != nil {
             heroFavouriteButton.setImage(UIImage(named: "star"), for: .normal)
         } else {
             heroFavouriteButton.setImage(UIImage(named: "star_add"), for: .normal)
-        }
-    }
-    
-    private func changeHeroStatus(name: String) {
-        if UserDefaults.standard.bool(forKey: name) {
-            UserDefaults.standard.removeObject(forKey: name)
-        } else {
-            UserDefaults.standard.set(true, forKey: name)
-            moveRowActionBlock?(self)
         }
     }
     
@@ -84,8 +75,12 @@ class HeroesTableViewCell: UITableViewCell {
     private func tableCellFavouriteButtonPressed() {
         guard let name = heroName.text else { return }
         
-        changeHeroStatus(name: name)
-        loadStarImage(name: name)
+        do {
+            try storeHero?(self)
+            loadStarImage(name: name)
+        } catch {
+            print(error)
+        }
     }
     
     private func setupConstraints() {
