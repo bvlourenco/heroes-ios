@@ -163,10 +163,12 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                     guard let name = hero.name else { return }
                     
                     if UserDefaults.standard.data(forKey: name) != nil {
+                        self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: true)
                         UserDefaults.standard.removeObject(forKey: name)
                     } else {
                         let data = try self.encoder.encode(hero)
                         UserDefaults.standard.set(data, forKey: name)
+                        self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: true)
                         self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
                     }
                 }
@@ -190,10 +192,15 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                 
                 if UserDefaults.standard.data(forKey: name) != nil {
                     UserDefaults.standard.removeObject(forKey: name)
+                    let actualIndexPath = collectionView.indexPath(for: aCell)!
+                    self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: false)
+                    let numberOfFavouriteHeroes = self.heroesViewModel.numberOfFavouriteHeroes
+                    collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: numberOfFavouriteHeroes, section: 1))
                 } else {
                     let data = try self.encoder.encode(hero)
                     UserDefaults.standard.set(data, forKey: name)
                     let actualIndexPath = collectionView.indexPath(for: aCell)!
+                    self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: true)
                     self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
                     collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: 0, section: 1))
                 }
@@ -366,8 +373,10 @@ extension HeroesGridViewController: HeroViewControllerDelegate {
         heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
     }
     
-    func updateView(heroIndex: Int, hero: Hero) {
-        heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
+    func updateView(isFavourite: Bool, hero: Hero) {
+        heroesViewModel.setHeroAtIndex(at: -1,
+                                       hero: hero,
+                                       newIndex: isFavourite ? 0 : heroesViewModel.numberOfFavouriteHeroes)
         reloadGridViewData()
     }
 }

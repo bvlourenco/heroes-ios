@@ -10,6 +10,7 @@ import Foundation
 class HeroesViewModel {
     private var heroes: [Hero] = []
     private var heroesInSearch: [Hero] = []
+    private (set) var numberOfFavouriteHeroes: Int = 0
     let heroService: HeroServiceProtocol
     
     init(heroService: HeroServiceProtocol) {
@@ -25,21 +26,20 @@ class HeroesViewModel {
                                                           searchQuery: searchQuery)
             if let additionalHeroes = try? result.get() {
                 
-                DispatchQueue.main.async {
-                    var count = 0
+                DispatchQueue.main.async { [weak self] in
                     if searchQuery != nil {
-                        self.heroesInSearch.append(contentsOf: additionalHeroes)
-                        count = additionalHeroes.count
+                        self?.heroesInSearch.append(contentsOf: additionalHeroes)
                     } else {
                         for hero in additionalHeroes {
-                            if self.heroes.contains(hero) == false {
-                                self.heroes.append(hero)
-                                count += 1
+                            if self?.heroes.contains(hero) == false {
+                                self?.heroes.append(hero)
+                            } else {
+                                self?.numberOfFavouriteHeroes += 1
                             }
                         }
                     }
                     
-                    addHeroesToTableView(count)
+                    addHeroesToTableView(self?.numberOfFavouriteHeroes ?? 0)
                 }
             } else {
                 DispatchQueue.main.async {
@@ -65,13 +65,13 @@ class HeroesViewModel {
         return self.heroesInSearch[index]
     }
     
-    func setHeroAtIndex(at index: Int, hero: Hero) {
+    func setHeroAtIndex(at index: Int, hero: Hero, newIndex: Int = 0) {
         if index >= 0 {
             self.heroes[index] = hero
         } else {
             guard let index = self.heroes.firstIndex(of: hero) else { return }
             self.heroes.remove(at: index)
-            self.heroes.insert(hero, at: 0)
+            self.heroes.insert(hero, at: newIndex)
         }
     }
     
@@ -81,5 +81,13 @@ class HeroesViewModel {
     
     func addHeroes(hero: Hero) {
         self.heroes.append(hero)
+    }
+    
+    func changeNumberOfFavouriteHeroes(moreFavouriteHeroes: Bool) {
+        if moreFavouriteHeroes {
+            numberOfFavouriteHeroes += 1
+        } else {
+            numberOfFavouriteHeroes -= 1
+        }
     }
 }

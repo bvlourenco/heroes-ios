@@ -188,6 +188,7 @@ class HeroDetailViewController: UIViewController {
         changeHeroStatus()
         let button = navigationItem.rightBarButtonItem?.customView as! UIButton
         loadStarImage(button: button)
-        delegate?.updateView(heroIndex: -1, hero: hero)
+        guard let name = hero.name else { return }
+        delegate?.updateView(isFavourite: UserDefaults.standard.data(forKey: name) != nil, hero: hero)
     }
 }
