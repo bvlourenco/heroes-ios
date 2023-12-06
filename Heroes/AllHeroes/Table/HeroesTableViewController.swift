@@ -106,11 +106,10 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 0 {
-            return isInSearch || heroesViewModel.numberOfHeroesInSearch() > 0 ? "Heroes Search Result" : nil
-        } else {
-            return heroesViewModel.numberOfHeroes() > 0 ? "All Heroes": nil
+        if isInSearch || heroesViewModel.numberOfHeroesInSearch() > 0 {
+            return section == 0 ? "Heroes Search Result" : "All Heroes"
         }
+        return nil
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -132,12 +131,15 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                     return UITableViewCell()
                 }
                 
-                let cell = tableView.dequeueReusableCell(withIdentifier: "searchCell",
-                                                         for: indexPath) as! HeroesTableSearchCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
+                                                         for: indexPath) as! HeroesTableViewCell
                 
                 let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
                 
                 cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
+                cell.moveRowActionBlock = { aCell in
+                    self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
+                }
                 
                 return cell
             }
@@ -147,7 +149,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                 return UITableViewCell()
             }
             
-            let cell = tableView.dequeueReusableCell(withIdentifier: "heroCell",
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
                                                      for: indexPath) as! HeroesTableViewCell
             
             let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)

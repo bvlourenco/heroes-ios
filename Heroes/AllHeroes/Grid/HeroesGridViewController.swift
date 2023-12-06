@@ -13,7 +13,7 @@ class HeroesGridViewController: AllHeroesViewController {
     private enum CollectionViewConstants {
         static let leftPadding: CGFloat = 10
         static let rightPadding: CGFloat = 10
-        static let cellHeight: CGFloat = 300
+        static let cellHeight: CGFloat = 240
         static let headingHeight: CGFloat = 30
     }
     
@@ -140,12 +140,15 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                     return UICollectionViewCell()
                 }
                 
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "searchCell",
-                                                              for: indexPath) as! HeroesGridSearchCell
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell",
+                                                              for: indexPath) as! HeroesGridViewCell
                 
                 let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
                 
                 cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
+                cell.moveRowActionBlock = { aCell in
+                    self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
+                }
                 
                 return cell
             }
@@ -155,7 +158,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                 return UICollectionViewCell()
             }
             
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "heroCell",
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell",
                                                           for: indexPath) as! HeroesGridViewCell
             
             let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
@@ -247,7 +250,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                         at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            if indexPath.section == 0 && heroesViewModel.numberOfHeroesInSearch() == 0 && isInSearch == false {
+            if heroesViewModel.numberOfHeroesInSearch() == 0 && isInSearch == false {
                 return UICollectionReusableView()
             }
             
@@ -286,7 +289,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
-        if section == 0 && heroesViewModel.numberOfHeroesInSearch() == 0 && isInSearch == false {
+        if heroesViewModel.numberOfHeroesInSearch() == 0 && isInSearch == false {
             return CGSize(width: 0, height: 0)
         } else {
             return CGSize(width: collectionView.frame.width, height: CollectionViewConstants.headingHeight)

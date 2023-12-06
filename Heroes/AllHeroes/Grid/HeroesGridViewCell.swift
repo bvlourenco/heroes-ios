@@ -17,8 +17,8 @@ class HeroesGridViewCell: UICollectionViewCell {
     private let heroName = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
-        label.lineBreakMode = .byWordWrapping
+        label.numberOfLines = 3
+        label.lineBreakMode = .byTruncatingTail
         return label
     }()
     
@@ -75,6 +75,7 @@ class HeroesGridViewCell: UICollectionViewCell {
         } else {
             heroImage.image = UIImage(named: "placeholder")
         }
+        heroImage.widthAnchor.constraint(equalTo: heroImage.heightAnchor).isActive = true
     }
     
     private func loadStarImage(name: String?) {
@@ -109,8 +110,6 @@ class HeroesGridViewCell: UICollectionViewCell {
             heroImage.topAnchor.constraint(equalTo: contentView.topAnchor),
             heroImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             heroImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            heroImage.heightAnchor.constraint(equalToConstant: CellConstants.imageHeight),
-            heroImage.widthAnchor.constraint(equalTo: heroImage.widthAnchor),
             heroName.topAnchor.constraint(equalTo: heroImage.bottomAnchor,
                                           constant: CellConstants.spacing),
             heroName.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
