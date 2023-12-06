@@ -11,7 +11,10 @@ class HeroesTableViewCell: UITableViewCell {
     
     private let heroName = UILabel()
     private let heroImage = UIImageView()
+    
     var onReuse: () -> Void = {}
+    var moveRowActionBlock: ((UITableViewCell) -> Void)?
+    
     private let heroFavouriteButton = {
         let button = UIButton()
         button.addTarget(self, action: #selector(tableCellFavouriteButtonPressed), for: .touchUpInside)
@@ -73,6 +76,7 @@ class HeroesTableViewCell: UITableViewCell {
             UserDefaults.standard.removeObject(forKey: name)
         } else {
             UserDefaults.standard.set(true, forKey: name)
+            moveRowActionBlock?(self)
         }
     }
     
