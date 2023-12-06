@@ -144,7 +144,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                     return UITableViewCell()
                 }
                 
-                let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
+                let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
                                                          for: indexPath) as! HeroesTableViewCell
                 
                 let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
@@ -172,7 +172,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                 return UITableViewCell()
             }
             
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
+            let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
                                                      for: indexPath) as! HeroesTableViewCell
             
             let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)

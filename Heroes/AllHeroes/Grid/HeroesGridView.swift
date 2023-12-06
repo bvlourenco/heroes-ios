@@ -57,14 +57,16 @@ class HeroesGridView: UIView {
     }
     
     private func configureCollectionView() {
-        collectionView.register(HeroesGridViewCell.self, forCellWithReuseIdentifier: "cell")
-        collectionView.register(LoadingGridViewCell.self, forCellWithReuseIdentifier: "loadingCell")
+        collectionView.register(HeroesGridViewCell.self, 
+                                forCellWithReuseIdentifier: Constants.cellIdentifier)
+        collectionView.register(LoadingGridViewCell.self, 
+                                forCellWithReuseIdentifier: Constants.loadingCellIdentifier)
         collectionView.register(HeroesGridFooter.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                                withReuseIdentifier: "footer")
+                                withReuseIdentifier: Constants.footerIdentifier)
         collectionView.register(HeroesGridHeader.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: "header")
+                                withReuseIdentifier: Constants.headerIdentifier)
         collectionView.backgroundColor = UIColor.white
         
         addSubview(collectionView)

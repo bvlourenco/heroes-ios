@@ -11,8 +11,8 @@ class HeroesTableView: UIView {
     private let tableView: UITableView = {
         let tableView = UITableView(frame: CGRectZero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(HeroesTableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: "loading")
+        tableView.register(HeroesTableViewCell.self, forCellReuseIdentifier: Constants.cellIdentifier)
+        tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: Constants.loadingCellIdentifier)
         
         // Assigning rowHeight property since a table view row initially does not have
         // the image (because of loading) and so, estimatedRowHeight would produce a

@@ -19,4 +19,8 @@ struct Constants {
     static let navigationTitleFrameSize = 50
     static let iconWidthSize = 28
     static let iconHeightSize = 28
+    static let cellIdentifier = "cell"
+    static let loadingCellIdentifier = "loadingCell"
+    static let footerIdentifier = "footer"
+    static let headerIdentifier = "header"
 }

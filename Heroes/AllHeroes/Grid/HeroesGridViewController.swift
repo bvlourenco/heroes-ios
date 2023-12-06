@@ -143,7 +143,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
             if isInSearch && heroesViewModel.numberOfHeroesInSearch() == 0 {
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "loadingCell",
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.loadingCellIdentifier,
                                                               for: indexPath) as! LoadingGridViewCell
                 cell.animateSpinner()
                 return cell
@@ -153,7 +153,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                     return UICollectionViewCell()
                 }
                 
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell",
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier,
                                                               for: indexPath) as! HeroesGridViewCell
                 
                 let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
@@ -181,7 +181,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                 return UICollectionViewCell()
             }
             
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell",
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier,
                                                           for: indexPath) as! HeroesGridViewCell
             
             let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
@@ -291,7 +291,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
             }
             
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                         withReuseIdentifier: "header",
+                                                                         withReuseIdentifier: Constants.headerIdentifier,
                                                                          for: indexPath) as! HeroesGridHeader
             if indexPath.section == 0 {
                 header.title.text = "Heroes Search Result"
@@ -302,7 +302,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
         case UICollectionView.elementKindSectionFooter:
             if indexPath.section == 1 {
                 return collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                       withReuseIdentifier: "footer",
+                                                                       withReuseIdentifier: Constants.footerIdentifier,
                                                                        for: indexPath) as! HeroesGridFooter
             } else {
                 return UICollectionReusableView()
