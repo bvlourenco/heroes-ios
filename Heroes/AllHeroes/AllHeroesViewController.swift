@@ -65,9 +65,3 @@ class AllHeroesViewController: UIViewController, UINavigationControllerDelegate 
         return self.isLoadingData
     }
 }
-
-extension AllHeroesViewController: HeroViewControllerDelegate {
-    func updateHeroInTableView(heroIndex: Int, hero: Hero) {
-        heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
-    }
-}

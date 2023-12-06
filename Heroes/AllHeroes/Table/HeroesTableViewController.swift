@@ -52,7 +52,7 @@ class HeroesTableViewController: AllHeroesViewController {
                                                  height: Constants.iconHeightSize))
         
         let searchButton = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(displaySearchController))
-        let gridButton =  UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(changeViewController))
+        let gridButton = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(changeViewController))
         
         self.rightBarButtonItems = [gridButton, searchButton]
         navigationItem.rightBarButtonItems = self.rightBarButtonItems
@@ -137,8 +137,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                 
                 let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
                 
-                cell.loadImage(imageURL: hero.thumbnail?.imageURL)
-                cell.setName(name: hero.name)
+                cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
                 
                 return cell
             }
@@ -153,8 +152,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
             
             let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
             
-            cell.loadImage(imageURL: hero.thumbnail?.imageURL)
-            cell.setName(name: hero.name)
+            cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
             
             return cell
         }
@@ -244,6 +242,17 @@ extension HeroesTableViewController: UISearchBarDelegate {
         navigationItem.titleView = nil
         navigationItem.rightBarButtonItems = self.rightBarButtonItems
         self.isInSearch = false
+        reloadTableViewData()
+    }
+}
+
+extension HeroesTableViewController: HeroViewControllerDelegate {
+    func updateHeroInTableView(heroIndex: Int, hero: Hero) {
+        heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
+    }
+    
+    func updateView(heroIndex: Int, hero: Hero) {
+        heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
         reloadTableViewData()
     }
 }

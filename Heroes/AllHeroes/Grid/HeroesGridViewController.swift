@@ -13,7 +13,7 @@ class HeroesGridViewController: AllHeroesViewController {
     private enum CollectionViewConstants {
         static let leftPadding: CGFloat = 10
         static let rightPadding: CGFloat = 10
-        static let cellHeight: CGFloat = 250
+        static let cellHeight: CGFloat = 300
         static let headingHeight: CGFloat = 30
     }
     
@@ -58,8 +58,13 @@ class HeroesGridViewController: AllHeroesViewController {
         image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
                                                  height: Constants.iconHeightSize))
         
-        let searchButton = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(displaySearchController))
-        let listButton = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(changeViewController))
+        let searchButton = UIBarButtonItem(barButtonSystemItem: .search, 
+                                           target: self,
+                                           action: #selector(displaySearchController))
+        let listButton = UIBarButtonItem(image: image, 
+                                         style: .plain,
+                                         target: self,
+                                         action: #selector(changeViewController))
         
         self.rightBarButtonItems = [listButton, searchButton]
         navigationItem.rightBarButtonItems = self.rightBarButtonItems
@@ -106,14 +111,16 @@ class HeroesGridViewController: AllHeroesViewController {
     }
 }
 
-extension HeroesGridViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension HeroesGridViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
+                                        UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
-            return isInSearch ? max(1, heroesViewModel.numberOfHeroesInSearch()) : heroesViewModel.numberOfHeroesInSearch()
+            return isInSearch ? max(1, heroesViewModel.numberOfHeroesInSearch()) : 
+                                heroesViewModel.numberOfHeroesInSearch()
         } else {
             return heroesViewModel.numberOfHeroes()
         }
@@ -138,8 +145,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                 
                 let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
                 
-                cell.loadImage(imageURL: hero.thumbnail?.imageURL)
-                cell.setName(name: hero.name)
+                cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name, indexPath: indexPath)
                 
                 return cell
             }
@@ -154,8 +160,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
             
             let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
             
-            cell.loadImage(imageURL: hero.thumbnail?.imageURL)
-            cell.setName(name: hero.name)
+            cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name, indexPath: indexPath)
             
             return cell
         }
@@ -315,6 +320,17 @@ extension HeroesGridViewController: UISearchBarDelegate {
         self.isInSearch = false
         navigationItem.titleView = nil
         navigationItem.rightBarButtonItems = self.rightBarButtonItems
+        reloadGridViewData()
+    }
+}
+
+extension HeroesGridViewController: HeroViewControllerDelegate {
+    func updateHeroInTableView(heroIndex: Int, hero: Hero) {
+        heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
+    }
+    
+    func updateView(heroIndex: Int, hero: Hero) {
+        heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
         reloadGridViewData()
     }
 }

@@ -14,6 +14,7 @@ struct Constants {
     static let smallPadding: CGFloat = 8
     static let mediumPadding: CGFloat = 16
     static let tableViewImageHeight: CGFloat = 45
+    static let favouriteIconHeight: CGFloat = 35
     static let spinnerHeight: CGFloat = 20
     static let navigationTitleFrameSize = 50
     static let iconWidthSize = 28

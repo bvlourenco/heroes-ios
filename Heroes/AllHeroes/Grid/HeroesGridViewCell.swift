@@ -14,14 +14,6 @@ class HeroesGridViewCell: UICollectionViewCell {
         static let spacing: CGFloat = 10
     }
     
-    private let stackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = CellConstants.spacing
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
     private let heroName = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -36,14 +28,22 @@ class HeroesGridViewCell: UICollectionViewCell {
         return image
     }()
     
+    private let heroFavouriteButton = {
+        let button = UIButton()
+        button.addTarget(self, action: #selector(gridCellFavouriteButtonPressed), for: .touchUpInside)
+        button.tintColor = .systemYellow
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     var onReuse: () -> Void = {}
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        contentView.addSubview(stackView)
-        stackView.addArrangedSubview(heroImage)
-        stackView.addArrangedSubview(heroName)
+        contentView.addSubview(heroImage)
+        contentView.addSubview(heroName)
+        contentView.addSubview(heroFavouriteButton)
         
         setupConstraints()
     }
@@ -57,7 +57,14 @@ class HeroesGridViewCell: UICollectionViewCell {
         heroImage.cancelImageLoad()
     }
     
-    func loadImage(imageURL: URL?) {
+    func configure(imageURL: URL?, name: String?, indexPath: IndexPath) {
+        heroName.text = name
+        
+        loadImage(imageURL: imageURL)
+        loadStarImage(name: name)
+    }
+    
+    private func loadImage(imageURL: URL?) {
         if let imageURL = imageURL {
             if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
                 heroImage.loadImage(at: imageURL)
@@ -69,16 +76,47 @@ class HeroesGridViewCell: UICollectionViewCell {
         }
     }
     
-    func setName(name: String?) {
-        heroName.text = name
+    private func loadStarImage(name: String?) {
+        guard let name = name else { return }
+        
+        if UserDefaults.standard.bool(forKey: name) {
+            heroFavouriteButton.setImage(UIImage(named: "star"), for: .normal)
+        } else {
+            heroFavouriteButton.setImage(UIImage(named: "star_add"), for: .normal)
+        }
+    }
+    
+    private func changeHeroStatus(name: String) {
+        if UserDefaults.standard.bool(forKey: name) {
+            UserDefaults.standard.removeObject(forKey: name)
+        } else {
+            UserDefaults.standard.set(true, forKey: name)
+        }
+    }
+    
+    @objc
+    private func gridCellFavouriteButtonPressed() {
+        guard let name = heroName.text else { return }
+        
+        changeHeroStatus(name: name)
+        loadStarImage(name: name)
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            heroImage.topAnchor.constraint(equalTo: contentView.topAnchor),
+            heroImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            heroImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            heroImage.heightAnchor.constraint(equalToConstant: CellConstants.imageHeight),
+            heroImage.widthAnchor.constraint(equalTo: heroImage.widthAnchor),
+            heroName.topAnchor.constraint(equalTo: heroImage.bottomAnchor,
+                                          constant: CellConstants.spacing),
+            heroName.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            heroName.trailingAnchor.constraint(equalTo: heroFavouriteButton.leadingAnchor),
+            heroFavouriteButton.trailingAnchor.constraint(equalTo: heroImage.trailingAnchor),
+            heroFavouriteButton.centerYAnchor.constraint(equalTo: heroName.centerYAnchor),
+            heroFavouriteButton.heightAnchor.constraint(equalToConstant: Constants.favouriteIconHeight),
+            heroFavouriteButton.widthAnchor.constraint(equalTo: heroFavouriteButton.heightAnchor),
         ])
         heroImage.contentMode = .scaleAspectFit
     }

@@ -44,6 +44,12 @@ class HeroDetailViewController: UIViewController {
         super.viewDidLoad()
         navigationItem.titleView = createTitleLabel()
         
+        let button = UIButton()
+        button.addTarget(self, action: #selector(favouriteHeroButtonPressed), for: .touchUpInside)
+        button.tintColor = .systemYellow
+        loadStarImage(button: button)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: button)
+        
         if let description = self.hero.description {
             if description.isEmpty == false {
                 heroView.heroDescriptionLabel.text = self.hero.description
@@ -145,5 +151,37 @@ class HeroDetailViewController: UIViewController {
                 viewCategory.updateDescription(atIndex: index, description: description)
             }
         }
+    }
+    
+    private func loadStarImage(button: UIButton) {
+        guard let name = hero.name else { return }
+        
+        var image: UIImage?
+        if UserDefaults.standard.bool(forKey: name) {
+            image = UIImage(named: "star")
+        } else {
+            image = UIImage(named: "star_add")
+        }
+        image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
+                                                 height: Constants.iconHeightSize))
+        button.setImage(image, for: .normal)
+    }
+    
+    private func changeHeroStatus() {
+        guard let name = hero.name else { return }
+        
+        if UserDefaults.standard.bool(forKey: name) {
+            UserDefaults.standard.removeObject(forKey: name)
+        } else {
+            UserDefaults.standard.set(true, forKey: name)
+        }
+    }
+    
+    @objc
+    private func favouriteHeroButtonPressed(sender: UIBarButtonItem) {
+        changeHeroStatus()
+        let button = navigationItem.rightBarButtonItem?.customView as! UIButton
+        loadStarImage(button: button)
+        delegate?.updateView(heroIndex: -1, hero: hero)
     }
 }
