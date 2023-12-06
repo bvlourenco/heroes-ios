@@ -132,17 +132,12 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                     return UITableViewCell()
                 }
                 
-                let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
-                                                         for: indexPath) as! HeroesTableViewCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "searchCell",
+                                                         for: indexPath) as! HeroesTableSearchCell
                 
                 let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
                 
                 cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
-                cell.moveRowActionBlock = { aCell in
-                    let actualIndexPath = tableView.indexPath(for: aCell)!
-                    self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
-                    tableView.moveRow(at: actualIndexPath, to: IndexPath(row: 0, section: 1))
-                }
                 
                 return cell
             }
@@ -152,7 +147,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                 return UITableViewCell()
             }
             
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell",
+            let cell = tableView.dequeueReusableCell(withIdentifier: "heroCell",
                                                      for: indexPath) as! HeroesTableViewCell
             
             let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)

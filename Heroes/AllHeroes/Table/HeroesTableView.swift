@@ -11,7 +11,8 @@ class HeroesTableView: UIView {
     private let tableView: UITableView = {
         let tableView = UITableView(frame: CGRectZero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(HeroesTableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(HeroesTableViewCell.self, forCellReuseIdentifier: "heroCell")
+        tableView.register(HeroesTableSearchCell.self, forCellReuseIdentifier: "searchCell")
         tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: "loading")
         
         // Assigning rowHeight property since a table view row initially does not have

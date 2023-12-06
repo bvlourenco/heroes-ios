@@ -37,6 +37,7 @@ class HeroesGridViewCell: UICollectionViewCell {
     }()
     
     var onReuse: () -> Void = {}
+    var moveRowActionBlock: ((UICollectionViewCell) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -57,7 +58,7 @@ class HeroesGridViewCell: UICollectionViewCell {
         heroImage.cancelImageLoad()
     }
     
-    func configure(imageURL: URL?, name: String?, indexPath: IndexPath) {
+    func configure(imageURL: URL?, name: String?) {
         heroName.text = name
         
         loadImage(imageURL: imageURL)
@@ -91,6 +92,7 @@ class HeroesGridViewCell: UICollectionViewCell {
             UserDefaults.standard.removeObject(forKey: name)
         } else {
             UserDefaults.standard.set(true, forKey: name)
+            moveRowActionBlock?(self)
         }
     }
     

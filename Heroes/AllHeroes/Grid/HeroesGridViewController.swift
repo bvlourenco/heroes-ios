@@ -140,12 +140,12 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                     return UICollectionViewCell()
                 }
                 
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell",
-                                                              for: indexPath) as! HeroesGridViewCell
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "searchCell",
+                                                              for: indexPath) as! HeroesGridSearchCell
                 
                 let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
                 
-                cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name, indexPath: indexPath)
+                cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
                 
                 return cell
             }
@@ -155,12 +155,17 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                 return UICollectionViewCell()
             }
             
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell",
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "heroCell",
                                                           for: indexPath) as! HeroesGridViewCell
             
             let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
             
-            cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name, indexPath: indexPath)
+            cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
+            cell.moveRowActionBlock = { aCell in
+                let actualIndexPath = collectionView.indexPath(for: aCell)!
+                self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
+                collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: 0, section: 1))
+            }
             
             return cell
         }
