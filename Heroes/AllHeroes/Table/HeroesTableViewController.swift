@@ -45,18 +45,21 @@ class HeroesTableViewController: AllHeroesViewController {
         super.viewDidLoad()
         
         let decoder = JSONDecoder()
+        var numberOfFavouriteHeroes = 0
         for heroName in UserDefaults.standard.dictionaryRepresentation().keys {
             do {
                 if let data = UserDefaults.standard.data(forKey: heroName) {
                     let newHero = try decoder.decode(Hero.self, from: data)
                     heroesViewModel.addHeroes(hero: newHero)
+                    numberOfFavouriteHeroes += 1
                 }
             } catch {
                 print(error)
             }
         }
+        heroesViewModel.numberOfFavouriteHeroes = numberOfFavouriteHeroes
         
-        heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
+        heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] in
             self?.addHeroesToTableView()
         }
         
@@ -96,7 +99,7 @@ class HeroesTableViewController: AllHeroesViewController {
     
     private func searchForHeroes(searchQuery text: String) {
         heroesViewModel.clearHeroesInSearch()
-        heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] numberOfNewHeroes in
+        heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] in
             self?.isInSearch = false
             self?.addHeroesToTableView()
         }
@@ -186,6 +189,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                     let actualIndexPath = tableView.indexPath(for: aCell)!
                     self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: false)
                     let numberOfFavouriteHeroes = self.heroesViewModel.numberOfFavouriteHeroes
+                    self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero, newIndex: numberOfFavouriteHeroes)
                     tableView.moveRow(at: actualIndexPath, to: IndexPath(row: numberOfFavouriteHeroes, section: 1))
                 } else {
                     let data = try self.encoder.encode(hero)
@@ -246,7 +250,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
             if super.loadingStatus() == false && indexPath.row >= rowIndexLoadMoreHeroes {
                 heroesTableView.isSpinnerHidden(to: false)
                 super.updateLoading(to: true)
-                heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
+                heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] in
                     self?.addHeroesToTableView()
                 }
             }
@@ -295,6 +299,7 @@ extension HeroesTableViewController: HeroViewControllerDelegate {
     }
     
     func updateView(isFavourite: Bool, hero: Hero) {
+        self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: isFavourite)
         heroesViewModel.setHeroAtIndex(at: -1,
                                        hero: hero,
                                        newIndex: isFavourite ? 0 : heroesViewModel.numberOfFavouriteHeroes)

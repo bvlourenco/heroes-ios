@@ -52,19 +52,22 @@ class HeroesGridViewController: AllHeroesViewController {
         super.viewDidLoad()
         
         let decoder = JSONDecoder()
+        var numberOfFavouriteHeroes = 0
         for heroName in UserDefaults.standard.dictionaryRepresentation().keys {
             do {
                 if let data = UserDefaults.standard.data(forKey: heroName) {
                     let newHero = try decoder.decode(Hero.self, from: data)
                     heroesViewModel.addHeroes(hero: newHero)
+                    numberOfFavouriteHeroes += 1
                 }
             } catch {
                 print(error)
             }
         }
+        heroesViewModel.numberOfFavouriteHeroes = numberOfFavouriteHeroes
         
-        heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
-            self?.addHeroesToGridView(numberOfNewHeroes: numberOfNewHeroes)
+        heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] in
+            self?.addHeroesToGridView()
         }
         
         var image = UIImage(named: "icons8-list-50")
@@ -108,13 +111,13 @@ class HeroesGridViewController: AllHeroesViewController {
     
     private func searchForHeroes(searchQuery text: String) {
         heroesViewModel.clearHeroesInSearch()
-        heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] numberOfNewHeroes in
-            self?.addHeroesToGridView(numberOfNewHeroes: numberOfNewHeroes)
+        heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] in
+            self?.addHeroesToGridView()
             self?.isInSearch = false
         }
     }
     
-    private func addHeroesToGridView(numberOfNewHeroes: Int) {
+    private func addHeroesToGridView() {
         reloadGridViewData()
         super.updateLoading(to: false)
     }
@@ -195,6 +198,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                     let actualIndexPath = collectionView.indexPath(for: aCell)!
                     self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: false)
                     let numberOfFavouriteHeroes = self.heroesViewModel.numberOfFavouriteHeroes
+                    self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero, newIndex: numberOfFavouriteHeroes)
                     collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: numberOfFavouriteHeroes, section: 1))
                 } else {
                     let data = try self.encoder.encode(hero)
@@ -257,8 +261,8 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
             let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
             if super.loadingStatus() == false && indexPath.row >= rowIndexLoadMoreHeroes {
                 super.updateLoading(to: true)
-                heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] numberOfNewHeroes in
-                    self?.addHeroesToGridView(numberOfNewHeroes: numberOfNewHeroes)
+                heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] in
+                    self?.addHeroesToGridView()
                 }
             }
         }
@@ -374,6 +378,7 @@ extension HeroesGridViewController: HeroViewControllerDelegate {
     }
     
     func updateView(isFavourite: Bool, hero: Hero) {
+        self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: isFavourite)
         heroesViewModel.setHeroAtIndex(at: -1,
                                        hero: hero,
                                        newIndex: isFavourite ? 0 : heroesViewModel.numberOfFavouriteHeroes)

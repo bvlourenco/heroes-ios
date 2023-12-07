@@ -10,41 +10,35 @@ import Foundation
 class HeroesViewModel {
     private var heroes: [Hero] = []
     private var heroesInSearch: [Hero] = []
-    private (set) var numberOfFavouriteHeroes: Int = 0
+    var numberOfFavouriteHeroes: Int = 0
     let heroService: HeroServiceProtocol
     
     init(heroService: HeroServiceProtocol) {
         self.heroService = heroService
     }
     
-    func fetchHeroes(searchQuery: String?, addHeroesToTableView: @escaping (_ numberOfNewHeroes: Int) -> Void) {
+    func fetchHeroes(searchQuery: String?, addHeroesToTableView: @escaping () -> Void) {
         Task {
             let offset = searchQuery != nil ? 0 : self.heroes.count
             
             let result = await self.heroService.getHeroes(offset: offset,
                                                           numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest,
                                                           searchQuery: searchQuery)
-            if let additionalHeroes = try? result.get() {
-                
-                DispatchQueue.main.async { [weak self] in
+            
+            DispatchQueue.main.async { [weak self] in
+                if let additionalHeroes = try? result.get() {
                     if searchQuery != nil {
                         self?.heroesInSearch.append(contentsOf: additionalHeroes)
                     } else {
                         for hero in additionalHeroes {
                             if self?.heroes.contains(hero) == false {
                                 self?.heroes.append(hero)
-                            } else {
-                                self?.numberOfFavouriteHeroes += 1
                             }
                         }
                     }
-                    
-                    addHeroesToTableView(self?.numberOfFavouriteHeroes ?? 0)
                 }
-            } else {
-                DispatchQueue.main.async {
-                    addHeroesToTableView(0)
-                }
+                
+                addHeroesToTableView()
             }
         }
     }
