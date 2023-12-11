@@ -8,6 +8,6 @@
 import Foundation
 
 protocol HeroViewControllerDelegate: AnyObject {
-    func updateHeroInTableView(heroIndex: Int, hero: Hero)
+    func updateHeroInView(heroIndex: Int, hero: Hero)
     func updateView(isFavourite: Bool, hero: Hero)
 }

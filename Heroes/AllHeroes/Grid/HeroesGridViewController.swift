@@ -8,35 +8,22 @@
 import Combine
 import UIKit
 
-class HeroesGridViewController: AllHeroesViewController {
+class HeroesGridViewController: AllHeroesViewController, ViewDelegate {
     
     private enum CollectionViewConstants {
         static let leftPadding: CGFloat = 10
         static let rightPadding: CGFloat = 10
         static let cellHeight: CGFloat = 240
         static let headingHeight: CGFloat = 30
+        static let footerIdentifier = "footer"
+        static let headerIdentifier = "header"
     }
     
     private let heroesGridView = HeroesGridView()
-    private let heroesViewModel: HeroesViewModel
-    private var cancellables: Set<AnyCancellable> = []
-    private var rightBarButtonItems: [UIBarButtonItem] = []
-    private let encoder = JSONEncoder()
-    private var isInSearch: Bool = false
-    
-    private var searchBar: UISearchBar = {
-        let searchBar = UISearchBar()
-        searchBar.showsCancelButton = true
-        searchBar.sizeToFit()
-        return searchBar
-    }()
-    
-    @Published
-    private var searchQuery = ""
     
     override init(heroesViewModel: HeroesViewModel) {
-        self.heroesViewModel = heroesViewModel
         super.init(heroesViewModel: heroesViewModel)
+        super.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -50,167 +37,59 @@ class HeroesGridViewController: AllHeroesViewController {
     override func viewDidLoad() {
         heroesGridView.setGridDataSourceAndDelegate(viewController: self)
         super.viewDidLoad()
-        
-        let decoder = JSONDecoder()
-        var numberOfFavouriteHeroes = 0
-        for heroName in UserDefaults.standard.dictionaryRepresentation().keys {
-            do {
-                if let data = UserDefaults.standard.data(forKey: heroName) {
-                    let newHero = try decoder.decode(Hero.self, from: data)
-                    heroesViewModel.addHeroes(hero: newHero)
-                    numberOfFavouriteHeroes += 1
-                }
-            } catch {
-                print(error)
-            }
-        }
-        heroesViewModel.numberOfFavouriteHeroes = numberOfFavouriteHeroes
-        
-        heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] in
-            self?.addHeroesToGridView()
-        }
-        
-        var image = UIImage(named: "icons8-list-50")
-        image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
-                                                 height: Constants.iconHeightSize))
-        
-        let searchButton = UIBarButtonItem(barButtonSystemItem: .search, 
-                                           target: self,
-                                           action: #selector(displaySearchController))
-        let listButton = UIBarButtonItem(image: image, 
-                                         style: .plain,
-                                         target: self,
-                                         action: #selector(changeViewController))
-        
-        self.rightBarButtonItems = [listButton, searchButton]
-        navigationItem.rightBarButtonItems = self.rightBarButtonItems
-        
-        searchBar.delegate = self
-        
-        $searchQuery
-            .debounce(for: .seconds(5), scheduler: DispatchQueue.main)
-            .filter { $0.count > 2 }
-            .removeDuplicates()
-            .sink { [weak self] text in
-                self?.searchForHeroes(searchQuery: text)
-            }
-            .store(in: &cancellables)
     }
     
-    @objc
-    func changeViewController(sender: UIBarButtonItem) {
-        let viewControllers = [HeroesTableViewController(heroesViewModel: heroesViewModel)]
-        self.navigationController?.setViewControllers(viewControllers, animated: true)
-    }
-    
-    @objc
-    func displaySearchController() {
-        navigationItem.titleView = searchBar
-        navigationItem.rightBarButtonItems = []
-    }
-    
-    private func searchForHeroes(searchQuery text: String) {
-        heroesViewModel.clearHeroesInSearch()
-        heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] in
-            self?.addHeroesToGridView()
-            self?.isInSearch = false
-        }
-    }
-    
-    private func addHeroesToGridView() {
-        reloadGridViewData()
+    func addHeroesToView() {
+        reloadView()
         super.updateLoading(to: false)
     }
     
-    private func reloadGridViewData() {
+    func hideSpinner() {}
+    
+    func reloadView() {
         heroesGridView.update()
+    }
+    
+    func getTopBarIconImage() -> UIImage? {
+        return UIImage(named: "icons8-list-50")
+    }
+    
+    func getViewControllers() -> [UIViewController] {
+        return [HeroesTableViewController(heroesViewModel: super.getViewModel())]
     }
 }
 
-extension HeroesGridViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
+extension HeroesGridViewController: UICollectionViewDataSource, UICollectionViewDelegate,
                                         UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 2
+        return super.getNumberOfSections()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 0 {
-            return isInSearch ? max(1, heroesViewModel.numberOfHeroesInSearch()) : 
-                                heroesViewModel.numberOfHeroesInSearch()
-        } else {
-            return heroesViewModel.numberOfHeroes()
-        }
+        return super.getNumberOfItemsInSection(section: section)
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if indexPath.section == 0 {
-            if isInSearch && heroesViewModel.numberOfHeroesInSearch() == 0 {
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.loadingCellIdentifier,
-                                                              for: indexPath) as! LoadingGridViewCell
-                cell.animateSpinner()
-                return cell
-            } else {
-                let numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
-                if indexPath.row >= numberOfHeroes {
-                    return UICollectionViewCell()
-                }
-                
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier,
-                                                              for: indexPath) as! HeroesGridViewCell
-                
-                let hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
-                
-                cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
-                cell.storeHero = { aCell in
-                    guard let name = hero.name else { return }
-                    
-                    if UserDefaults.standard.data(forKey: name) != nil {
-                        self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: false)
-                        let numberOfFavouriteHeroes = self.heroesViewModel.numberOfFavouriteHeroes
-                        self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero, newIndex: numberOfFavouriteHeroes)
-                        UserDefaults.standard.removeObject(forKey: name)
-                        self.reloadGridViewData()
-                    } else {
-                        let data = try self.encoder.encode(hero)
-                        UserDefaults.standard.set(data, forKey: name)
-                        self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: true)
-                        self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
-                        self.reloadGridViewData()
-                    }
-                }
-                
-                return cell
-            }
+        if isLoadingCell(section: indexPath.section) {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.loadingCellIdentifier,
+                                                          for: indexPath) as! LoadingGridViewCell
+            cell.animateSpinner()
+            return cell
         } else {
-            let numberOfHeroes = heroesViewModel.numberOfHeroes()
-            if indexPath.row >= numberOfHeroes {
-                return UICollectionViewCell()
-            }
-            
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier,
                                                           for: indexPath) as! HeroesGridViewCell
-            
-            let hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
+            let hero = super.getHero(indexPath: indexPath)
             
             cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
             cell.storeHero = { aCell in
-                guard let name = hero.name else { return }
-                
-                if UserDefaults.standard.data(forKey: name) != nil {
-                    UserDefaults.standard.removeObject(forKey: name)
+                let destinationIndex = try super.persistHero(section: indexPath.section,
+                                                             hero: hero)
+                if indexPath.section == 0 {
+                    self.reloadView()
+                } else if destinationIndex >= 0 {
                     let actualIndexPath = collectionView.indexPath(for: aCell)!
-                    self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: false)
-                    let numberOfFavouriteHeroes = self.heroesViewModel.numberOfFavouriteHeroes
-                    self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero, newIndex: numberOfFavouriteHeroes)
-                    collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: numberOfFavouriteHeroes, section: 1))
-                } else {
-                    let data = try self.encoder.encode(hero)
-                    UserDefaults.standard.set(data, forKey: name)
-                    let actualIndexPath = collectionView.indexPath(for: aCell)!
-                    self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: true)
-                    self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
-                    collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: 0, section: 1))
+                    collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 1))
                 }
             }
             
@@ -219,57 +98,15 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let numberOfHeroes: Int
-        let hero: Hero
-        
-        if isInSearch && indexPath.section == 0 {
-            return
-        }
-        
-        if indexPath.section == 0 {
-            numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
-            hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
-        } else {
-            numberOfHeroes = heroesViewModel.numberOfHeroes()
-            hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
-        }
-        
-        if indexPath.row >= numberOfHeroes {
-            return
-        }
-        
         collectionView.deselectItem(at: indexPath, animated: true)
-        
-        let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
-        
-        let heroIndex = indexPath.section == 0 ? -1 : indexPath.row
-        let destination = HeroDetailViewController(hero: hero,
-                                                   heroIndex: heroIndex,
-                                                   heroDetailViewModel: heroDetailViewModel,
-                                                   loader: super.getLoader())
-        destination.delegate = self
-        navigationController?.pushViewController(destination, animated: true)
+        super.itemSelected(indexPath: indexPath)
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         willDisplay cell: UICollectionViewCell,
                         forItemAt indexPath: IndexPath) {
-        if indexPath.section == 1 {
-            let numberOfHeroes = heroesViewModel.numberOfHeroes()
-            if numberOfHeroes < Constants.numberOfHeroesPerRequest {
-                return
-            }
-            
-            let lastRowIndex = max(0, collectionView.numberOfItems(inSection: 1) - 1)
-            let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
-            let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
-            if super.loadingStatus() == false && indexPath.row >= rowIndexLoadMoreHeroes {
-                super.updateLoading(to: true)
-                heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] in
-                    self?.addHeroesToGridView()
-                }
-            }
-        }
+        let lastRowIndex = collectionView.numberOfItems(inSection: 1) - 1
+        super.willFetchMoreHeroes(indexPath: indexPath, lastRowIndex: lastRowIndex)
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -278,7 +115,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
         let cellHeight: CGFloat = CollectionViewConstants.cellHeight
         
         let cellWidth: CGFloat
-        if indexPath.section == 0 && isInSearch && heroesViewModel.numberOfHeroesInSearch() == 0 {
+        if isLoadingCell(section: indexPath.section) {
             cellWidth = collectionView.frame.width
         } else {
             cellWidth = collectionView.frame.width / 2 - (
@@ -294,23 +131,19 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                         at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            if heroesViewModel.numberOfHeroesInSearch() == 0 && isInSearch == false {
+            if isDoingASearch() == false {
                 return UICollectionReusableView()
             }
             
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                         withReuseIdentifier: Constants.headerIdentifier,
+                                                                         withReuseIdentifier: CollectionViewConstants.headerIdentifier,
                                                                          for: indexPath) as! HeroesGridHeader
-            if indexPath.section == 0 {
-                header.title.text = "Heroes Search Result"
-            } else {
-                header.title.text = "All Heroes"
-            }
+            header.title.text = super.getSectionTitle(section: indexPath.section)
             return header
         case UICollectionView.elementKindSectionFooter:
             if indexPath.section == 1 {
                 return collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                       withReuseIdentifier: Constants.footerIdentifier,
+                                                                       withReuseIdentifier: CollectionViewConstants.footerIdentifier,
                                                                        for: indexPath) as! HeroesGridFooter
             } else {
                 return UICollectionReusableView()
@@ -320,72 +153,23 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, 
+    func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForFooterInSection section: Int) -> CGSize {
-        if section == 1 {
-            return CGSize(width: collectionView.frame.width, height: Constants.spinnerHeight)
-        } else {
+        if section == 0 {
             return CGSize(width: 0, height: 0)
+        } else {
+            return CGSize(width: collectionView.frame.width, height: Constants.spinnerHeight)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
-        if heroesViewModel.numberOfHeroesInSearch() == 0 && isInSearch == false {
+        if isDoingASearch() == false {
             return CGSize(width: 0, height: 0)
         } else {
             return CGSize(width: collectionView.frame.width, height: CollectionViewConstants.headingHeight)
         }
-    }
-}
-
-extension HeroesGridViewController: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if self.isInSearch == false {
-            self.isInSearch = true
-            reloadGridViewData()
-        }
-        
-        self.searchQuery = searchText
-        
-        if searchText == "" {
-            self.isInSearch = false
-            heroesViewModel.clearHeroesInSearch()
-            reloadGridViewData()
-        }
-    }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let text = searchBar.text ?? ""
-        if text.isEmpty == false && text.count > 2 {
-            searchBar.resignFirstResponder()
-            searchForHeroes(searchQuery: text)
-        }
-    }
-
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.text = ""
-        self.searchQuery = ""
-        heroesViewModel.clearHeroesInSearch()
-        self.isInSearch = false
-        navigationItem.titleView = nil
-        navigationItem.rightBarButtonItems = self.rightBarButtonItems
-        reloadGridViewData()
-    }
-}
-
-extension HeroesGridViewController: HeroViewControllerDelegate {
-    func updateHeroInTableView(heroIndex: Int, hero: Hero) {
-        heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
-    }
-    
-    func updateView(isFavourite: Bool, hero: Hero) {
-        self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: isFavourite)
-        heroesViewModel.setHeroAtIndex(at: -1,
-                                       hero: hero,
-                                       newIndex: isFavourite ? 0 : heroesViewModel.numberOfFavouriteHeroes)
-        reloadGridViewData()
     }
 }

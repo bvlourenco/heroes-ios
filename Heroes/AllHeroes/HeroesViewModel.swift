@@ -17,7 +17,7 @@ class HeroesViewModel {
         self.heroService = heroService
     }
     
-    func fetchHeroes(searchQuery: String?, addHeroesToTableView: @escaping () -> Void) {
+    func fetchHeroes(searchQuery: String?, addHeroesToView: @escaping () -> Void) {
         Task {
             let offset = searchQuery != nil ? 0 : self.heroes.count
             
@@ -38,7 +38,7 @@ class HeroesViewModel {
                     }
                 }
                 
-                addHeroesToTableView()
+                addHeroesToView()
             }
         }
     }

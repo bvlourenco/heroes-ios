@@ -99,7 +99,7 @@ class HeroDetailViewController: UIViewController {
     private func getCategoriesDescriptions() {
         Task {
             self.hero = await heroViewModel.getHeroDescriptions()
-            delegate?.updateHeroInTableView(heroIndex: heroIndex, hero: self.hero)
+            delegate?.updateHeroInView(heroIndex: heroIndex, hero: self.hero)
             
             if isSnapshotTest == false {
                 self.updateAllDescriptions()
