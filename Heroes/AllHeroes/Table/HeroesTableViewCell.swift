@@ -7,29 +7,15 @@
 
 import UIKit
 
-class HeroesTableViewCell: UITableViewCell {
-    
-    private let heroName = UILabel()
-    private let heroImage = UIImageView()
-    
-    var onReuse: () -> Void = {}
+class HeroesTableViewCell: UITableViewCell, CellDelegate {
+    let allHeroesCell = AllHeroesCell()
     var storeHero: ((UITableViewCell) throws -> Void)?
-    
-    private let heroFavouriteButton = {
-        let button = UIButton()
-        button.addTarget(self, action: #selector(tableCellFavouriteButtonPressed), for: .touchUpInside)
-        button.tintColor = .systemYellow
-        return button
-    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        contentView.addSubview(heroImage)
-        contentView.addSubview(heroName)
-        contentView.addSubview(heroFavouriteButton)
-        
-        setupConstraints()
+        allHeroesCell.delegate = self
+        allHeroesCell.addViews(view: contentView)
+        allHeroesCell.setupConstraints(view: contentView, type: ViewType.TableView)
     }
     
     required init?(coder: NSCoder) {
@@ -37,72 +23,14 @@ class HeroesTableViewCell: UITableViewCell {
     }
     
     override func prepareForReuse() {
-        heroImage.image = nil
-        heroImage.cancelImageLoad()
+        allHeroesCell.prepareCellForReuse()
     }
     
     func configure(imageURL: URL?, name: String?) {
-        heroName.text = name
-        heroName.numberOfLines = 0
-        
-        loadImage(imageURL: imageURL)
-        loadStarImage(name: name)
+        allHeroesCell.configure(imageURL: imageURL, name: name)
     }
     
-    private func loadImage(imageURL: URL?) {
-        if let imageURL = imageURL {
-            if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
-                heroImage.loadImage(at: imageURL)
-            } else {
-                heroImage.image = UIImage(named: "placeholder")
-            }
-        } else {
-            heroImage.image = UIImage(named: "placeholder")
-        }
-    }
-    
-    private func loadStarImage(name: String?) {
-        guard let name = name else { return }
-        
-        if UserDefaults.standard.data(forKey: name) != nil {
-            heroFavouriteButton.setImage(UIImage(named: "star"), for: .normal)
-        } else {
-            heroFavouriteButton.setImage(UIImage(named: "star_add"), for: .normal)
-        }
-    }
-    
-    @objc
-    private func tableCellFavouriteButtonPressed() {
-        guard let name = heroName.text else { return }
-        
-        do {
-            try storeHero?(self)
-            loadStarImage(name: name)
-        } catch {
-            print(error)
-        }
-    }
-    
-    private func setupConstraints() {
-        heroImage.translatesAutoresizingMaskIntoConstraints = false
-        heroName.translatesAutoresizingMaskIntoConstraints = false
-        heroFavouriteButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            heroImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
-                                               constant: Constants.mediumPadding),
-            heroImage.heightAnchor.constraint(equalToConstant: Constants.tableViewImageHeight),
-            heroImage.widthAnchor.constraint(equalTo: heroImage.heightAnchor),
-            heroImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            heroName.leadingAnchor.constraint(equalTo: heroImage.trailingAnchor,
-                                              constant: Constants.smallPadding),
-            heroName.trailingAnchor.constraint(equalTo: heroFavouriteButton.leadingAnchor),
-            heroName.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            heroFavouriteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
-                                                          constant: -Constants.mediumPadding),
-            heroFavouriteButton.heightAnchor.constraint(equalToConstant: Constants.favouriteIconHeight),
-            heroFavouriteButton.widthAnchor.constraint(equalTo: heroFavouriteButton.heightAnchor),
-            heroFavouriteButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-        ])
+    func favouriteHero() throws {
+        try storeHero?(self)
     }
 }

@@ -85,7 +85,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                 if indexPath.section == 0 {
                     self.reloadView()
                 } else if destinationIndex >= 0 {
-                    let actualIndexPath = tableView.indexPath(for: aCell)!
+                    guard let actualIndexPath = tableView.indexPath(for: aCell) else { return }
                     tableView.moveRow(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 1))
                 }
             }

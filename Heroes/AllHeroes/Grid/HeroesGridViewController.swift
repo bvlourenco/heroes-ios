@@ -88,7 +88,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                 if indexPath.section == 0 {
                     self.reloadView()
                 } else if destinationIndex >= 0 {
-                    let actualIndexPath = collectionView.indexPath(for: aCell)!
+                    guard let actualIndexPath = collectionView.indexPath(for: aCell) else { return }
                     collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 1))
                 }
             }
