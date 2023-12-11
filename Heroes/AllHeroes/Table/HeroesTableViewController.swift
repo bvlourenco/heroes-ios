@@ -69,8 +69,10 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if isLoadingCell(section: indexPath.section) {
-            return tableView.dequeueReusableCell(withIdentifier: Constants.loadingCellIdentifier,
-                                                 for: indexPath) as! LoadingTableViewCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: Constants.loadingCellIdentifier,
+                                                     for: indexPath) as! LoadingTableViewCell
+            cell.animateSpinner()
+            return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
                                                      for: indexPath) as! HeroesTableViewCell

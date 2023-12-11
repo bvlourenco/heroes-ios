@@ -261,18 +261,16 @@ class AllHeroesViewController: UIViewController, UINavigationControllerDelegate 
 
 extension AllHeroesViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if self.isInSearch == false {
+        if searchText.isEmpty {
+            self.isInSearch = false
+            heroesViewModel.clearHeroesInSearch()
+            delegate?.reloadView()
+        } else if self.isInSearch == false {
             self.isInSearch = true
             delegate?.reloadView()
         }
         
         self.searchQuery = searchText
-        
-        if searchText == "" {
-            self.isInSearch = false
-            heroesViewModel.clearHeroesInSearch()
-            delegate?.reloadView()
-        }
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -280,6 +278,12 @@ extension AllHeroesViewController: UISearchBarDelegate {
         if text.isEmpty == false && text.count > 2 {
             searchBar.resignFirstResponder()
             searchForHeroes(searchQuery: text)
+        } else {
+            let alert = UIAlertController(title: "Cannot perform search",
+                                          message: "Your search query has less than 3 characters. Insert more characters",
+                                          preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
     }
 

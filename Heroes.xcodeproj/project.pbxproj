@@ -47,6 +47,7 @@
 		D9DF20492AEBDB6F00B81F12 /* CategoryViewComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DF20482AEBDB6F00B81F12 /* CategoryViewComponent.swift */; };
 		D9DFF5012AE950EA002E7B6A /* HeroesTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DFF5002AE950EA002E7B6A /* HeroesTableView.swift */; };
 		D9ED34962B271E3B004C7DB3 /* ViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9ED34952B271E3B004C7DB3 /* ViewDelegate.swift */; };
+		D9ED34982B27709C004C7DB3 /* LoadingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9ED34972B27709C004C7DB3 /* LoadingCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,6 +118,7 @@
 		D9DF20482AEBDB6F00B81F12 /* CategoryViewComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewComponent.swift; sourceTree = "<group>"; };
 		D9DFF5002AE950EA002E7B6A /* HeroesTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesTableView.swift; sourceTree = "<group>"; };
 		D9ED34952B271E3B004C7DB3 /* ViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewDelegate.swift; sourceTree = "<group>"; };
+		D9ED34972B27709C004C7DB3 /* LoadingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCell.swift; sourceTree = "<group>"; };
 		F27E44D86DD4F3E5A099D270 /* Pods-Heroes-HeroesUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Heroes-HeroesUITests.release.xcconfig"; path = "Target Support Files/Pods-Heroes-HeroesUITests/Pods-Heroes-HeroesUITests.release.xcconfig"; sourceTree = "<group>"; };
 		F9D2A5273B45C15132A19067 /* Pods_Heroes.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Heroes.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF4B5B046B9656CFA45B190C /* Pods-HeroesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HeroesTests.debug.xcconfig"; path = "Target Support Files/Pods-HeroesTests/Pods-HeroesTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -293,6 +295,7 @@
 				D95AD9372AFA54E400A34996 /* HeroesViewModel.swift */,
 				D90E71CD2B0CB7230041AAAE /* AllHeroesViewController.swift */,
 				D9ED34952B271E3B004C7DB3 /* ViewDelegate.swift */,
+				D9ED34972B27709C004C7DB3 /* LoadingCell.swift */,
 			);
 			path = AllHeroes;
 			sourceTree = "<group>";
@@ -575,6 +578,7 @@
 				D93F4FB62AE7E12900610761 /* HeroService.swift in Sources */,
 				D95AD9382AFA54E400A34996 /* HeroesViewModel.swift in Sources */,
 				D93F4FA22AE7BEDB00610761 /* HeroesTableViewController.swift in Sources */,
+				D9ED34982B27709C004C7DB3 /* LoadingCell.swift in Sources */,
 				D9ED34962B271E3B004C7DB3 /* ViewDelegate.swift in Sources */,
 				D98B207C2B02345F0095C81E /* HeroViewControllerDelegate.swift in Sources */,
 				D93F4F9E2AE7BEDB00610761 /* AppDelegate.swift in Sources */,
