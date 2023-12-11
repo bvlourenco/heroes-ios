@@ -158,12 +158,16 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
                     
                     if UserDefaults.standard.data(forKey: name) != nil {
                         self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: false)
+                        let numberOfFavouriteHeroes = self.heroesViewModel.numberOfFavouriteHeroes
+                        self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero, newIndex: numberOfFavouriteHeroes)
                         UserDefaults.standard.removeObject(forKey: name)
+                        self.reloadTableViewData()
                     } else {
                         let data = try self.encoder.encode(hero)
                         UserDefaults.standard.set(data, forKey: name)
                         self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: true)
                         self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
+                        self.reloadTableViewData()
                     }
                 }
                 
