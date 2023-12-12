@@ -1,5 +1,5 @@
 //
-//  AllHeroesViewController.swift
+//  HeroesViewController.swift
 //  Heroes
 //
 //  Created by Bernardo Vala Lourenço on 21/11/2023.
@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-class AllHeroesViewController: UIViewController, UINavigationControllerDelegate {
+class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     
     private enum ViewConstants {
         static let numberOfSections = 2
@@ -26,7 +26,7 @@ class AllHeroesViewController: UIViewController, UINavigationControllerDelegate 
     private var rightBarButtonItems: [UIBarButtonItem] = []
     private let encoder = JSONEncoder()
     private var isInSearch: Bool = false
-    weak var delegate: ViewDelegate?
+    weak var delegate: ViewControllerDelegate?
     
     private var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
@@ -259,7 +259,7 @@ class AllHeroesViewController: UIViewController, UINavigationControllerDelegate 
     }
 }
 
-extension AllHeroesViewController: UISearchBarDelegate {
+extension HeroesViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {
             self.isInSearch = false
@@ -298,7 +298,7 @@ extension AllHeroesViewController: UISearchBarDelegate {
     }
 }
 
-extension AllHeroesViewController: HeroViewControllerDelegate {
+extension HeroesViewController: HeroViewControllerDelegate {
     func updateHeroInView(heroIndex: Int, hero: Hero) {
         heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
     }

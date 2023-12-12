@@ -1,5 +1,5 @@
 //
-//  CustomView.swift
+//  HeroesTableView.swift
 //  Heroes
 //
 //  Created by Bernardo Vala Lourenço on 25/10/2023.

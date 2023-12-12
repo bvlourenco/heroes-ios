@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-class HeroesGridViewController: AllHeroesViewController, ViewDelegate {
+class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
     
     private enum CollectionViewConstants {
         static let leftPadding: CGFloat = 10

@@ -1,5 +1,5 @@
 //
-//  AllHeroesCell.swift
+//  HeroesCell.swift
 //  Heroes
 //
 //  Created by Bernardo Vala Lourenço on 11/12/2023.
@@ -11,7 +11,7 @@ enum ViewType {
     case TableView, GridView
 }
 
-class AllHeroesCell: UIView {
+class HeroesCell: UIView {
     private enum CellConstants {
         static let spacing: CGFloat = 10
     }

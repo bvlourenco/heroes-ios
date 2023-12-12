@@ -8,7 +8,7 @@
 import UIKit
 
 class HeroesGridViewCell: UICollectionViewCell, CellDelegate {
-    let allHeroesCell = AllHeroesCell()
+    let allHeroesCell = HeroesCell()
     var storeHero: ((UICollectionViewCell) throws -> Void)?
     
     override init(frame: CGRect) {

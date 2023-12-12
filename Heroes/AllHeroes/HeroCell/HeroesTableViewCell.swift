@@ -8,7 +8,7 @@
 import UIKit
 
 class HeroesTableViewCell: UITableViewCell, CellDelegate {
-    let allHeroesCell = AllHeroesCell()
+    let allHeroesCell = HeroesCell()
     var storeHero: ((UITableViewCell) throws -> Void)?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

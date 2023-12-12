@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-class HeroesTableViewController: AllHeroesViewController, ViewDelegate {
+class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
     private let heroesTableView = HeroesTableView()
 
     override init(heroesViewModel: HeroesViewModel) {

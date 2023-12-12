@@ -1,5 +1,5 @@
 //
-//  ViewDelegate.swift
+//  ViewControllerDelegate.swift
 //  Heroes
 //
 //  Created by Bernardo Vala Lourenço on 11/12/2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol ViewDelegate: AnyObject {
+protocol ViewControllerDelegate: AnyObject {
     func addHeroesToView()
     func reloadView()
     func getTopBarIconImage() -> UIImage?

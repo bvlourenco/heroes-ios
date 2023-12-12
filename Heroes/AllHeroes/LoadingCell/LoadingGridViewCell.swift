@@ -1,5 +1,5 @@
 //
-//  LoadingCollectionViewCell.swift
+//  LoadingGridViewCell.swift
 //  Heroes
 //
 //  Created by Bernardo Vala Lourenço on 30/11/2023.
