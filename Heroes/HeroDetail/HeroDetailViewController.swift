@@ -11,7 +11,7 @@ class HeroDetailViewController: UIViewController {
     
     private let heroView: HeroDetailView
     private var hero: Hero
-    private let heroIndex: Int
+    private let heroIndex: Int?
     private let heroViewModel: HeroDetailViewModel
     private let loader: ImageLoader
     // TODO: Try to remove the distinction between snapshot test and normal program execution
@@ -20,7 +20,7 @@ class HeroDetailViewController: UIViewController {
     weak var delegate: HeroViewControllerDelegate?
     
     init(hero: Hero, 
-         heroIndex: Int,
+         heroIndex: Int?,
          heroDetailViewModel: HeroDetailViewModel,
          loader: ImageLoader,
          isSnapshotTest: Bool = false) {
@@ -30,7 +30,7 @@ class HeroDetailViewController: UIViewController {
         self.loader = loader
         self.heroIndex = heroIndex
         self.isSnapshotTest = isSnapshotTest
-        super.init(nibName: "HeroViewController", bundle: Bundle.main)
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -99,7 +99,10 @@ class HeroDetailViewController: UIViewController {
     private func getCategoriesDescriptions() {
         Task {
             self.hero = await heroViewModel.getHeroDescriptions()
-            delegate?.updateHeroInView(heroIndex: heroIndex, hero: self.hero)
+            
+            if let index = heroIndex {
+                delegate?.updateHeroInView(heroIndex: index, hero: self.hero)
+            }
             
             if isSnapshotTest == false {
                 self.updateAllDescriptions()

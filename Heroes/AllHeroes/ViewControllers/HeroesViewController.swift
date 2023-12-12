@@ -18,6 +18,8 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         static let alertMessage = "Your search query has less than 3 characters. Insert more characters"
         static let alertButtonTitle = "Ok"
         static let navigationTitle = "All Heroes"
+        static let searchQueryMinimumLength = 2
+        static let secondsToWait = 5
     }
     
     let heroesViewModel: HeroesViewModel
@@ -79,19 +81,17 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     
     private func loadFavouriteHeroes() {
         let decoder = JSONDecoder()
-        var numberOfFavouriteHeroes = 0
         for heroName in UserDefaults.standard.dictionaryRepresentation().keys {
             do {
                 if let data = UserDefaults.standard.data(forKey: heroName) {
                     let newHero = try decoder.decode(Hero.self, from: data)
                     heroesViewModel.addHeroes(hero: newHero)
-                    numberOfFavouriteHeroes += 1
+                    heroesViewModel.numberOfFavouriteHeroes += 1
                 }
             } catch {
                 print(error)
             }
         }
-        heroesViewModel.numberOfFavouriteHeroes = numberOfFavouriteHeroes
     }
     
     private func loadNavigationBarButtons() {
@@ -115,8 +115,8 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         searchBar.delegate = self
         
         $searchQuery
-            .debounce(for: .seconds(5), scheduler: DispatchQueue.main)
-            .filter { $0.count > 2 }
+            .debounce(for: .seconds(ViewConstants.secondsToWait), scheduler: DispatchQueue.main)
+            .filter { $0.count > ViewConstants.searchQueryMinimumLength }
             .removeDuplicates()
             .sink { [weak self] text in
                 self?.searchForHeroes(searchQuery: text)
@@ -191,24 +191,22 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         return section == 0 && isInSearch && heroesViewModel.numberOfHeroes(inSearch: true) == 0
     }
     
-    func persistHero(section: Int, hero: Hero) throws -> Int {
-        guard let name = hero.name else { return -1 }
-        
-        var destinationIndex: Int
+    // Returns the index to where the hero will be moved in the view (table or grid view)
+    func persistHero(section: Int, hero: Hero) throws -> Int? {
+        guard let name = hero.name else { return nil }
+
         if UserDefaults.standard.data(forKey: name) != nil {
             UserDefaults.standard.removeObject(forKey: name)
             self.heroesViewModel.numberOfFavouriteHeroes -= 1
-            let numberOfFavouriteHeroes = self.heroesViewModel.numberOfFavouriteHeroes
-            self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero, newIndex: numberOfFavouriteHeroes)
-            destinationIndex = numberOfFavouriteHeroes
+            self.heroesViewModel.moveHero(hero: hero, to: self.heroesViewModel.numberOfFavouriteHeroes)
+            return self.heroesViewModel.numberOfFavouriteHeroes
         } else {
             let data = try self.encoder.encode(hero)
             UserDefaults.standard.set(data, forKey: name)
             self.heroesViewModel.numberOfFavouriteHeroes += 1
-            self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
-            destinationIndex = 0
+            self.heroesViewModel.moveHero(hero: hero, to: 0)
+            return 0
         }
-        return destinationIndex
     }
     
     func willFetchMoreHeroes(indexPath: IndexPath, lastRowIndex: Int) {
@@ -234,7 +232,7 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     func itemSelected(indexPath: IndexPath) {
         let hero = heroesViewModel.getHero(inSearch: indexPath.section == 0, index: indexPath.row)
         let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
-        let heroIndex = indexPath.section == 0 ? -1 : indexPath.row
+        let heroIndex = indexPath.section == 1 ? indexPath.row: nil
         let destination = HeroDetailViewController(hero: hero,
                                                    heroIndex: heroIndex,
                                                    heroDetailViewModel: heroDetailViewModel,
@@ -260,7 +258,7 @@ extension HeroesViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let text = searchBar.text ?? ""
-        if text.isEmpty == false && text.count > 2 {
+        if text.isEmpty == false && text.count > ViewConstants.searchQueryMinimumLength {
             searchBar.resignFirstResponder()
             searchForHeroes(searchQuery: text)
         } else {
@@ -281,7 +279,7 @@ extension HeroesViewController: UISearchBarDelegate {
 
 extension HeroesViewController: HeroViewControllerDelegate {
     func updateHeroInView(heroIndex: Int, hero: Hero) {
-        heroesViewModel.setHeroAtIndex(at: heroIndex, hero: hero)
+        heroesViewModel.setHero(at: heroIndex, hero: hero)
     }
     
     func updateView(isFavourite: Bool, hero: Hero) {
@@ -290,9 +288,8 @@ extension HeroesViewController: HeroViewControllerDelegate {
         } else {
             self.heroesViewModel.numberOfFavouriteHeroes -= 1
         }
-        heroesViewModel.setHeroAtIndex(at: -1,
-                                       hero: hero,
-                                       newIndex: isFavourite ? 0 : heroesViewModel.numberOfFavouriteHeroes)
+        heroesViewModel.moveHero(hero: hero,
+                                 to: isFavourite ? 0 : heroesViewModel.numberOfFavouriteHeroes)
         delegate?.reloadView()
     }
 }
