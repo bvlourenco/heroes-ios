@@ -63,10 +63,10 @@ class HeroDetailViewController: UIViewController {
             if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
                 heroView.heroImageView.loadImage(at: imageURL)
             } else {
-                heroView.heroImageView.image = UIImage(named: "placeholder")
+                heroView.heroImageView.image = UIImage(named: Constants.placeholderImageName)
             }
         } else {
-            heroView.heroImageView.image = UIImage(named: "placeholder")
+            heroView.heroImageView.image = UIImage(named: Constants.placeholderImageName)
         }
         
         addCategory(categoryValues: self.hero.comics,

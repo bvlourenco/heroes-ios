@@ -71,10 +71,10 @@ class HeroesCell: UIView {
             if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
                 heroImage.loadImage(at: imageURL)
             } else {
-                heroImage.image = UIImage(named: "placeholder")
+                heroImage.image = UIImage(named: Constants.placeholderImageName)
             }
         } else {
-            heroImage.image = UIImage(named: "placeholder")
+            heroImage.image = UIImage(named: Constants.placeholderImageName)
         }
         heroImage.widthAnchor.constraint(equalTo: heroImage.heightAnchor).isActive = true
     }
@@ -83,9 +83,9 @@ class HeroesCell: UIView {
         guard let name = name else { return }
         
         if UserDefaults.standard.data(forKey: name) != nil {
-            heroFavouriteButton.setImage(UIImage(named: "star"), for: .normal)
+            heroFavouriteButton.setImage(UIImage(named: Constants.favouriteImageName), for: .normal)
         } else {
-            heroFavouriteButton.setImage(UIImage(named: "star_add"), for: .normal)
+            heroFavouriteButton.setImage(UIImage(named: Constants.addFavouriteImageName), for: .normal)
         }
     }
     
@@ -104,6 +104,12 @@ class HeroesCell: UIView {
     func setupConstraints(view: UIView, type: ViewType) {
         heroFavouriteButton.addTarget(self, action: #selector(favouriteButtonPressed), for: .touchUpInside)
         
+        NSLayoutConstraint.activate([
+            heroFavouriteButton.heightAnchor.constraint(equalToConstant: Constants.favouriteIconHeight),
+            heroFavouriteButton.widthAnchor.constraint(equalTo: heroFavouriteButton.heightAnchor),
+            heroName.trailingAnchor.constraint(equalTo: heroFavouriteButton.leadingAnchor)
+        ])
+        
         if type == .GridView {
             NSLayoutConstraint.activate([
                 heroImage.topAnchor.constraint(equalTo: view.topAnchor),
@@ -112,28 +118,19 @@ class HeroesCell: UIView {
                 heroName.topAnchor.constraint(equalTo: heroImage.bottomAnchor,
                                               constant: CellConstants.spacing),
                 heroName.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                heroName.trailingAnchor.constraint(equalTo: heroFavouriteButton.leadingAnchor),
                 heroFavouriteButton.trailingAnchor.constraint(equalTo: heroImage.trailingAnchor),
                 heroFavouriteButton.centerYAnchor.constraint(equalTo: heroName.centerYAnchor),
-                heroFavouriteButton.heightAnchor.constraint(equalToConstant: Constants.favouriteIconHeight),
-                heroFavouriteButton.widthAnchor.constraint(equalTo: heroFavouriteButton.heightAnchor),
             ])
-            heroImage.contentMode = .scaleAspectFit
         } else if type == .TableView {
             NSLayoutConstraint.activate([
                 heroImage.leadingAnchor.constraint(equalTo: view.leadingAnchor,
                                                    constant: Constants.mediumPadding),
                 heroImage.heightAnchor.constraint(equalToConstant: Constants.tableViewImageHeight),
-                heroImage.widthAnchor.constraint(equalTo: heroImage.heightAnchor),
-                heroImage.centerYAnchor.constraint(equalTo: view.centerYAnchor),
                 heroName.leadingAnchor.constraint(equalTo: heroImage.trailingAnchor,
                                                   constant: Constants.smallPadding),
-                heroName.trailingAnchor.constraint(equalTo: heroFavouriteButton.leadingAnchor),
                 heroName.centerYAnchor.constraint(equalTo: view.centerYAnchor),
                 heroFavouriteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor,
                                                               constant: -Constants.mediumPadding),
-                heroFavouriteButton.heightAnchor.constraint(equalToConstant: Constants.favouriteIconHeight),
-                heroFavouriteButton.widthAnchor.constraint(equalTo: heroFavouriteButton.heightAnchor),
                 heroFavouriteButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
             ])
         }

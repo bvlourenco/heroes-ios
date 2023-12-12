@@ -11,9 +11,6 @@ class LoadingCell {
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .medium)
         spinner.startAnimating()
-        spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0),
-                               width: UIScreen.main.bounds.width,
-                               height: CGFloat(Constants.spinnerHeight))
         spinner.translatesAutoresizingMaskIntoConstraints = false
         return spinner
     }()

@@ -23,4 +23,7 @@ struct Constants {
     static let loadingCellIdentifier = "loadingCell"
     static let footerIdentifier = "footer"
     static let headerIdentifier = "header"
+    static let placeholderImageName = "placeholder"
+    static let favouriteImageName = "star"
+    static let addFavouriteImageName = "star_add"
 }

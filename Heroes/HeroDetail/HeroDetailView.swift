@@ -20,7 +20,7 @@ class HeroDetailView: UIView {
     }()
     
     let heroImageView: UIImageView = {
-        let placeholderImage = UIImage(named: "placeholder")
+        let placeholderImage = UIImage(named: Constants.placeholderImageName)
         let imageView = UIImageView(image: placeholderImage)
         imageView.contentMode = .scaleAspectFit
         return imageView

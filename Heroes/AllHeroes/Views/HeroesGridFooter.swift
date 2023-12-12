@@ -9,7 +9,12 @@ import UIKit
 
 class HeroesGridFooter: UICollectionReusableView {
     
-    private let spinner: UIActivityIndicatorView = UIActivityIndicatorView(style: .medium)
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.startAnimating()
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        return spinner
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -17,11 +22,7 @@ class HeroesGridFooter: UICollectionReusableView {
     }
     
     private func configureSpinner() {
-        spinner.startAnimating()
-        
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.addSubview(spinner)
+        addSubview(spinner)
         
         NSLayoutConstraint.activate([
             spinner.centerXAnchor.constraint(equalTo: self.centerXAnchor),

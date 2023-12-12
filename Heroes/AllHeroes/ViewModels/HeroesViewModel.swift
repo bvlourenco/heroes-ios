@@ -43,20 +43,20 @@ class HeroesViewModel {
         }
     }
     
-    func numberOfHeroes() -> Int {
-        return self.heroes.count
+    func numberOfHeroes(inSearch: Bool) -> Int {
+        if inSearch {
+            return self.heroesInSearch.count
+        } else {
+            return self.heroes.count
+        }
     }
     
-    func numberOfHeroesInSearch() -> Int {
-        return self.heroesInSearch.count
-    }
-    
-    func getHeroAtIndex(index: Int) -> Hero {
-        return self.heroes[index]
-    }
-    
-    func getHeroInSearchAtIndex(index: Int) -> Hero {
-        return self.heroesInSearch[index]
+    func getHero(inSearch: Bool, index: Int) -> Hero {
+        if inSearch {
+            return self.heroesInSearch[index]
+        } else {
+            return self.heroes[index]
+        }
     }
     
     func setHeroAtIndex(at index: Int, hero: Hero, newIndex: Int = 0) {
@@ -75,13 +75,5 @@ class HeroesViewModel {
     
     func addHeroes(hero: Hero) {
         self.heroes.append(hero)
-    }
-    
-    func changeNumberOfFavouriteHeroes(moreFavouriteHeroes: Bool) {
-        if moreFavouriteHeroes {
-            numberOfFavouriteHeroes += 1
-        } else {
-            numberOfFavouriteHeroes -= 1
-        }
     }
 }

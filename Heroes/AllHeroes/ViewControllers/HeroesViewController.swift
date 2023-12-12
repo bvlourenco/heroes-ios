@@ -14,11 +14,14 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         static let numberOfSections = 2
         static let heroSearchSectionTitle = "Heroes Search Result"
         static let heroesSectionTitle = "All Heroes"
+        static let alertTitle = "Cannot perform search"
+        static let alertMessage = "Your search query has less than 3 characters. Insert more characters"
+        static let alertButtonTitle = "Ok"
+        static let navigationTitle = "All Heroes"
     }
     
-    private let heroesViewModel: HeroesViewModel
+    let heroesViewModel: HeroesViewModel
     private let loader: ImageLoader = ImageLoader()
-    private let spinner: UIActivityIndicatorView
     private var isLoadingData: Bool = false
     private let transition = Transition()
     
@@ -28,6 +31,12 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     private var isInSearch: Bool = false
     weak var delegate: ViewControllerDelegate?
     
+    let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.startAnimating()
+        return spinner
+    }()
+    
     private var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.showsCancelButton = true
@@ -35,16 +44,21 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         return searchBar
     }()
     
+    private let alert: UIAlertController = {
+        let alert = UIAlertController(title: ViewConstants.alertTitle,
+                                      message: ViewConstants.alertMessage,
+                                      preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: ViewConstants.alertButtonTitle,
+                                      style: UIAlertAction.Style.default,
+                                      handler: nil))
+        return alert
+    }()
+    
     @Published
     private var searchQuery = ""
     
     init(heroesViewModel: HeroesViewModel) {
         self.heroesViewModel = heroesViewModel
-        self.spinner = UIActivityIndicatorView(style: .medium)
-        self.spinner.startAnimating()
-        self.spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0),
-                                    width: UIScreen.main.bounds.width,
-                                    height: CGFloat(Constants.spinnerHeight))
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -54,9 +68,16 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "All heroes"
+        navigationItem.title = ViewConstants.navigationTitle
         navigationController?.delegate = self
         
+        loadFavouriteHeroes()
+        heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: delegate?.addHeroesToView ?? {})
+        loadNavigationBarButtons()
+        setupSearch()
+    }
+    
+    private func loadFavouriteHeroes() {
         let decoder = JSONDecoder()
         var numberOfFavouriteHeroes = 0
         for heroName in UserDefaults.standard.dictionaryRepresentation().keys {
@@ -71,9 +92,9 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
             }
         }
         heroesViewModel.numberOfFavouriteHeroes = numberOfFavouriteHeroes
-        
-        heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: delegate?.addHeroesToView ?? {})
-        
+    }
+    
+    private func loadNavigationBarButtons() {
         var image = delegate?.getTopBarIconImage()
         image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
                                                  height: Constants.iconHeightSize))
@@ -88,7 +109,9 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         
         self.rightBarButtonItems = [listButton, searchButton]
         navigationItem.rightBarButtonItems = self.rightBarButtonItems
-        
+    }
+    
+    private func setupSearch() {
         searchBar.delegate = self
         
         $searchQuery
@@ -127,24 +150,8 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
     
-    func getViewModel() -> HeroesViewModel {
-        return heroesViewModel
-    }
-    
-    func getSpinner() -> UIActivityIndicatorView {
-        return spinner
-    }
-    
     func updateLoading(to value: Bool) {
         self.isLoadingData = value
-    }
-    
-    func getLoader() -> ImageLoader {
-        return loader
-    }
-    
-    func loadingStatus() -> Bool {
-        return self.isLoadingData
     }
     
     private func searchForHeroes(searchQuery text: String) {
@@ -160,15 +167,16 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     func getNumberOfItemsInSection(section: Int) -> Int {
-        if section == 0 {
-            return isInSearch ? max(1, heroesViewModel.numberOfHeroesInSearch()) : heroesViewModel.numberOfHeroesInSearch()
+        if isInSearch {
+            // Loading Cell only
+            return 1
         } else {
-            return heroesViewModel.numberOfHeroes()
+            return heroesViewModel.numberOfHeroes(inSearch: section == 0)
         }
     }
     
     func isDoingASearch() -> Bool {
-        return isInSearch || heroesViewModel.numberOfHeroesInSearch() > 0
+        return isInSearch || heroesViewModel.numberOfHeroes(inSearch: true) > 0
     }
     
     func getSectionTitle(section: Int) -> String {
@@ -180,15 +188,7 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     func isLoadingCell(section: Int) -> Bool {
-        return section == 0 && isInSearch && heroesViewModel.numberOfHeroesInSearch() == 0
-    }
-    
-    func getHero(indexPath: IndexPath) -> Hero {
-        if indexPath.section == 0 {
-            return heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
-        } else {
-            return heroesViewModel.getHeroAtIndex(index: indexPath.row)
-        }
+        return section == 0 && isInSearch && heroesViewModel.numberOfHeroes(inSearch: true) == 0
     }
     
     func persistHero(section: Int, hero: Hero) throws -> Int {
@@ -197,14 +197,14 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         var destinationIndex: Int
         if UserDefaults.standard.data(forKey: name) != nil {
             UserDefaults.standard.removeObject(forKey: name)
-            self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: false)
+            self.heroesViewModel.numberOfFavouriteHeroes -= 1
             let numberOfFavouriteHeroes = self.heroesViewModel.numberOfFavouriteHeroes
             self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero, newIndex: numberOfFavouriteHeroes)
             destinationIndex = numberOfFavouriteHeroes
         } else {
             let data = try self.encoder.encode(hero)
             UserDefaults.standard.set(data, forKey: name)
-            self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: true)
+            self.heroesViewModel.numberOfFavouriteHeroes += 1
             self.heroesViewModel.setHeroAtIndex(at: -1, hero: hero)
             destinationIndex = 0
         }
@@ -213,14 +213,14 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     
     func willFetchMoreHeroes(indexPath: IndexPath, lastRowIndex: Int) {
         if indexPath.section == 1 {
-            let numberOfHeroes = heroesViewModel.numberOfHeroes()
+            let numberOfHeroes = heroesViewModel.numberOfHeroes(inSearch: false)
             if numberOfHeroes < Constants.numberOfHeroesPerRequest {
                 return
             }
             
             let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
             let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
-            if loadingStatus() == false && indexPath.row >= rowIndexLoadMoreHeroes {
+            if self.isLoadingData == false && indexPath.row >= rowIndexLoadMoreHeroes {
                 delegate?.hideSpinner()
                 updateLoading(to: true)
                 
@@ -232,28 +232,13 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     func itemSelected(indexPath: IndexPath) {
-        let numberOfHeroes: Int
-        let hero: Hero
-        
-        if indexPath.section == 0 {
-            numberOfHeroes = heroesViewModel.numberOfHeroesInSearch()
-            hero = heroesViewModel.getHeroInSearchAtIndex(index: indexPath.row)
-        } else {
-            numberOfHeroes = heroesViewModel.numberOfHeroes()
-            hero = heroesViewModel.getHeroAtIndex(index: indexPath.row)
-        }
-        
-        if indexPath.row >= numberOfHeroes {
-            return
-        }
-        
+        let hero = heroesViewModel.getHero(inSearch: indexPath.section == 0, index: indexPath.row)
         let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
-        
         let heroIndex = indexPath.section == 0 ? -1 : indexPath.row
         let destination = HeroDetailViewController(hero: hero,
                                                    heroIndex: heroIndex,
                                                    heroDetailViewModel: heroDetailViewModel,
-                                                   loader: getLoader())
+                                                   loader: loader)
         destination.delegate = self
         navigationController?.pushViewController(destination, animated: true)
     }
@@ -279,14 +264,10 @@ extension HeroesViewController: UISearchBarDelegate {
             searchBar.resignFirstResponder()
             searchForHeroes(searchQuery: text)
         } else {
-            let alert = UIAlertController(title: "Cannot perform search",
-                                          message: "Your search query has less than 3 characters. Insert more characters",
-                                          preferredStyle: UIAlertController.Style.alert)
-            alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
         }
     }
-
+    
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = ""
         self.searchQuery = ""
@@ -304,7 +285,11 @@ extension HeroesViewController: HeroViewControllerDelegate {
     }
     
     func updateView(isFavourite: Bool, hero: Hero) {
-        self.heroesViewModel.changeNumberOfFavouriteHeroes(moreFavouriteHeroes: isFavourite)
+        if isFavourite {
+            self.heroesViewModel.numberOfFavouriteHeroes += 1
+        } else {
+            self.heroesViewModel.numberOfFavouriteHeroes -= 1
+        }
         heroesViewModel.setHeroAtIndex(at: -1,
                                        hero: hero,
                                        newIndex: isFavourite ? 0 : heroesViewModel.numberOfFavouriteHeroes)

@@ -9,12 +9,17 @@ import Combine
 import UIKit
 
 class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
+    
+    private enum TableViewConstants {
+        static let gridIconName = "icons8-grid-2-50"
+    }
+    
     private let heroesTableView = HeroesTableView()
 
     override init(heroesViewModel: HeroesViewModel) {
         super.init(heroesViewModel: heroesViewModel)
         super.delegate = self
-        heroesTableView.addSpinnerToBottom(spinner: super.getSpinner())
+        heroesTableView.addSpinnerToBottom(spinner: super.spinner)
     }
     
     required init?(coder: NSCoder) {
@@ -45,11 +50,11 @@ class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
     }
     
     func getTopBarIconImage() -> UIImage? {
-        return UIImage(named: "icons8-grid-2-50")
+        return UIImage(named: TableViewConstants.gridIconName)
     }
     
     func getViewControllers() -> [UIViewController] {
-        return [HeroesGridViewController(heroesViewModel: super.getViewModel())]
+        return [HeroesGridViewController(heroesViewModel: super.heroesViewModel)]
     }
 }
 
@@ -76,7 +81,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
                                                      for: indexPath) as! HeroesTableViewCell
-            let hero = super.getHero(indexPath: indexPath)
+            let hero = super.heroesViewModel.getHero(inSearch: indexPath.section == 0, index: indexPath.row)
             
             cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
             cell.storeHero = { aCell in

@@ -10,13 +10,14 @@ import UIKit
 
 class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
     
-    private enum CollectionViewConstants {
+    private enum GridConstants {
         static let leftPadding: CGFloat = 10
         static let rightPadding: CGFloat = 10
         static let cellHeight: CGFloat = 240
         static let headingHeight: CGFloat = 30
         static let footerIdentifier = "footer"
         static let headerIdentifier = "header"
+        static let tableIconName = "icons8-list-50"
     }
     
     private let heroesGridView = HeroesGridView()
@@ -51,11 +52,11 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
     }
     
     func getTopBarIconImage() -> UIImage? {
-        return UIImage(named: "icons8-list-50")
+        return UIImage(named: GridConstants.tableIconName)
     }
     
     func getViewControllers() -> [UIViewController] {
-        return [HeroesTableViewController(heroesViewModel: super.getViewModel())]
+        return [HeroesTableViewController(heroesViewModel: super.heroesViewModel)]
     }
 }
 
@@ -79,7 +80,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier,
                                                           for: indexPath) as! HeroesGridViewCell
-            let hero = super.getHero(indexPath: indexPath)
+            let hero = super.heroesViewModel.getHero(inSearch: indexPath.section == 0, index: indexPath.row)
             
             cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
             cell.storeHero = { aCell in
@@ -112,15 +113,15 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let cellHeight: CGFloat = CollectionViewConstants.cellHeight
+        let cellHeight: CGFloat = GridConstants.cellHeight
         
         let cellWidth: CGFloat
         if isLoadingCell(section: indexPath.section) {
             cellWidth = collectionView.frame.width
         } else {
             cellWidth = collectionView.frame.width / 2 - (
-                CollectionViewConstants.leftPadding +
-                CollectionViewConstants.rightPadding)
+                GridConstants.leftPadding +
+                GridConstants.rightPadding)
         }
         
         return CGSize(width: cellWidth, height: cellHeight)
@@ -136,14 +137,14 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
             }
             
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                         withReuseIdentifier: CollectionViewConstants.headerIdentifier,
+                                                                         withReuseIdentifier: GridConstants.headerIdentifier,
                                                                          for: indexPath) as! HeroesGridHeader
             header.title.text = super.getSectionTitle(section: indexPath.section)
             return header
         case UICollectionView.elementKindSectionFooter:
             if indexPath.section == 1 {
                 return collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                       withReuseIdentifier: CollectionViewConstants.footerIdentifier,
+                                                                       withReuseIdentifier: GridConstants.footerIdentifier,
                                                                        for: indexPath) as! HeroesGridFooter
             } else {
                 return UICollectionReusableView()
@@ -169,7 +170,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
         if isDoingASearch() == false {
             return CGSize(width: 0, height: 0)
         } else {
-            return CGSize(width: collectionView.frame.width, height: CollectionViewConstants.headingHeight)
+            return CGSize(width: collectionView.frame.width, height: GridConstants.headingHeight)
         }
     }
 }

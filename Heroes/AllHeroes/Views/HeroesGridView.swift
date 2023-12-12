@@ -16,17 +16,21 @@ class HeroesGridView: UIView {
         static let rightPadding: CGFloat = 10
     }
     
-    private let collectionView: UICollectionView
-    
-    override init(frame: CGRect) {
+    private let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: GridPadding.topPadding,
                                            left: GridPadding.leftPadding,
                                            bottom: GridPadding.bottomPadding,
                                            right: GridPadding.rightPadding)
         
-        collectionView = UICollectionView(frame: frame,
-                                          collectionViewLayout: layout)
+        let collectionView = UICollectionView(frame: CGRectZero,
+                                              collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        
+        return collectionView
+    }()
+    
+    override init(frame: CGRect) {
         super.init(frame: frame)
         configureCollectionView()
         setupConstraints()
@@ -46,8 +50,6 @@ class HeroesGridView: UIView {
     }
     
     private func setupConstraints() {
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: self.topAnchor),
             collectionView.leftAnchor.constraint(equalTo: self.leftAnchor),
