@@ -25,19 +25,19 @@ class HeroesViewModel {
                                                           numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest,
                                                           searchQuery: searchQuery)
             
-            DispatchQueue.main.async { [weak self] in
-                if let additionalHeroes = try? result.get() {
-                    if searchQuery != nil {
-                        self?.heroesInSearch.append(contentsOf: additionalHeroes)
-                    } else {
-                        for hero in additionalHeroes {
-                            if self?.heroes.contains(hero) == false {
-                                self?.heroes.append(hero)
-                            }
+            if let additionalHeroes = try? result.get() {
+                if searchQuery != nil {
+                    self.heroesInSearch.append(contentsOf: additionalHeroes)
+                } else {
+                    for hero in additionalHeroes {
+                        if self.heroes.contains(hero) == false {
+                            self.heroes.append(hero)
                         }
                     }
                 }
+            }
                 
+            DispatchQueue.main.async {
                 addHeroesToView()
             }
         }

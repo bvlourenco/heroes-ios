@@ -11,39 +11,24 @@ import XCTest
 
 final class AllHeroesViewSnapshotTests: XCTestCase {
     
-    private func makeHeroes() -> HeroesViewModel {
+    private func createHeroesViewModel() -> HeroesViewModel {
+        let domainName = Bundle.main.bundleIdentifier!
+        UserDefaults.standard.removePersistentDomain(forName: domainName)
+        
         let heroService = HeroFakeService()
-        
-        let thumbnail1 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
-                                                      extension: "jpg")
-        let thumbnail2 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
-                                                      extension: "jpg")
-        let thumbnail3 = Hero.createHeroThumbnailMock(path: "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
-                                                      extension: "jpg")
-        let hero1 = Hero.mock(thumbnail: thumbnail1)
-        let hero2 = Hero.mock(name: "name 2", description: "description 2", thumbnail: thumbnail2)
-        let hero3 = Hero.mock(name: "name 3", description: "description 3", thumbnail: thumbnail3)
         let numberOfHeroes = 20
-        
         var heroes: [Hero] = []
-        for i in 0..<numberOfHeroes {
-            if i % 3 == 0 {
-                heroes.append(hero1)
-            } else if i % 3 == 1 {
-                heroes.append(hero2)
-            } else {
-                heroes.append(hero3)
-            }
+        for index in 0..<numberOfHeroes {
+            heroes.append(Hero.mock(name: "name \(index)"))
         }
         
         heroService.getHeroesStub = { .success(heroes) }
         
-        let heroesViewModel = HeroesViewModel(heroService: heroService)
-        return heroesViewModel
+        return HeroesViewModel(heroService: heroService)
     }
     
     func testHeroesTableViewController() {
-        let heroesViewModel = makeHeroes()
+        let heroesViewModel = createHeroesViewModel()
         let heroesTableViewController = HeroesTableViewController(heroesViewModel: heroesViewModel)
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
         
@@ -51,7 +36,7 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
     }
     
     func testHeroesGridViewController() {
-        let heroesViewModel = makeHeroes()
+        let heroesViewModel = createHeroesViewModel()
         let heroesGridViewController = HeroesGridViewController(heroesViewModel: heroesViewModel)
         let navigationController = UINavigationController(rootViewController: heroesGridViewController)
         
