@@ -16,8 +16,8 @@ class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
     
     private let heroesTableView = HeroesTableView()
 
-    override init(heroesViewModel: HeroesViewModel) {
-        super.init(heroesViewModel: heroesViewModel)
+    override init(heroesViewModel: HeroesViewModel, firstInitialization: Bool = true) {
+        super.init(heroesViewModel: heroesViewModel, firstInitialization: firstInitialization)
         super.delegate = self
         heroesTableView.addSpinnerToBottom(spinner: super.spinner)
     }
@@ -54,7 +54,7 @@ class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
     }
     
     func getViewControllers() -> [UIViewController] {
-        return [HeroesGridViewController(heroesViewModel: super.heroesViewModel)]
+        return [HeroesGridViewController(heroesViewModel: super.heroesViewModel, firstInitialization: false)]
     }
 }
 

@@ -31,6 +31,7 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     private var rightBarButtonItems: [UIBarButtonItem] = []
     private let encoder = JSONEncoder()
     private var isInSearch: Bool = false
+    private var firstInitialization: Bool
     weak var delegate: ViewControllerDelegate?
     
     let spinner: UIActivityIndicatorView = {
@@ -59,8 +60,9 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     @Published
     private var searchQuery = ""
     
-    init(heroesViewModel: HeroesViewModel) {
+    init(heroesViewModel: HeroesViewModel, firstInitialization: Bool) {
         self.heroesViewModel = heroesViewModel
+        self.firstInitialization = firstInitialization
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -73,8 +75,11 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         navigationItem.title = ViewConstants.navigationTitle
         navigationController?.delegate = self
         
-        loadFavouriteHeroes()
-        heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: delegate?.addHeroesToView ?? {})
+        if firstInitialization {
+            loadFavouriteHeroes()
+            heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: delegate?.addHeroesToView ?? {})
+        }
+        
         loadNavigationBarButtons()
         setupSearch()
     }

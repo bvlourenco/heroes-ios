@@ -22,8 +22,8 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
     
     private let heroesGridView = HeroesGridView()
     
-    override init(heroesViewModel: HeroesViewModel) {
-        super.init(heroesViewModel: heroesViewModel)
+    override init(heroesViewModel: HeroesViewModel, firstInitialization: Bool = true) {
+        super.init(heroesViewModel: heroesViewModel, firstInitialization: firstInitialization)
         super.delegate = self
     }
     
@@ -56,7 +56,7 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
     }
     
     func getViewControllers() -> [UIViewController] {
-        return [HeroesTableViewController(heroesViewModel: super.heroesViewModel)]
+        return [HeroesTableViewController(heroesViewModel: super.heroesViewModel, firstInitialization: false)]
     }
 }
 
