@@ -23,7 +23,11 @@ class UIImageLoader {
         
         let token = imageLoader.loadImage(url) { result in
             
-            defer { self.uuidMap.removeValue(forKey: imageView) }
+            defer {
+                if self.uuidMap[imageView] != nil {
+                    self.uuidMap.removeValue(forKey: imageView)
+                }
+            }
             
             do {
                 let image = try result.get()
