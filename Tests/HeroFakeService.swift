@@ -11,13 +11,18 @@ import UIKit
 class HeroFakeService: HeroServiceProtocol {
     
     var getHeroesStub: () -> Result<[Hero], HeroError> = { return .success([]) }
+    var getHeroesSearchStub: () -> Result<[Hero], HeroError> = { return .success([]) }
     var comicsDescription: [String] = []
     var eventsDescription: [String] = []
     var storiesDescription: [String] = []
     var seriesDescription: [String] = []
     
     func getHeroes(offset: Int, numberOfHeroesPerRequest: Int, searchQuery: String?) async -> Result<[Hero], HeroError> {
-        return self.getHeroesStub()
+        if searchQuery != nil {
+            return self.getHeroesSearchStub()
+        } else {
+            return self.getHeroesStub()
+        }
     }
 
     func getHeroDetails(hero: Hero) async -> Result<Hero, HeroError> {

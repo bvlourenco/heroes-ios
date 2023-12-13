@@ -32,9 +32,6 @@ final class HeroesViewModelUnitTests: XCTestCase {
         for index in 0..<numberOfHeroes {
             heroes.append(Hero.mock(name: "name \(startIndex + index)"))
         }
-        
-        guard let heroService else { return heroes }
-        heroService.getHeroesStub = { .success(heroes) }
         return heroes
     }
     
@@ -55,7 +52,6 @@ final class HeroesViewModelUnitTests: XCTestCase {
         XCTAssertEqual(hero.description, description)
         XCTAssertEqual(hero.thumbnail?.path, imagePath)
         XCTAssertEqual(hero.thumbnail?.extension, imageExtension)
-        
         XCTAssertEqual(hero.comics?.items.count, numberOfComics)
         XCTAssertEqual(hero.events?.items.count, numberOfEvents)
         XCTAssertEqual(hero.series?.items.count, numberOfSeries)
@@ -79,20 +75,19 @@ final class HeroesViewModelUnitTests: XCTestCase {
     }
 
     func testFetch20Heroes() async throws {
+        guard let heroService else { return }
         guard let heroesViewModel else { return }
         let numberOfHeroes = 20
         let expectation = XCTestExpectation(description: "Fetch Heroes")
         
-        let _ = createFakeHeroes(numberOfHeroes: numberOfHeroes, startIndex: 0)
-        
+        let heroes = createFakeHeroes(numberOfHeroes: numberOfHeroes, startIndex: 0)
+        heroService.getHeroesStub = { .success(heroes) }
         heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: {
             expectation.fulfill()
         })
-        
         await fulfillment(of: [expectation], timeout: 5)
         
         XCTAssertEqual(heroesViewModel.numberOfHeroes(inSearch: false), 20)
-        
         for index in 0..<numberOfHeroes {
             validateHero(hero: heroesViewModel.getHero(inSearch: false, index: index),
                          name: "name \(index)")
@@ -100,33 +95,49 @@ final class HeroesViewModelUnitTests: XCTestCase {
     }
     
     func testFetchMoreThan20Heroes() async throws {
+        guard let heroService else { return }
         guard let heroesViewModel else { return }
         let numberOfHeroes = 20
         let expectation1 = XCTestExpectation(description: "Fetch first 20 heroes")
         let expectation2 = XCTestExpectation(description: "Fetch more heroes")
         
         var heroes = createFakeHeroes(numberOfHeroes: numberOfHeroes, startIndex: 0)
-        
+        heroService.getHeroesStub = { .success(heroes) }
         heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: {
             expectation1.fulfill()
         })
-        
         await fulfillment(of: [expectation1], timeout: 5)
         
         heroes.append(contentsOf: createFakeHeroes(numberOfHeroes: numberOfHeroes, startIndex: 20))
-        
+        heroService.getHeroesStub = { .success(heroes) }
         heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: {
             expectation2.fulfill()
         })
-        
         await fulfillment(of: [expectation2], timeout: 5)
         
-        let totalNumberOfHeroes = heroesViewModel.numberOfHeroes(inSearch: false)
-        
-        XCTAssertEqual(totalNumberOfHeroes, 40)
-        
+        XCTAssertEqual(heroesViewModel.numberOfHeroes(inSearch: false), 40)
         for index in 0..<numberOfHeroes {
             validateHero(hero: heroesViewModel.getHero(inSearch: false, index: index),
+                         name: "name \(index)")
+        }
+    }
+    
+    func testFetchHeroesInSearch() async throws {
+        guard let heroService else { return }
+        guard let heroesViewModel else { return }
+        let numberOfHeroes = 20
+        let expectation = XCTestExpectation(description: "Fetch Heroes in search")
+        
+        let heroes = createFakeHeroes(numberOfHeroes: numberOfHeroes, startIndex: 0)
+        heroService.getHeroesSearchStub = { .success(heroes) }
+        heroesViewModel.fetchHeroes(searchQuery: "name", addHeroesToView: {
+            expectation.fulfill()
+        })
+        await fulfillment(of: [expectation], timeout: 5)
+        
+        XCTAssertEqual(heroesViewModel.numberOfHeroes(inSearch: true), 20)
+        for index in 0..<numberOfHeroes {
+            validateHero(hero: heroesViewModel.getHero(inSearch: true, index: index),
                          name: "name \(index)")
         }
     }
@@ -134,41 +145,30 @@ final class HeroesViewModelUnitTests: XCTestCase {
     func testFetch0Heroes() async throws {
         guard let heroService else { return }
         guard let heroesViewModel else { return }
-        
         let expectation = XCTestExpectation(description: "Fetch Heroes")
-        
         heroService.getHeroesStub = { .success([]) }
-        
         heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: {
             expectation.fulfill()
         })
-        
         await fulfillment(of: [expectation], timeout: 5)
-        
         XCTAssertEqual(heroesViewModel.numberOfHeroes(inSearch: false), 0)
     }
 
     func testFetchHeroesWithError() async throws {
         guard let heroService else { return }
         guard let heroesViewModel else { return }
-        
         let expectation = XCTestExpectation(description: "Fetch Heroes")
-        
         heroService.getHeroesStub = { .failure(HeroError.serverError) }
-        
         do {
             let heroes = try await heroService.getHeroes(offset: 0, numberOfHeroesPerRequest: 20, searchQuery: nil).get()
             XCTFail("No error was thrown.")
         } catch {
             XCTAssertEqual(error as! HeroError, HeroError.serverError)
         }
-        
         heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: {
             expectation.fulfill()
         })
-        
         await fulfillment(of: [expectation], timeout: 5)
-        
         XCTAssertEqual(heroesViewModel.numberOfHeroes(inSearch: false), 0)
     }
 }
