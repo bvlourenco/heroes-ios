@@ -92,6 +92,7 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
                 print(error)
             }
         }
+        heroesViewModel.orderHeroes()
     }
     
     private func loadNavigationBarButtons() {
@@ -192,7 +193,7 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     // Returns the index to where the hero will be moved in the view (table or grid view)
-    func persistHero(section: Int, hero: Hero) throws -> Int? {
+    func persistHero(hero: Hero) throws -> Int? {
         guard let name = hero.name else { return nil }
 
         if UserDefaults.standard.data(forKey: name) != nil {

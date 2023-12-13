@@ -76,4 +76,8 @@ class HeroesViewModel {
     func addHeroes(hero: Hero) {
         self.heroes.append(hero)
     }
+    
+    func orderHeroes() {
+        self.heroes = self.heroes.sorted { $0.name ?? "" < $1.name ?? "" }
+    }
 }

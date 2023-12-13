@@ -11,7 +11,7 @@ import XCTest
 
 final class AllHeroesViewSnapshotTests: XCTestCase {
     
-    private func createHeroesViewModel() -> HeroesViewModel {
+    private func createHeroesViewModel(numberOfFavouriteHeroes: Int = 0) -> HeroesViewModel {
         let domainName = Bundle.main.bundleIdentifier!
         UserDefaults.standard.removePersistentDomain(forName: domainName)
         
@@ -22,23 +22,55 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
             heroes.append(Hero.mock(name: "name \(index)"))
         }
         
+        if numberOfFavouriteHeroes > 0 {
+            persistHeroes(numberOfFavouriteHeroes: numberOfFavouriteHeroes, heroes: heroes)
+        }
+        
         heroService.getHeroesStub = { .success(heroes) }
         
         return HeroesViewModel(heroService: heroService)
     }
     
+    private func persistHeroes(numberOfFavouriteHeroes: Int, heroes: [Hero]) {
+        let encoder = JSONEncoder()
+        do {
+            for index in 0..<numberOfFavouriteHeroes {
+                guard let name = heroes[index].name else { continue }
+                
+                let data = try encoder.encode(heroes[index])
+                UserDefaults.standard.set(data, forKey: name)
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
     func testHeroesTableViewController() {
-        let heroesViewModel = createHeroesViewModel()
-        let heroesTableViewController = HeroesTableViewController(heroesViewModel: heroesViewModel)
+        let heroesTableViewController = HeroesTableViewController(heroesViewModel: createHeroesViewModel())
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
         
         assertSnapshot(matching: navigationController, as: .image)
     }
     
     func testHeroesGridViewController() {
-        let heroesViewModel = createHeroesViewModel()
-        let heroesGridViewController = HeroesGridViewController(heroesViewModel: heroesViewModel)
+        let heroesGridViewController = HeroesGridViewController(heroesViewModel: createHeroesViewModel())
         let navigationController = UINavigationController(rootViewController: heroesGridViewController)
+        
+        assertSnapshot(matching: navigationController, as: .image)
+    }
+    
+    func testHeroesTableViewPersistance() {
+        let heroesViewModel = createHeroesViewModel(numberOfFavouriteHeroes: 2)
+        let heroesTableViewController = HeroesTableViewController(heroesViewModel: heroesViewModel)
+        let navigationController = UINavigationController(rootViewController: heroesTableViewController)
+        
+        assertSnapshot(matching: navigationController, as: .image)
+    }
+    
+    func testHeroesGridViewPersistance() {
+        let heroesViewModel = createHeroesViewModel(numberOfFavouriteHeroes: 2)
+        let heroesTableViewController = HeroesGridViewController(heroesViewModel: heroesViewModel)
+        let navigationController = UINavigationController(rootViewController: heroesTableViewController)
         
         assertSnapshot(matching: navigationController, as: .image)
     }

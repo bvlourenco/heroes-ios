@@ -84,8 +84,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
             
             cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
             cell.storeHero = { aCell in
-                let destinationIndex = try super.persistHero(section: indexPath.section,
-                                                             hero: hero)
+                let destinationIndex = try super.persistHero(hero: hero)
                 if indexPath.section == 0 {
                     self.reloadView()
                 } else {
