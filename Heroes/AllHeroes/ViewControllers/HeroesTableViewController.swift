@@ -59,44 +59,25 @@ class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
 }
 
 extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return super.getNumberOfSections()
-    }
-    
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return isDoingASearch() ? super.getSectionTitle(section: section) : nil
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return super.getNumberOfItemsInSection(section: section)
+        return super.getNumberOfItems()
     }
     
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if isLoadingCell(section: indexPath.section) {
-            let cell = tableView.dequeueReusableCell(withIdentifier: Constants.loadingCellIdentifier,
-                                                     for: indexPath) as! LoadingTableViewCell
-            cell.animateSpinner()
-            return cell
-        } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
-                                                     for: indexPath) as! HeroesTableViewCell
-            let hero = super.heroesViewModel.getHero(inSearch: indexPath.section == 0, index: indexPath.row)
-            
-            cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
-            cell.storeHero = { aCell in
-                let destinationIndex = try super.persistHero(hero: hero)
-                if indexPath.section == 0 {
-                    self.reloadView()
-                } else {
-                    guard let destinationIndex else { return }
-                    guard let actualIndexPath = tableView.indexPath(for: aCell) else { return }
-                    tableView.moveRow(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 1))
-                }
-            }
-            
-            return cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
+                                                 for: indexPath) as! HeroesTableViewCell
+        let hero = super.heroesViewModel.getHero(index: indexPath.row)
+        
+        cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
+        cell.storeHero = { aCell in
+            let destinationIndex = try super.persistHero(hero: hero)
+            guard let destinationIndex else { return }
+            guard let actualIndexPath = tableView.indexPath(for: aCell) else { return }
+            tableView.moveRow(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 0))
         }
+        
+        return cell
     }
     
     func tableView(_ tableView: UITableView,
@@ -108,7 +89,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView,
                    willDisplay cell: UITableViewCell,
                    forRowAt indexPath: IndexPath) {
-        let lastRowIndex = tableView.numberOfRows(inSection: 1) - 1
+        let lastRowIndex = tableView.numberOfRows(inSection: 0) - 1
         super.willFetchMoreHeroes(indexPath: indexPath, lastRowIndex: lastRowIndex)
     }
 }

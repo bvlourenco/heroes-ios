@@ -9,7 +9,6 @@ import Foundation
 
 class HeroesViewModel {
     private var heroes: [Hero] = []
-    private var heroesInSearch: [Hero] = []
     var numberOfFavouriteHeroes: Int = 0
     let heroService: HeroServiceProtocol
     
@@ -17,22 +16,16 @@ class HeroesViewModel {
         self.heroService = heroService
     }
     
-    func fetchHeroes(searchQuery: String?, addHeroesToView: @escaping () -> Void) {
+    func fetchHeroes(addHeroesToView: @escaping () -> Void) {
         Task {
-            let offset = searchQuery != nil ? 0 : (self.heroes.count - numberOfFavouriteHeroes)
-            
-            let result = await self.heroService.getHeroes(offset: offset,
+            let result = await self.heroService.getHeroes(offset: self.heroes.count,
                                                           numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest,
-                                                          searchQuery: searchQuery)
+                                                          searchQuery: nil)
             
             if let additionalHeroes = try? result.get() {
-                if searchQuery != nil {
-                    self.heroesInSearch.append(contentsOf: additionalHeroes)
-                } else {
-                    for hero in additionalHeroes {
-                        if self.heroes.contains(hero) == false {
-                            self.heroes.append(hero)
-                        }
+                for hero in additionalHeroes {
+                    if self.heroes.contains(hero) == false {
+                        self.heroes.append(hero)
                     }
                 }
             }
@@ -43,20 +36,12 @@ class HeroesViewModel {
         }
     }
     
-    func numberOfHeroes(inSearch: Bool) -> Int {
-        if inSearch {
-            return self.heroesInSearch.count
-        } else {
-            return self.heroes.count
-        }
+    func numberOfHeroes() -> Int {
+        return self.heroes.count
     }
     
-    func getHero(inSearch: Bool, index: Int) -> Hero {
-        if inSearch {
-            return self.heroesInSearch[index]
-        } else {
-            return self.heroes[index]
-        }
+    func getHero(index: Int) -> Hero {
+        return self.heroes[index]
     }
     
     func setHero(at index: Int, hero: Hero) {
@@ -69,11 +54,7 @@ class HeroesViewModel {
         self.heroes.insert(hero, at: newIndex)
     }
     
-    func clearHeroesInSearch() {
-        self.heroesInSearch = []
-    }
-    
-    func addHeroes(hero: Hero) {
+    func addHero(hero: Hero) {
         self.heroes.append(hero)
     }
     

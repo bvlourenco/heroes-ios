@@ -62,40 +62,25 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
 
 extension HeroesGridViewController: UICollectionViewDataSource, UICollectionViewDelegate,
                                         UICollectionViewDelegateFlowLayout {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return super.getNumberOfSections()
-    }
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return super.getNumberOfItemsInSection(section: section)
+        return super.getNumberOfItems()
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if isLoadingCell(section: indexPath.section) {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.loadingCellIdentifier,
-                                                          for: indexPath) as! LoadingGridViewCell
-            cell.animateSpinner()
-            return cell
-        } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier,
-                                                          for: indexPath) as! HeroesGridViewCell
-            let hero = super.heroesViewModel.getHero(inSearch: indexPath.section == 0, index: indexPath.row)
-            
-            cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
-            cell.storeHero = { aCell in
-                let destinationIndex = try super.persistHero(hero: hero)
-                if indexPath.section == 0 {
-                    self.reloadView()
-                } else {
-                    guard let destinationIndex else { return }
-                    guard let actualIndexPath = collectionView.indexPath(for: aCell) else { return }
-                    collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 1))
-                }
-            }
-            
-            return cell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier,
+                                                      for: indexPath) as! HeroesGridViewCell
+        let hero = super.heroesViewModel.getHero(index: indexPath.row)
+        
+        cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
+        cell.storeHero = { aCell in
+            let destinationIndex = try super.persistHero(hero: hero)
+            guard let destinationIndex else { return }
+            guard let actualIndexPath = collectionView.indexPath(for: aCell) else { return }
+            collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 0))
         }
+        
+        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -106,7 +91,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     func collectionView(_ collectionView: UICollectionView,
                         willDisplay cell: UICollectionViewCell,
                         forItemAt indexPath: IndexPath) {
-        let lastRowIndex = collectionView.numberOfItems(inSection: 1) - 1
+        let lastRowIndex = collectionView.numberOfItems(inSection: 0) - 1
         super.willFetchMoreHeroes(indexPath: indexPath, lastRowIndex: lastRowIndex)
     }
     
@@ -115,14 +100,9 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let cellHeight: CGFloat = GridConstants.cellHeight
         
-        let cellWidth: CGFloat
-        if isLoadingCell(section: indexPath.section) {
-            cellWidth = collectionView.frame.width
-        } else {
-            cellWidth = collectionView.frame.width / 2 - (
+        let cellWidth = collectionView.frame.width / 2 - (
                 GridConstants.leftPadding +
                 GridConstants.rightPadding)
-        }
         
         return CGSize(width: cellWidth, height: cellHeight)
     }
@@ -131,24 +111,10 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
-        case UICollectionView.elementKindSectionHeader:
-            if isDoingASearch() == false {
-                return UICollectionReusableView()
-            }
-            
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                         withReuseIdentifier: GridConstants.headerIdentifier,
-                                                                         for: indexPath) as! HeroesGridHeader
-            header.title.text = super.getSectionTitle(section: indexPath.section)
-            return header
         case UICollectionView.elementKindSectionFooter:
-            if indexPath.section == 1 {
-                return collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                       withReuseIdentifier: GridConstants.footerIdentifier,
-                                                                       for: indexPath) as! HeroesGridFooter
-            } else {
-                return UICollectionReusableView()
-            }
+            return collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+                                                                   withReuseIdentifier: GridConstants.footerIdentifier,
+                                                                   for: indexPath) as! HeroesGridFooter
         default:
             assert(false, "Unexpected kind in collectionView")
         }
@@ -157,20 +123,6 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForFooterInSection section: Int) -> CGSize {
-        if section == 0 {
-            return CGSize(width: 0, height: 0)
-        } else {
-            return CGSize(width: collectionView.frame.width, height: Constants.spinnerHeight)
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        referenceSizeForHeaderInSection section: Int) -> CGSize {
-        if isDoingASearch() == false {
-            return CGSize(width: 0, height: 0)
-        } else {
-            return CGSize(width: collectionView.frame.width, height: GridConstants.headingHeight)
-        }
+        return CGSize(width: collectionView.frame.width, height: Constants.spinnerHeight)
     }
 }
