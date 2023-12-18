@@ -36,4 +36,13 @@ class FavouritesViewModel {
     func getHero(index: Int) -> Hero {
         return self.favouriteHeroes[index]
     }
+    
+    func removeHero(hero: Hero) {
+        guard let index = self.favouriteHeroes.firstIndex(of: hero) else { return }
+        self.favouriteHeroes.remove(at: index)
+    }
+    
+    func addFavourite(hero: Hero) {
+        self.favouriteHeroes.append(hero)
+    }
 }

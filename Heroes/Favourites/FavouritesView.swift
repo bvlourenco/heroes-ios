@@ -33,6 +33,10 @@ class FavouritesView: UIView {
         ])
     }
     
+    func update() {
+        favourites.update()
+    }
+    
     func setDataSourceAndDelegate(viewController: FavouritesViewController) {
         favourites.setTableDataSourceAndDelegate(viewController: viewController)
     }

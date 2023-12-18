@@ -12,6 +12,7 @@ class FavouritesViewController: UIViewController {
     private let favouritesViewModel: FavouritesViewModel
     private let heroService: HeroServiceProtocol
     private let loader: ImageLoader = ImageLoader()
+    private let encoder = JSONEncoder()
     
     init(favouritesViewModel: FavouritesViewModel, heroService: HeroServiceProtocol) {
         self.favouritesViewModel = favouritesViewModel
@@ -25,6 +26,10 @@ class FavouritesViewController: UIViewController {
     
     override func loadView() {
         view = favouritesView
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        favouritesView.update()
     }
     
     override func viewDidLoad() {
@@ -45,6 +50,20 @@ extension FavouritesViewController: UITableViewDelegate, UITableViewDataSource {
                                                  for: indexPath) as! HeroesTableViewCell
         let hero = favouritesViewModel.getHero(index: indexPath.row)
         cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
+        cell.storeHero = { aCell in
+            guard let name = hero.name else { return }
+
+            if UserDefaults.standard.data(forKey: name) != nil {
+                UserDefaults.standard.removeObject(forKey: name)
+                self.favouritesViewModel.removeHero(hero: hero)
+            } else {
+                let data = try self.encoder.encode(hero)
+                UserDefaults.standard.set(data, forKey: name)
+                self.favouritesViewModel.addFavourite(hero: hero)
+            }
+            
+            self.favouritesView.update()
+        }
         
         return cell
     }
@@ -57,7 +76,8 @@ extension FavouritesViewController: UITableViewDelegate, UITableViewDataSource {
         let destination = HeroDetailViewController(hero: hero,
                                                    heroIndex: indexPath.row,
                                                    heroDetailViewModel: heroDetailViewModel,
-                                                   loader: loader)
+                                                   loader: loader, 
+                                                   favouritesViewModel: favouritesViewModel)
         navigationController?.pushViewController(destination, animated: true)
     }
 }

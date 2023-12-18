@@ -17,6 +17,7 @@ class SearchViewController: UIViewController {
     
     private let searchView = SearchView()
     private let searchViewModel: HeroesViewModel
+    private let favouritesViewModel: FavouritesViewModel
     private let encoder = JSONEncoder()
     private let loader: ImageLoader = ImageLoader()
     private var isLoadingData: Bool = false
@@ -25,8 +26,9 @@ class SearchViewController: UIViewController {
     @Published
     private var searchQuery = ""
     
-    init(searchViewModel: HeroesViewModel) {
+    init(searchViewModel: HeroesViewModel, favouritesViewModel: FavouritesViewModel) {
         self.searchViewModel = searchViewModel
+        self.favouritesViewModel = favouritesViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -126,9 +128,11 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
 
             if UserDefaults.standard.data(forKey: name) != nil {
                 UserDefaults.standard.removeObject(forKey: name)
+                self.favouritesViewModel.removeHero(hero: hero)
             } else {
                 let data = try self.encoder.encode(hero)
                 UserDefaults.standard.set(data, forKey: name)
+                self.favouritesViewModel.addFavourite(hero: hero)
             }
         }
         
@@ -143,7 +147,8 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         let destination = HeroDetailViewController(hero: hero,
                                                    heroIndex: indexPath.row,
                                                    heroDetailViewModel: heroDetailViewModel,
-                                                   loader: loader)
+                                                   loader: loader,
+                                                   favouritesViewModel: favouritesViewModel)
         destination.delegate = self
         navigationController?.pushViewController(destination, animated: true)
     }
@@ -178,5 +183,6 @@ extension SearchViewController: HeroViewControllerDelegate {
     }
     
     func updateView(isFavourite: Bool, hero: Hero) {
+        searchView.updateResults()
     }
 }

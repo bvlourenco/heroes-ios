@@ -15,6 +15,7 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     let heroesViewModel: HeroesViewModel
+    private let favouritesViewModel: FavouritesViewModel
     private let loader: ImageLoader = ImageLoader()
     private var isLoadingData: Bool = false
     private let transition = Transition()
@@ -22,14 +23,21 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     private var firstInitialization: Bool
     weak var delegate: ViewControllerDelegate?
     
-    init(heroesViewModel: HeroesViewModel, firstInitialization: Bool) {
+    init(heroesViewModel: HeroesViewModel, 
+         favouritesViewModel: FavouritesViewModel,
+         firstInitialization: Bool) {
         self.heroesViewModel = heroesViewModel
         self.firstInitialization = firstInitialization
+        self.favouritesViewModel = favouritesViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        delegate?.reloadView()
     }
     
     override func viewDidLoad() {
@@ -69,9 +77,11 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
 
         if UserDefaults.standard.data(forKey: name) != nil {
             UserDefaults.standard.removeObject(forKey: name)
+            favouritesViewModel.removeHero(hero: hero)
         } else {
             let data = try self.encoder.encode(hero)
             UserDefaults.standard.set(data, forKey: name)
+            favouritesViewModel.addFavourite(hero: hero)
         }
     }
     
@@ -101,7 +111,8 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         let destination = HeroDetailViewController(hero: hero,
                                                    heroIndex: indexPath.row,
                                                    heroDetailViewModel: heroDetailViewModel,
-                                                   loader: loader)
+                                                   loader: loader,
+                                                   favouritesViewModel: favouritesViewModel)
         destination.delegate = self
         navigationController?.pushViewController(destination, animated: true)
     }
