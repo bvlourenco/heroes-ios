@@ -10,7 +10,5 @@ import UIKit
 protocol ViewControllerDelegate: AnyObject {
     func addHeroesToView()
     func reloadView()
-    func getTopBarIconImage() -> UIImage?
-    func getViewControllers() -> [UIViewController]
-    func hideSpinner()
+    func spinnerHidden(to value: Bool)
 }

@@ -9,17 +9,11 @@ import Combine
 import UIKit
 
 class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
-    
-    private enum TableViewConstants {
-        static let gridIconName = "icons8-grid-2-50"
-    }
-    
-    private let heroesTableView = HeroesTableView()
+    private let heroesTableView = HeroesTableView(spinnerHidden: false)
 
     override init(heroesViewModel: HeroesViewModel, firstInitialization: Bool = true) {
         super.init(heroesViewModel: heroesViewModel, firstInitialization: firstInitialization)
         super.delegate = self
-        heroesTableView.addSpinnerToBottom(spinner: super.spinner)
     }
     
     required init?(coder: NSCoder) {
@@ -37,24 +31,15 @@ class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
     
     func addHeroesToView() {
         reloadView()
-        heroesTableView.isSpinnerHidden(to: true)
         super.updateLoading(to: false)
-    }
-    
-    func hideSpinner() {
-        heroesTableView.isSpinnerHidden(to: false)
     }
     
     func reloadView() {
         heroesTableView.update()
     }
     
-    func getTopBarIconImage() -> UIImage? {
-        return UIImage(named: TableViewConstants.gridIconName)
-    }
-    
-    func getViewControllers() -> [UIViewController] {
-        return [HeroesGridViewController(heroesViewModel: super.heroesViewModel, firstInitialization: false)]
+    func spinnerHidden(to value: Bool) {
+        heroesTableView.isSpinnerHidden(to: value)
     }
 }
 

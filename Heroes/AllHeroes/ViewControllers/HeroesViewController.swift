@@ -11,54 +11,16 @@ import UIKit
 class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     
     private enum ViewConstants {
-//        static let numberOfSections = 2
-//        static let heroSearchSectionTitle = "Heroes Search Result"
-//        static let heroesSectionTitle = "All Heroes"
-//        static let alertTitle = "Cannot perform search"
-//        static let alertMessage = "Your search query has less than 3 characters. Insert more characters"
-//        static let alertButtonTitle = "Ok"
         static let navigationTitle = "All Heroes"
-//        static let searchQueryMinimumLength = 2
-//        static let secondsToWait = 5
     }
     
     let heroesViewModel: HeroesViewModel
     private let loader: ImageLoader = ImageLoader()
     private var isLoadingData: Bool = false
     private let transition = Transition()
-    
-    //private var cancellables: Set<AnyCancellable> = []
-    //private var rightBarButtonItems: [UIBarButtonItem] = []
     private let encoder = JSONEncoder()
-    //private var isInSearch: Bool = false
     private var firstInitialization: Bool
     weak var delegate: ViewControllerDelegate?
-    
-    let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(style: .medium)
-        spinner.startAnimating()
-        return spinner
-    }()
-    
-//    private var searchBar: UISearchBar = {
-//        let searchBar = UISearchBar()
-//        searchBar.showsCancelButton = true
-//        searchBar.sizeToFit()
-//        return searchBar
-//    }()
-    
-//    private let alert: UIAlertController = {
-//        let alert = UIAlertController(title: ViewConstants.alertTitle,
-//                                      message: ViewConstants.alertMessage,
-//                                      preferredStyle: UIAlertController.Style.alert)
-//        alert.addAction(UIAlertAction(title: ViewConstants.alertButtonTitle,
-//                                      style: UIAlertAction.Style.default,
-//                                      handler: nil))
-//        return alert
-//    }()
-    
-//    @Published
-//    private var searchQuery = ""
     
     init(heroesViewModel: HeroesViewModel, firstInitialization: Bool) {
         self.heroesViewModel = heroesViewModel
@@ -76,41 +38,9 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         navigationController?.delegate = self
         
         if firstInitialization {
-            // loadFavouriteHeroes()
             heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: delegate?.addHeroesToView ?? {})
         }
-
-        //setupSearch()
     }
-    
-//    private func loadFavouriteHeroes() {
-//        let decoder = JSONDecoder()
-//        for heroName in UserDefaults.standard.dictionaryRepresentation().keys {
-//            do {
-//                if let data = UserDefaults.standard.data(forKey: heroName) {
-//                    let newHero = try decoder.decode(Hero.self, from: data)
-//                    heroesViewModel.addHero(hero: newHero)
-//                    heroesViewModel.numberOfFavouriteHeroes += 1
-//                }
-//            } catch {
-//                print(error)
-//            }
-//        }
-//        heroesViewModel.orderHeroes()
-//    }
-    
-//    private func setupSearch() {
-//        searchBar.delegate = self
-//        
-//        $searchQuery
-//            .debounce(for: .seconds(ViewConstants.secondsToWait), scheduler: DispatchQueue.main)
-//            .filter { $0.count > ViewConstants.searchQueryMinimumLength }
-//            .removeDuplicates()
-//            .sink { [weak self] text in
-//                self?.searchForHeroes(searchQuery: text)
-//            }
-//            .store(in: &cancellables)
-//    }
     
     func navigationController(_ navigationController: UINavigationController,
                               animationControllerFor operation: UINavigationController.Operation,
@@ -130,37 +60,9 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         self.isLoadingData = value
     }
     
-//    private func searchForHeroes(searchQuery text: String) {
-//        heroesViewModel.clearHeroesInSearch()
-//        heroesViewModel.fetchHeroes(searchQuery: text) { [weak self] in
-//            self?.isInSearch = false
-//            self?.delegate?.addHeroesToView()
-//        }
-//    }
-    
-//    func getNumberOfSections() -> Int {
-//        return ViewConstants.numberOfSections
-//    }
-//    
     func getNumberOfItems() -> Int {
         return heroesViewModel.numberOfHeroes()
     }
-    
-//    func isDoingASearch() -> Bool {
-//        return isInSearch || heroesViewModel.numberOfHeroes(inSearch: true) > 0
-//    }
-    
-//    func getSectionTitle(section: Int) -> String {
-//        if section == 0 {
-//            return ViewConstants.heroSearchSectionTitle
-//        } else {
-//            return ViewConstants.heroesSectionTitle
-//        }
-//    }
-    
-//    func isLoadingCell(section: Int) -> Bool {
-//        return section == 0 && isInSearch && heroesViewModel.numberOfHeroes(inSearch: true) == 0
-//    }
     
     // Returns the index to where the hero will be moved in the view (table or grid view)
     func persistHero(hero: Hero) throws {
@@ -177,17 +79,19 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     func willFetchMoreHeroes(indexPath: IndexPath, lastRowIndex: Int) {
         let numberOfHeroes = heroesViewModel.numberOfHeroes()
         if numberOfHeroes < Constants.numberOfHeroesPerRequest {
+            delegate?.spinnerHidden(to: true)
             return
         }
         
         let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
         let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
         if self.isLoadingData == false && indexPath.row >= rowIndexLoadMoreHeroes {
-            delegate?.hideSpinner()
+            delegate?.spinnerHidden(to: false)
             updateLoading(to: true)
             
             heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] in
                 self?.delegate?.addHeroesToView()
+                self?.delegate?.spinnerHidden(to: true)
             }
         }
     }
@@ -195,50 +99,14 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     func itemSelected(indexPath: IndexPath) {
         let hero = heroesViewModel.getHero(index: indexPath.row)
         let heroDetailViewModel = HeroDetailViewModel(heroService: heroesViewModel.heroService, hero: hero)
-        let heroIndex = indexPath.section == 1 ? indexPath.row: nil
         let destination = HeroDetailViewController(hero: hero,
-                                                   heroIndex: heroIndex,
+                                                   heroIndex: indexPath.row,
                                                    heroDetailViewModel: heroDetailViewModel,
                                                    loader: loader)
         destination.delegate = self
         navigationController?.pushViewController(destination, animated: true)
     }
 }
-
-//extension HeroesViewController: UISearchBarDelegate {
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchText.isEmpty {
-//            self.isInSearch = false
-//            heroesViewModel.clearHeroesInSearch()
-//            delegate?.reloadView()
-//        } else if self.isInSearch == false {
-//            self.isInSearch = true
-//            delegate?.reloadView()
-//        }
-//        
-//        self.searchQuery = searchText
-//    }
-//    
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        let text = searchBar.text ?? ""
-//        if text.isEmpty == false && text.count > ViewConstants.searchQueryMinimumLength {
-//            searchBar.resignFirstResponder()
-//            searchForHeroes(searchQuery: text)
-//        } else {
-//            self.present(alert, animated: true, completion: nil)
-//        }
-//    }
-//    
-//    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-//        searchBar.text = ""
-//        self.searchQuery = ""
-//        heroesViewModel.clearHeroesInSearch()
-//        navigationItem.titleView = nil
-//        navigationItem.rightBarButtonItems = self.rightBarButtonItems
-//        self.isInSearch = false
-//        delegate?.reloadView()
-//    }
-//}
 
 extension HeroesViewController: HeroViewControllerDelegate {
     func updateHeroInView(heroIndex: Int, hero: Hero) {

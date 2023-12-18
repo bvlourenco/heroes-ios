@@ -17,7 +17,6 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
         static let headingHeight: CGFloat = 30
         static let footerIdentifier = "footer"
         static let headerIdentifier = "header"
-        static let tableIconName = "icons8-list-50"
     }
     
     private let heroesGridView = HeroesGridView()
@@ -45,18 +44,12 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
         super.updateLoading(to: false)
     }
     
-    func hideSpinner() {}
-    
     func reloadView() {
         heroesGridView.update()
     }
     
-    func getTopBarIconImage() -> UIImage? {
-        return UIImage(named: GridConstants.tableIconName)
-    }
-    
-    func getViewControllers() -> [UIViewController] {
-        return [HeroesTableViewController(heroesViewModel: super.heroesViewModel, firstInitialization: false)]
+    func spinnerHidden(to value: Bool) {
+        heroesGridView.isSpinnerHidden(to: value)
     }
 }
 

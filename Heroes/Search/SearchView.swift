@@ -8,17 +8,24 @@
 import UIKit
 
 class SearchView: UIView {
-    let searchBar: UISearchBar = {
+    private enum ViewConstants {
+        static let alertTitle = "Cannot perform search"
+        static let alertMessage = "Your search query has less than 3 characters. Insert more characters"
+        static let alertButtonTitle = "Ok"
+        static let searchPlaceholder = "Search for heroes"
+    }
+    
+    private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.showsCancelButton = true
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.backgroundImage = UIImage()
-        searchBar.placeholder = "Search for heroes"
+        searchBar.placeholder = ViewConstants.searchPlaceholder
         return searchBar
     }()
     
-    let results: HeroesTableView = {
-        let heroesTableView = HeroesTableView()
+    private let results: HeroesTableView = {
+        let heroesTableView = HeroesTableView(spinnerHidden: true)
         heroesTableView.translatesAutoresizingMaskIntoConstraints = false
         return heroesTableView
     }()
@@ -31,29 +38,26 @@ class SearchView: UIView {
         return view
     }()
     
-    private let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(style: .medium)
-        spinner.startAnimating()
-        spinner.isHidden = true
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        return spinner
+    private let alert: UIAlertController = {
+        let alert = UIAlertController(title: ViewConstants.alertTitle,
+                                      message: ViewConstants.alertMessage,
+                                      preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: ViewConstants.alertButtonTitle,
+                                      style: UIAlertAction.Style.default,
+                                      handler: nil))
+        return alert
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(stackView)
         stackView.addArrangedSubview(searchBar)
-        stackView.addArrangedSubview(spinner)
         stackView.addArrangedSubview(results)
         setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setSearchDelegate(viewController: SearchViewController) {
-        searchBar.delegate = viewController
     }
     
     private func setupConstraints() {
@@ -65,11 +69,31 @@ class SearchView: UIView {
         ])
     }
     
-    func getSearchText() -> String? {
-        return searchBar.text
+    func setSearchDelegate(viewController: SearchViewController) {
+        searchBar.delegate = viewController
+    }
+    
+    func setResultsDataSourceAndDelegate(viewController: SearchViewController) {
+        results.setTableDataSourceAndDelegate(viewController: viewController)
+    }
+    
+    func hideKeyboard() {
+        searchBar.resignFirstResponder()
+    }
+    
+    func updateResults() {
+        results.update()
+    }
+    
+    func getAlert() -> UIAlertController {
+        return alert
     }
     
     func spinnerHidden(to value: Bool) {
-        spinner.isHidden = value
+        results.isSpinnerHidden(to: value)
+    }
+    
+    func getSearchText() -> String? {
+        return searchBar.text
     }
 }

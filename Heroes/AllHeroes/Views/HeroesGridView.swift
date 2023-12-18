@@ -30,8 +30,25 @@ class HeroesGridView: UIView {
         return collectionView
     }()
     
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.startAnimating()
+        return spinner
+    }()
+    
+    private let stackView: UIStackView = {
+        let view = UIStackView()
+        view.axis = .vertical
+        view.spacing = 10
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
+        addSubview(stackView)
+        stackView.addArrangedSubview(spinner)
+        stackView.addArrangedSubview(collectionView)
         configureCollectionView()
         setupConstraints()
     }
@@ -47,6 +64,10 @@ class HeroesGridView: UIView {
     
     func update() {
         collectionView.reloadData()
+    }
+    
+    func isSpinnerHidden(to value: Bool) {
+        spinner.isHidden = value
     }
     
     private func setupConstraints() {
@@ -65,7 +86,5 @@ class HeroesGridView: UIView {
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: Constants.footerIdentifier)
         collectionView.backgroundColor = UIColor.white
-        
-        addSubview(collectionView)
     }
 }

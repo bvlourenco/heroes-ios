@@ -9,11 +9,7 @@ import Combine
 import UIKit
 
 class SearchViewController: UIViewController {
-    
     private enum ViewConstants {
-        static let alertTitle = "Cannot perform search"
-        static let alertMessage = "Your search query has less than 3 characters. Insert more characters"
-        static let alertButtonTitle = "Ok"
         static let navigationTitle = "All Heroes"
         static let searchQueryMinimumLength = 2
         static let secondsToWait = 1
@@ -25,16 +21,6 @@ class SearchViewController: UIViewController {
     private let loader: ImageLoader = ImageLoader()
     private var isLoadingData: Bool = false
     private var cancellables: Set<AnyCancellable> = []
-    
-    private let alert: UIAlertController = {
-        let alert = UIAlertController(title: ViewConstants.alertTitle,
-                                      message: ViewConstants.alertMessage,
-                                      preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: ViewConstants.alertButtonTitle,
-                                      style: UIAlertAction.Style.default,
-                                      handler: nil))
-        return alert
-    }()
     
     @Published
     private var searchQuery = ""
@@ -59,7 +45,7 @@ class SearchViewController: UIViewController {
     
     private func setupSearch() {
         searchView.setSearchDelegate(viewController: self)
-        searchView.results.setTableDataSourceAndDelegate(viewController: self)
+        searchView.setResultsDataSourceAndDelegate(viewController: self)
 
         $searchQuery
             .debounce(for: .seconds(ViewConstants.secondsToWait), scheduler: DispatchQueue.main)
@@ -79,14 +65,14 @@ class SearchViewController: UIViewController {
         searchViewModel.clearHeroes()
         searchViewModel.fetchHeroes(searchQuery: text) { [weak self] in
             self?.searchView.spinnerHidden(to: true)
-            self?.searchView.searchBar.resignFirstResponder()
+            self?.searchView.hideKeyboard()
             self?.addHeroesToView()
         }
     }
     
     func addHeroesToView() {
-        searchView.results.update()
-        searchView.results.isSpinnerHidden(to: true)
+        searchView.spinnerHidden(to: true)
+        searchView.updateResults()
         updateLoading(to: false)
     }
 }
@@ -99,7 +85,7 @@ extension SearchViewController: UISearchBarDelegate {
             searchView.spinnerHidden(to: false)
         }
         searchViewModel.clearHeroes()
-        searchView.results.update()
+        searchView.updateResults()
         self.searchQuery = searchText
     }
 
@@ -109,7 +95,7 @@ extension SearchViewController: UISearchBarDelegate {
             searchBar.resignFirstResponder()
             searchForHeroes(searchQuery: text)
         } else {
-            self.present(alert, animated: true, completion: nil)
+            self.present(searchView.getAlert(), animated: true, completion: nil)
         }
     }
 
@@ -118,7 +104,7 @@ extension SearchViewController: UISearchBarDelegate {
         self.searchQuery = ""
         searchView.spinnerHidden(to: true)
         searchViewModel.clearHeroes()
-        searchView.results.update()
+        searchView.updateResults()
         searchBar.resignFirstResponder()
     }
 }
@@ -175,12 +161,14 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
         let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
         if self.isLoadingData == false && indexPath.row >= rowIndexLoadMoreHeroes {
-            searchView.results.isSpinnerHidden(to: false)
+            searchView.spinnerHidden(to: false)
             updateLoading(to: true)
             
             searchViewModel.fetchHeroes(searchQuery: searchView.getSearchText()) { [weak self] in
                 self?.addHeroesToView()
             }
+        } else {
+            searchView.spinnerHidden(to: true)
         }
     }
 }

@@ -12,7 +12,6 @@ class HeroesTableView: UIView {
         let tableView = UITableView(frame: CGRectZero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(HeroesTableViewCell.self, forCellReuseIdentifier: Constants.cellIdentifier)
-        tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: Constants.loadingCellIdentifier)
         
         // Assigning rowHeight property since a table view row initially does not have
         // the image (because of loading) and so, estimatedRowHeight would produce a
@@ -22,10 +21,17 @@ class HeroesTableView: UIView {
         return tableView
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.startAnimating()
+        return spinner
+    }()
+    
+    init(spinnerHidden value: Bool) {
+        super.init(frame: CGRectZero)
         addSubview(tableView)
         setupConstraints()
+        addSpinnerToBottom(spinnerHidden: value)
     }
     
     required init?(coder: NSCoder) {
@@ -44,16 +50,15 @@ class HeroesTableView: UIView {
     
     func update() {
         tableView.reloadData()
-        tableView.tableFooterView?.isHidden = true
     }
     
-    func addSpinnerToBottom(spinner: UIActivityIndicatorView) {
+    func addSpinnerToBottom(spinnerHidden value: Bool) {
         tableView.tableFooterView = spinner
-        tableView.tableFooterView?.isHidden = false
+        tableView.tableFooterView?.isHidden = value
     }
     
-    func isSpinnerHidden(to status: Bool) {
-        tableView.tableFooterView?.isHidden = status
+    func isSpinnerHidden(to value: Bool) {
+        tableView.tableFooterView?.isHidden = value
     }
     
     private func setupConstraints() {
