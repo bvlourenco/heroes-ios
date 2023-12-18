@@ -64,7 +64,6 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         return heroesViewModel.numberOfHeroes()
     }
     
-    // Returns the index to where the hero will be moved in the view (table or grid view)
     func persistHero(hero: Hero) throws {
         guard let name = hero.name else { return }
 

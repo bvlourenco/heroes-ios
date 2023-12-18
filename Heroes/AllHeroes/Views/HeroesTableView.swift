@@ -48,6 +48,11 @@ class HeroesTableView: UIView {
         tableView.dataSource = viewController
     }
     
+    func setTableDataSourceAndDelegate(viewController: FavouritesViewController) {
+        tableView.delegate = viewController
+        tableView.dataSource = viewController
+    }
+    
     func update() {
         tableView.reloadData()
     }

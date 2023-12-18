@@ -140,9 +140,8 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true)
         let hero = searchViewModel.getHero(index: indexPath.row)
         let heroDetailViewModel = HeroDetailViewModel(heroService: searchViewModel.heroService, hero: hero)
-        let heroIndex = indexPath.section == 1 ? indexPath.row: nil
         let destination = HeroDetailViewController(hero: hero,
-                                                   heroIndex: heroIndex,
+                                                   heroIndex: indexPath.row,
                                                    heroDetailViewModel: heroDetailViewModel,
                                                    loader: loader)
         destination.delegate = self

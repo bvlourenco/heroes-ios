@@ -30,25 +30,9 @@ class HeroesGridView: UIView {
         return collectionView
     }()
     
-    private let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(style: .medium)
-        spinner.startAnimating()
-        return spinner
-    }()
-    
-    private let stackView: UIStackView = {
-        let view = UIStackView()
-        view.axis = .vertical
-        view.spacing = 10
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubview(stackView)
-        stackView.addArrangedSubview(spinner)
-        stackView.addArrangedSubview(collectionView)
+        addSubview(collectionView)
         configureCollectionView()
         setupConstraints()
     }
@@ -64,18 +48,18 @@ class HeroesGridView: UIView {
     
     func update() {
         collectionView.reloadData()
+        isSpinnerHidden(to: true)
     }
     
     func isSpinnerHidden(to value: Bool) {
-        spinner.isHidden = value
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: self.topAnchor),
+            collectionView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
             collectionView.leftAnchor.constraint(equalTo: self.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: self.rightAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     
