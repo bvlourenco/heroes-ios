@@ -18,9 +18,10 @@ class TabBar: UITabBarController {
     }
     
     func setupVCs() {
-        let heroesViewModel = HeroesViewModel(heroService: HeroService())
+        let heroService = HeroService()
+        let heroesViewModel = HeroesViewModel(heroService: heroService)
         viewControllers = [
-            createNavController(for: HeroesTableViewController(heroesViewModel: heroesViewModel),
+            createNavController(for: SearchViewController(searchViewModel: HeroesViewModel(heroService: heroService)),
                                 title: "Search",
                                 image: UIImage(systemName: "magnifyingglass")!),
             createNavController(for: HeroesTableViewController(heroesViewModel: heroesViewModel),

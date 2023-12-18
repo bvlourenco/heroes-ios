@@ -37,6 +37,11 @@ class HeroesTableView: UIView {
         tableView.dataSource = viewController
     }
     
+    func setTableDataSourceAndDelegate(viewController: SearchViewController) {
+        tableView.delegate = viewController
+        tableView.dataSource = viewController
+    }
+    
     func update() {
         tableView.reloadData()
         tableView.tableFooterView?.isHidden = true

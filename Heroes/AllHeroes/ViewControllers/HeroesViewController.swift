@@ -76,28 +76,28 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         navigationController?.delegate = self
         
         if firstInitialization {
-            loadFavouriteHeroes()
-            heroesViewModel.fetchHeroes(addHeroesToView: delegate?.addHeroesToView ?? {})
+            // loadFavouriteHeroes()
+            heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: delegate?.addHeroesToView ?? {})
         }
 
         //setupSearch()
     }
     
-    private func loadFavouriteHeroes() {
-        let decoder = JSONDecoder()
-        for heroName in UserDefaults.standard.dictionaryRepresentation().keys {
-            do {
-                if let data = UserDefaults.standard.data(forKey: heroName) {
-                    let newHero = try decoder.decode(Hero.self, from: data)
-                    heroesViewModel.addHero(hero: newHero)
-                    heroesViewModel.numberOfFavouriteHeroes += 1
-                }
-            } catch {
-                print(error)
-            }
-        }
-        heroesViewModel.orderHeroes()
-    }
+//    private func loadFavouriteHeroes() {
+//        let decoder = JSONDecoder()
+//        for heroName in UserDefaults.standard.dictionaryRepresentation().keys {
+//            do {
+//                if let data = UserDefaults.standard.data(forKey: heroName) {
+//                    let newHero = try decoder.decode(Hero.self, from: data)
+//                    heroesViewModel.addHero(hero: newHero)
+//                    heroesViewModel.numberOfFavouriteHeroes += 1
+//                }
+//            } catch {
+//                print(error)
+//            }
+//        }
+//        heroesViewModel.orderHeroes()
+//    }
     
 //    private func setupSearch() {
 //        searchBar.delegate = self
@@ -163,20 +163,14 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
 //    }
     
     // Returns the index to where the hero will be moved in the view (table or grid view)
-    func persistHero(hero: Hero) throws -> Int? {
-        guard let name = hero.name else { return nil }
+    func persistHero(hero: Hero) throws {
+        guard let name = hero.name else { return }
 
         if UserDefaults.standard.data(forKey: name) != nil {
             UserDefaults.standard.removeObject(forKey: name)
-            self.heroesViewModel.numberOfFavouriteHeroes -= 1
-            self.heroesViewModel.moveHero(hero: hero, to: self.heroesViewModel.numberOfFavouriteHeroes)
-            return self.heroesViewModel.numberOfFavouriteHeroes
         } else {
             let data = try self.encoder.encode(hero)
             UserDefaults.standard.set(data, forKey: name)
-            self.heroesViewModel.numberOfFavouriteHeroes += 1
-            self.heroesViewModel.moveHero(hero: hero, to: 0)
-            return 0
         }
     }
     
@@ -192,7 +186,7 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
             delegate?.hideSpinner()
             updateLoading(to: true)
             
-            heroesViewModel.fetchHeroes() { [weak self] in
+            heroesViewModel.fetchHeroes(searchQuery: nil) { [weak self] in
                 self?.delegate?.addHeroesToView()
             }
         }
@@ -252,13 +246,6 @@ extension HeroesViewController: HeroViewControllerDelegate {
     }
     
     func updateView(isFavourite: Bool, hero: Hero) {
-        if isFavourite {
-            self.heroesViewModel.numberOfFavouriteHeroes += 1
-        } else {
-            self.heroesViewModel.numberOfFavouriteHeroes -= 1
-        }
-        heroesViewModel.moveHero(hero: hero,
-                                 to: isFavourite ? 0 : heroesViewModel.numberOfFavouriteHeroes)
         delegate?.reloadView()
     }
 }

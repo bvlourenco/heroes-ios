@@ -71,10 +71,7 @@ extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource 
         
         cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
         cell.storeHero = { aCell in
-            let destinationIndex = try super.persistHero(hero: hero)
-            guard let destinationIndex else { return }
-            guard let actualIndexPath = tableView.indexPath(for: aCell) else { return }
-            tableView.moveRow(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 0))
+            try super.persistHero(hero: hero)
         }
         
         return cell

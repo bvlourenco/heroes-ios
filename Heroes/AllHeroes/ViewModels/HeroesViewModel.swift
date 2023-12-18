@@ -9,18 +9,17 @@ import Foundation
 
 class HeroesViewModel {
     private var heroes: [Hero] = []
-    var numberOfFavouriteHeroes: Int = 0
     let heroService: HeroServiceProtocol
     
     init(heroService: HeroServiceProtocol) {
         self.heroService = heroService
     }
     
-    func fetchHeroes(addHeroesToView: @escaping () -> Void) {
+    func fetchHeroes(searchQuery: String?, addHeroesToView: @escaping () -> Void) {
         Task {
             let result = await self.heroService.getHeroes(offset: self.heroes.count,
                                                           numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest,
-                                                          searchQuery: nil)
+                                                          searchQuery: searchQuery)
             
             if let additionalHeroes = try? result.get() {
                 for hero in additionalHeroes {
@@ -60,5 +59,9 @@ class HeroesViewModel {
     
     func orderHeroes() {
         self.heroes = self.heroes.sorted { $0.name ?? "" < $1.name ?? "" }
+    }
+    
+    func clearHeroes() {
+        self.heroes = []
     }
 }

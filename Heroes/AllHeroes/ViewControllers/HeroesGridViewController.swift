@@ -74,10 +74,10 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
         
         cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
         cell.storeHero = { aCell in
-            let destinationIndex = try super.persistHero(hero: hero)
-            guard let destinationIndex else { return }
-            guard let actualIndexPath = collectionView.indexPath(for: aCell) else { return }
-            collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 0))
+            try super.persistHero(hero: hero)
+//            guard let destinationIndex else { return }
+//            guard let actualIndexPath = collectionView.indexPath(for: aCell) else { return }
+//            collectionView.moveItem(at: actualIndexPath, to: IndexPath(row: destinationIndex, section: 0))
         }
         
         return cell
