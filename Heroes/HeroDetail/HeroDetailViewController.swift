@@ -13,6 +13,7 @@ class HeroDetailViewController: UIViewController {
     private var hero: Hero
     private let heroIndex: Int?
     private let heroViewModel: HeroDetailViewModel
+    private let favouritesViewModel: FavouritesViewModel
     private let loader: ImageLoader
     // TODO: Try to remove the distinction between snapshot test and normal program execution
     private let isSnapshotTest: Bool
@@ -23,6 +24,7 @@ class HeroDetailViewController: UIViewController {
          heroIndex: Int?,
          heroDetailViewModel: HeroDetailViewModel,
          loader: ImageLoader,
+         favouritesViewModel: FavouritesViewModel,
          isSnapshotTest: Bool = false) {
         self.hero = hero
         self.heroView = HeroDetailView()
@@ -30,6 +32,7 @@ class HeroDetailViewController: UIViewController {
         self.loader = loader
         self.heroIndex = heroIndex
         self.isSnapshotTest = isSnapshotTest
+        self.favouritesViewModel = favouritesViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -176,10 +179,12 @@ class HeroDetailViewController: UIViewController {
         
         if UserDefaults.standard.data(forKey: name) != nil {
             UserDefaults.standard.removeObject(forKey: name)
+            favouritesViewModel.removeHero(hero: hero)
         } else {
             do {
                 let data = try self.encoder.encode(hero)
                 UserDefaults.standard.set(data, forKey: name)
+                favouritesViewModel.addFavourite(hero: hero)
             } catch {
                 print(error)
             }

@@ -32,6 +32,7 @@ class HeroesGridView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        addSubview(collectionView)
         configureCollectionView()
         setupConstraints()
     }
@@ -47,30 +48,27 @@ class HeroesGridView: UIView {
     
     func update() {
         collectionView.reloadData()
+        isSpinnerHidden(to: true)
+    }
+    
+    func isSpinnerHidden(to value: Bool) {
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: self.topAnchor),
+            collectionView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
             collectionView.leftAnchor.constraint(equalTo: self.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: self.rightAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     
     private func configureCollectionView() {
         collectionView.register(HeroesGridViewCell.self, 
                                 forCellWithReuseIdentifier: Constants.cellIdentifier)
-        collectionView.register(LoadingGridViewCell.self, 
-                                forCellWithReuseIdentifier: Constants.loadingCellIdentifier)
         collectionView.register(HeroesGridFooter.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: Constants.footerIdentifier)
-        collectionView.register(HeroesGridHeader.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: Constants.headerIdentifier)
         collectionView.backgroundColor = UIColor.white
-        
-        addSubview(collectionView)
     }
 }
