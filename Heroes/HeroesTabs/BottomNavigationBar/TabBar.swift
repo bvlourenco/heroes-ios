@@ -8,7 +8,17 @@
 import UIKit
 
 class TabBar: UITabBarController {
-
+    private let heroService: HeroServiceProtocol
+    
+    init(heroService: HeroServiceProtocol) {
+        self.heroService = heroService
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -19,7 +29,6 @@ class TabBar: UITabBarController {
     }
     
     func createTabBarViewControllers() {
-        let heroService = HeroService()
         let heroesViewModel = HeroesViewModel(heroService: heroService)
         let searchViewModel = HeroesViewModel(heroService: heroService)
         let favouritesViewModel = FavouritesViewModel()

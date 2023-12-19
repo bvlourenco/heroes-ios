@@ -11,7 +11,7 @@ import XCTest
 
 final class AllHeroesViewSnapshotTests: XCTestCase {
     
-    private func createHeroesViewModel(numberOfFavouriteHeroes: Int = 0) -> HeroesViewModel {
+    private func createHeroService(numberOfFavouriteHeroes: Int = 0) -> HeroServiceProtocol {
         let domainName = Bundle.main.bundleIdentifier!
         UserDefaults.standard.removePersistentDomain(forName: domainName)
         
@@ -28,7 +28,7 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
         
         heroService.getHeroesStub = { .success(heroes) }
         
-        return HeroesViewModel(heroService: heroService)
+        return heroService
     }
     
     private func persistHeroes(numberOfFavouriteHeroes: Int, heroes: [Hero]) {
@@ -46,33 +46,45 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
     }
     
     func testHeroesTableViewController() {
-        let heroesTableViewController = HomeViewController(heroesViewModel: createHeroesViewModel(), favouritesViewModel: FavouritesViewModel())
-        let navigationController = UINavigationController(rootViewController: heroesTableViewController)
-        
-        assertSnapshot(matching: navigationController, as: .image)
+        let home = TabBar(heroService: createHeroService())
+        home.selectedIndex = 1
+        assertSnapshot(matching: home, as: .image)
     }
     
     func testHeroesGridViewController() {
-        let heroesGridViewController = HeroesGridViewController(heroesViewModel: createHeroesViewModel(), favouritesViewModel: FavouritesViewModel())
-        let navigationController = UINavigationController(rootViewController: heroesGridViewController)
-        
-        assertSnapshot(matching: navigationController, as: .image)
+        let home = TabBar(heroService: createHeroService())
+        home.selectedIndex = 3
+        assertSnapshot(matching: home, as: .image)
     }
     
     func testHeroesTableViewPersistance() {
-        let heroesViewModel = createHeroesViewModel(numberOfFavouriteHeroes: 2)
-        let heroesTableViewController = HomeViewController(heroesViewModel: heroesViewModel, favouritesViewModel: FavouritesViewModel())
-        let navigationController = UINavigationController(rootViewController: heroesTableViewController)
-        
-        assertSnapshot(matching: navigationController, as: .image)
+        let home = TabBar(heroService: createHeroService(numberOfFavouriteHeroes: 2))
+        home.selectedIndex = 1
+        assertSnapshot(matching: home, as: .image)
     }
     
     func testHeroesGridViewPersistance() {
-        let heroesViewModel = createHeroesViewModel(numberOfFavouriteHeroes: 2)
-        let heroesTableViewController = HeroesGridViewController(heroesViewModel: heroesViewModel, favouritesViewModel: FavouritesViewModel())
-        let navigationController = UINavigationController(rootViewController: heroesTableViewController)
-        
-        assertSnapshot(matching: navigationController, as: .image)
+        let home = TabBar(heroService: createHeroService(numberOfFavouriteHeroes: 2))
+        home.selectedIndex = 3
+        assertSnapshot(matching: home, as: .image)
+    }
+    
+    func testHeroesFavouriteViewWith4FavouriteHeroes() {
+        let home = TabBar(heroService: createHeroService(numberOfFavouriteHeroes: 4))
+        home.selectedIndex = 2
+        assertSnapshot(matching: home, as: .image)
+    }
+    
+    func testHeroesFavouriteViewWith0FavouriteHeroes() {
+        let home = TabBar(heroService: createHeroService())
+        home.selectedIndex = 2
+        assertSnapshot(matching: home, as: .image)
+    }
+    
+    func testHeroesSearchWith0Heroes() {
+        let home = TabBar(heroService: createHeroService())
+        home.selectedIndex = 0
+        assertSnapshot(matching: home, as: .image)
     }
 }
 
