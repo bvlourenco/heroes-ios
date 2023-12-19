@@ -34,6 +34,7 @@ class FavouritesViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.delegate = self
         favouritesView.setDataSourceAndDelegate(viewController: self)
         favouritesViewModel.getFavouriteHeroes()
     }
@@ -50,18 +51,8 @@ extension FavouritesViewController: UITableViewDelegate, UITableViewDataSource {
                                                  for: indexPath) as! HeroesTableViewCell
         let hero = favouritesViewModel.getHero(index: indexPath.row)
         cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
-        cell.storeHero = { aCell in
-            guard let name = hero.name else { return }
-
-            if UserDefaults.standard.data(forKey: name) != nil {
-                UserDefaults.standard.removeObject(forKey: name)
-                self.favouritesViewModel.removeHero(hero: hero)
-            } else {
-                let data = try self.encoder.encode(hero)
-                UserDefaults.standard.set(data, forKey: name)
-                self.favouritesViewModel.addFavourite(hero: hero)
-            }
-            
+        cell.storeHero = {
+            self.favouritesViewModel.changeHeroPersistanceStatus(hero: hero)
             self.favouritesView.update()
         }
         

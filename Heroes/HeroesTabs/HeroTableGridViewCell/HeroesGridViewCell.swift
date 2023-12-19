@@ -9,7 +9,7 @@ import UIKit
 
 class HeroesGridViewCell: UICollectionViewCell, CellDelegate {
     private let allHeroesCell = HeroesCell()
-    var storeHero: ((UICollectionViewCell) throws -> Void)?
+    var storeHero: (() throws -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -31,6 +31,6 @@ class HeroesGridViewCell: UICollectionViewCell, CellDelegate {
     }
     
     func favouriteHero() throws {
-        try storeHero?(self)
+        try storeHero?()
     }
 }

@@ -9,7 +9,7 @@ import UIKit
 
 class HeroesTableViewCell: UITableViewCell, CellDelegate {
     private let allHeroesCell = HeroesCell()
-    var storeHero: ((UITableViewCell) throws -> Void)?
+    var storeHero: (() throws -> Void)?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -31,6 +31,6 @@ class HeroesTableViewCell: UITableViewCell, CellDelegate {
     }
     
     func favouriteHero() throws {
-        try storeHero?(self)
+        try storeHero?()
     }
 }

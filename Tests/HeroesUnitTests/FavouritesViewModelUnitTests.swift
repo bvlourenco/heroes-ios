@@ -36,9 +36,7 @@ final class FavouritesViewModelUnitTests: XCTestCase {
         var heroes = HeroesUnitTestHelpers.createFakeHeroes(numberOfHeroes: numberOfHeroes, startIndex: 0)
         heroes = order(heroes: heroes)
         for hero in heroes {
-            guard let name = hero.name else { return }
-            let data = try self.encoder.encode(hero)
-            UserDefaults.standard.set(data, forKey: name)
+            favouritesViewModel.changeHeroPersistanceStatus(hero: hero)
         }
         
         favouritesViewModel.getFavouriteHeroes()

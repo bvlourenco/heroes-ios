@@ -59,8 +59,8 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         let hero = super.heroesViewModel.getHero(index: indexPath.row)
         
         cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
-        cell.storeHero = { aCell in
-            try super.persistHero(hero: hero)
+        cell.storeHero = {
+            try super.changeHeroPersistanceStatus(hero: hero)
         }
         
         return cell

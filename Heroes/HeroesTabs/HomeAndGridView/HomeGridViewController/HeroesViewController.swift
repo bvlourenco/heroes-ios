@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-class HeroesViewController: UIViewController, UINavigationControllerDelegate {
+class HeroesViewController: UIViewController {
     
     private enum ViewConstants {
         static let navigationTitle = "All Heroes"
@@ -18,8 +18,6 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
     private let favouritesViewModel: FavouritesViewModel
     private let loader: ImageLoader = ImageLoader()
     private var isLoadingData: Bool = false
-    private let transition = Transition()
-    private let encoder = JSONEncoder()
     private var firstInitialization: Bool
     weak var delegate: ViewControllerDelegate?
     
@@ -50,20 +48,6 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
     
-    func navigationController(_ navigationController: UINavigationController,
-                              animationControllerFor operation: UINavigationController.Operation,
-                              from fromVC: UIViewController,
-                              to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        switch operation {
-        case .push:
-            return transition
-        case .pop:
-            return nil
-        default:
-            return nil
-        }
-    }
-    
     func updateLoading(to value: Bool) {
         self.isLoadingData = value
     }
@@ -72,17 +56,8 @@ class HeroesViewController: UIViewController, UINavigationControllerDelegate {
         return heroesViewModel.numberOfHeroes()
     }
     
-    func persistHero(hero: Hero) throws {
-        guard let name = hero.name else { return }
-
-        if UserDefaults.standard.data(forKey: name) != nil {
-            UserDefaults.standard.removeObject(forKey: name)
-            favouritesViewModel.removeHero(hero: hero)
-        } else {
-            let data = try self.encoder.encode(hero)
-            UserDefaults.standard.set(data, forKey: name)
-            favouritesViewModel.addFavourite(hero: hero)
-        }
+    func changeHeroPersistanceStatus(hero: Hero) throws {
+        favouritesViewModel.changeHeroPersistanceStatus(hero: hero)
     }
     
     func willFetchMoreHeroes(indexPath: IndexPath, lastRowIndex: Int) {

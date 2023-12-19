@@ -273,6 +273,7 @@
 		D95378392B2CC25E001ADB13 /* Favourites */ = {
 			isa = PBXGroup;
 			children = (
+				D92E88482B30A93F0014AC3E /* FavouritesViewModel.swift */,
 				D92E88462B30A8610014AC3E /* FavouritesView.swift */,
 				D953783C2B2CC340001ADB13 /* FavouritesViewController.swift */,
 			);
@@ -295,8 +296,8 @@
 				D95378392B2CC25E001ADB13 /* Favourites */,
 				D95378382B2CC256001ADB13 /* Search */,
 				D9F2B8492B3197E9001ABFC8 /* HomeAndGridView */,
-				D9F6A4A82B285D90003B0B84 /* ViewModels */,
-				D9F6A4A72B285D77003B0B84 /* TableView */,
+				D9F6A4A82B285D90003B0B84 /* HomeGridSearchViewModel */,
+				D9F6A4A72B285D77003B0B84 /* HomeSearchFavouritesTableView */,
 				D9F6A4A42B285CBD003B0B84 /* HeroTableGridViewCell */,
 			);
 			path = HeroesTabs;
@@ -355,7 +356,7 @@
 		D9F2B8492B3197E9001ABFC8 /* HomeAndGridView */ = {
 			isa = PBXGroup;
 			children = (
-				D9F6A4A62B285D36003B0B84 /* TableGridViewController */,
+				D9F6A4A62B285D36003B0B84 /* HomeGridViewController */,
 				D9F2B8472B319757001ABFC8 /* GridView */,
 				D9F2B8482B319797001ABFC8 /* Home */,
 			);
@@ -373,30 +374,29 @@
 			path = HeroTableGridViewCell;
 			sourceTree = "<group>";
 		};
-		D9F6A4A62B285D36003B0B84 /* TableGridViewController */ = {
+		D9F6A4A62B285D36003B0B84 /* HomeGridViewController */ = {
 			isa = PBXGroup;
 			children = (
 				D90E71CD2B0CB7230041AAAE /* HeroesViewController.swift */,
 				D9ED34952B271E3B004C7DB3 /* ViewControllerDelegate.swift */,
 			);
-			path = TableGridViewController;
+			path = HomeGridViewController;
 			sourceTree = "<group>";
 		};
-		D9F6A4A72B285D77003B0B84 /* TableView */ = {
+		D9F6A4A72B285D77003B0B84 /* HomeSearchFavouritesTableView */ = {
 			isa = PBXGroup;
 			children = (
 				D9DFF5002AE950EA002E7B6A /* HeroesTableView.swift */,
 			);
-			path = TableView;
+			path = HomeSearchFavouritesTableView;
 			sourceTree = "<group>";
 		};
-		D9F6A4A82B285D90003B0B84 /* ViewModels */ = {
+		D9F6A4A82B285D90003B0B84 /* HomeGridSearchViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				D92E88482B30A93F0014AC3E /* FavouritesViewModel.swift */,
 				D95AD9372AFA54E400A34996 /* HeroesViewModel.swift */,
 			);
-			path = ViewModels;
+			path = HomeGridSearchViewModel;
 			sourceTree = "<group>";
 		};
 		D9F6A4A92B286356003B0B84 /* Images */ = {

@@ -17,7 +17,6 @@ class HeroDetailViewController: UIViewController {
     private let loader: ImageLoader
     // TODO: Try to remove the distinction between snapshot test and normal program execution
     private let isSnapshotTest: Bool
-    private let encoder: JSONEncoder = JSONEncoder()
     weak var delegate: HeroViewControllerDelegate?
     
     init(hero: Hero, 
@@ -174,26 +173,9 @@ class HeroDetailViewController: UIViewController {
         button.setImage(image, for: .normal)
     }
     
-    private func changeHeroStatus() {
-        guard let name = hero.name else { return }
-        
-        if UserDefaults.standard.data(forKey: name) != nil {
-            UserDefaults.standard.removeObject(forKey: name)
-            favouritesViewModel.removeHero(hero: hero)
-        } else {
-            do {
-                let data = try self.encoder.encode(hero)
-                UserDefaults.standard.set(data, forKey: name)
-                favouritesViewModel.addFavourite(hero: hero)
-            } catch {
-                print(error)
-            }
-        }
-    }
-    
     @objc
     private func favouriteHeroButtonPressed(sender: UIBarButtonItem) {
-        changeHeroStatus()
+        favouritesViewModel.changeHeroPersistanceStatus(hero: hero)
         let button = navigationItem.rightBarButtonItem?.customView as! UIButton
         loadStarImage(button: button)
         guard let name = hero.name else { return }
