@@ -46,6 +46,7 @@ class HeroDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.titleView = createTitleLabel()
+        navigationItem.largeTitleDisplayMode = .never
         
         let button = UIButton()
         button.addTarget(self, action: #selector(favouriteHeroButtonPressed), for: .touchUpInside)

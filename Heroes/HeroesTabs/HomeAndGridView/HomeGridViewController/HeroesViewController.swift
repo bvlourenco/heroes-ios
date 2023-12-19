@@ -18,14 +18,11 @@ class HeroesViewController: UIViewController {
     private let favouritesViewModel: FavouritesViewModel
     private let loader: ImageLoader = ImageLoader()
     private var isLoadingData: Bool = false
-    private var firstInitialization: Bool
     weak var delegate: ViewControllerDelegate?
     
     init(heroesViewModel: HeroesViewModel, 
-         favouritesViewModel: FavouritesViewModel,
-         firstInitialization: Bool) {
+         favouritesViewModel: FavouritesViewModel) {
         self.heroesViewModel = heroesViewModel
-        self.firstInitialization = firstInitialization
         self.favouritesViewModel = favouritesViewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -36,16 +33,14 @@ class HeroesViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         delegate?.reloadView()
+        super.viewWillAppear(animated)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = ViewConstants.navigationTitle
         navigationController?.delegate = self
-        
-        if firstInitialization {
-            heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: delegate?.addHeroesToView ?? {})
-        }
+        heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: delegate?.addHeroesToView ?? {})
     }
     
     func updateLoading(to value: Bool) {

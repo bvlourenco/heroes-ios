@@ -26,4 +26,5 @@ struct Constants {
     static let placeholderImageName = "placeholder"
     static let favouriteImageName = "star"
     static let addFavouriteImageName = "star_add"
+    static let animationDuration = 0.3
 }

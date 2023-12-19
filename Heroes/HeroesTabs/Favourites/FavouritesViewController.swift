@@ -30,6 +30,7 @@ class FavouritesViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         favouritesView.update()
+        super.viewWillAppear(animated)
     }
     
     override func viewDidLoad() {

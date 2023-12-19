@@ -22,11 +22,9 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
     private let heroesGridView = HeroesGridView()
     
     override init(heroesViewModel: HeroesViewModel,
-                  favouritesViewModel: FavouritesViewModel,
-                  firstInitialization: Bool = true) {
+                  favouritesViewModel: FavouritesViewModel) {
         super.init(heroesViewModel: heroesViewModel, 
-                   favouritesViewModel: favouritesViewModel,
-                   firstInitialization: firstInitialization)
+                   favouritesViewModel: favouritesViewModel)
         super.delegate = self
     }
     

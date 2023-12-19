@@ -8,6 +8,18 @@
 import UIKit
 
 class TabBar: UITabBarController {
+    
+    private enum TabConstants {
+        static let searchTitle = "Search"
+        static let searchIconName = "magnifyingglass"
+        static let homeTitle = "Home"
+        static let homeIconName = "house"
+        static let favouritesTitle = "Favourites"
+        static let favouritesIconName = "star"
+        static let gridViewTitle = "Grid View"
+        static let gridViewIconName = "square.grid.2x2"
+    }
+    
     private let heroService: HeroServiceProtocol
     
     init(heroService: HeroServiceProtocol) {
@@ -35,24 +47,24 @@ class TabBar: UITabBarController {
         viewControllers = [
             createNavController(for: SearchViewController(searchViewModel: searchViewModel,
                                                           favouritesViewModel: favouritesViewModel),
-                                title: "Search",
-                                image: UIImage(systemName: "magnifyingglass")!),
+                                title: TabConstants.searchTitle,
+                                image: UIImage(systemName: TabConstants.searchIconName)!),
             createNavController(for: HomeViewController(heroesViewModel: heroesViewModel,
                                                                favouritesViewModel: favouritesViewModel),
-                                title: "Home",
-                                image: UIImage(systemName: "house")!),
+                                title: TabConstants.homeTitle,
+                                image: UIImage(systemName: TabConstants.homeIconName)!),
             createNavController(for: FavouritesViewController(favouritesViewModel: favouritesViewModel,
                                                               heroService: heroService),
-                                title: "Favourites",
-                                image: UIImage(systemName: "star")!),
+                                title: TabConstants.favouritesTitle,
+                                image: UIImage(systemName: TabConstants.favouritesIconName)!),
             createNavController(for: HeroesGridViewController(heroesViewModel: heroesViewModel,
                                                               favouritesViewModel: favouritesViewModel),
-                                title: "Grid View",
-                                image: UIImage(systemName: "square.grid.2x2")!)
+                                title: TabConstants.gridViewTitle,
+                                image: UIImage(systemName: TabConstants.gridViewIconName)!)
         ]
     }
     
-    fileprivate func createNavController(for rootViewController: UIViewController,
+    private func createNavController(for rootViewController: UIViewController,
                                          title: String,
                                          image: UIImage) -> UIViewController {
         let navController = UINavigationController(rootViewController: rootViewController)
@@ -74,7 +86,7 @@ extension TabBar: UITabBarControllerDelegate {
         if fromView != toView {
             UIView.transition(from: fromView,
                               to: toView,
-                              duration: 0.3,
+                              duration: Constants.animationDuration,
                               options: .transitionCrossDissolve,
                               completion: nil)
         }

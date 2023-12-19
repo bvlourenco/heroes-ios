@@ -11,12 +11,8 @@ import UIKit
 class HomeViewController: HeroesViewController, ViewControllerDelegate {
     private let heroesTableView = HeroesTableView(spinnerHidden: false)
 
-    override init(heroesViewModel: HeroesViewModel,
-                  favouritesViewModel: FavouritesViewModel,
-                  firstInitialization: Bool = true) {
-        super.init(heroesViewModel: heroesViewModel,
-                   favouritesViewModel: favouritesViewModel,
-                   firstInitialization: firstInitialization)
+    override init(heroesViewModel: HeroesViewModel, favouritesViewModel: FavouritesViewModel) {
+        super.init(heroesViewModel: heroesViewModel, favouritesViewModel: favouritesViewModel)
         super.delegate = self
     }
     
