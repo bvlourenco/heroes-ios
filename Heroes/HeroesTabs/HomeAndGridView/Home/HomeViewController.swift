@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
+class HomeViewController: HeroesViewController, ViewControllerDelegate {
     private let heroesTableView = HeroesTableView(spinnerHidden: false)
 
     override init(heroesViewModel: HeroesViewModel,
@@ -47,7 +47,7 @@ class HeroesTableViewController: HeroesViewController, ViewControllerDelegate {
     }
 }
 
-extension HeroesTableViewController: UITableViewDelegate, UITableViewDataSource {
+extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return super.getNumberOfItems()
     }

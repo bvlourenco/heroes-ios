@@ -38,7 +38,7 @@ class HeroesTableView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setTableDataSourceAndDelegate(viewController: HeroesTableViewController) {
+    func setTableDataSourceAndDelegate(viewController: HomeViewController) {
         tableView.delegate = viewController
         tableView.dataSource = viewController
     }

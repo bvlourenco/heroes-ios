@@ -46,7 +46,7 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
     }
     
     func testHeroesTableViewController() {
-        let heroesTableViewController = HeroesTableViewController(heroesViewModel: createHeroesViewModel())
+        let heroesTableViewController = HomeViewController(heroesViewModel: createHeroesViewModel())
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
         
         assertSnapshot(matching: navigationController, as: .image)
@@ -61,7 +61,7 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
     
     func testHeroesTableViewPersistance() {
         let heroesViewModel = createHeroesViewModel(numberOfFavouriteHeroes: 2)
-        let heroesTableViewController = HeroesTableViewController(heroesViewModel: heroesViewModel)
+        let heroesTableViewController = HomeViewController(heroesViewModel: heroesViewModel)
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
         
         assertSnapshot(matching: navigationController, as: .image)

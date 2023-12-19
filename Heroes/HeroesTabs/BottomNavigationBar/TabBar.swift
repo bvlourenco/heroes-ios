@@ -28,7 +28,7 @@ class TabBar: UITabBarController {
                                                           favouritesViewModel: favouritesViewModel),
                                 title: "Search",
                                 image: UIImage(systemName: "magnifyingglass")!),
-            createNavController(for: HeroesTableViewController(heroesViewModel: heroesViewModel,
+            createNavController(for: HomeViewController(heroesViewModel: heroesViewModel,
                                                                favouritesViewModel: favouritesViewModel),
                                 title: "Home",
                                 image: UIImage(systemName: "house")!),
