@@ -59,6 +59,7 @@ final class HeroDetailSnapshotTests: XCTestCase {
         
         var hero = createHero()
         let heroDetailViewModel = HeroDetailViewModel(heroService: heroService, hero: hero)
+        let favouritesViewModel = FavouritesViewModel()
 
         hero = await heroDetailViewModel.getHeroDescriptions()
         
@@ -66,6 +67,7 @@ final class HeroDetailSnapshotTests: XCTestCase {
                                                           heroIndex: 0,
                                                           heroDetailViewModel: heroDetailViewModel,
                                                           loader: ImageLoader(),
+                                                          favouritesViewModel: favouritesViewModel,
                                                           isSnapshotTest: true)
         let navigationController = UINavigationController(rootViewController: heroViewController)
         
@@ -79,6 +81,7 @@ final class HeroDetailSnapshotTests: XCTestCase {
         
         var hero = createHero()
         let heroDetailViewModel = HeroDetailViewModel(heroService: heroService, hero: hero)
+        let favouritesViewModel = FavouritesViewModel()
 
         hero = await heroDetailViewModel.getHeroDescriptions()
         
@@ -88,6 +91,7 @@ final class HeroDetailSnapshotTests: XCTestCase {
                                                           heroIndex: 0,
                                                           heroDetailViewModel: heroDetailViewModel,
                                                           loader: ImageLoader(),
+                                                          favouritesViewModel: favouritesViewModel,
                                                           isSnapshotTest: true)
         let navigationController = UINavigationController(rootViewController: heroViewController)
         

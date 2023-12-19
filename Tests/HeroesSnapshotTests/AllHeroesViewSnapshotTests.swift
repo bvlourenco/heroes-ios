@@ -46,14 +46,14 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
     }
     
     func testHeroesTableViewController() {
-        let heroesTableViewController = HomeViewController(heroesViewModel: createHeroesViewModel())
+        let heroesTableViewController = HomeViewController(heroesViewModel: createHeroesViewModel(), favouritesViewModel: FavouritesViewModel())
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
         
         assertSnapshot(matching: navigationController, as: .image)
     }
     
     func testHeroesGridViewController() {
-        let heroesGridViewController = HeroesGridViewController(heroesViewModel: createHeroesViewModel())
+        let heroesGridViewController = HeroesGridViewController(heroesViewModel: createHeroesViewModel(), favouritesViewModel: FavouritesViewModel())
         let navigationController = UINavigationController(rootViewController: heroesGridViewController)
         
         assertSnapshot(matching: navigationController, as: .image)
@@ -61,7 +61,7 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
     
     func testHeroesTableViewPersistance() {
         let heroesViewModel = createHeroesViewModel(numberOfFavouriteHeroes: 2)
-        let heroesTableViewController = HomeViewController(heroesViewModel: heroesViewModel)
+        let heroesTableViewController = HomeViewController(heroesViewModel: heroesViewModel, favouritesViewModel: FavouritesViewModel())
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
         
         assertSnapshot(matching: navigationController, as: .image)
@@ -69,7 +69,7 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
     
     func testHeroesGridViewPersistance() {
         let heroesViewModel = createHeroesViewModel(numberOfFavouriteHeroes: 2)
-        let heroesTableViewController = HeroesGridViewController(heroesViewModel: heroesViewModel)
+        let heroesTableViewController = HeroesGridViewController(heroesViewModel: heroesViewModel, favouritesViewModel: FavouritesViewModel())
         let navigationController = UINavigationController(rootViewController: heroesTableViewController)
         
         assertSnapshot(matching: navigationController, as: .image)

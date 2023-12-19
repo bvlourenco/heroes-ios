@@ -47,18 +47,8 @@ class HeroesViewModel {
         self.heroes[index] = hero
     }
     
-    func moveHero(hero: Hero, to newIndex: Int) {
-        guard let index = self.heroes.firstIndex(of: hero) else { return }
-        self.heroes.remove(at: index)
-        self.heroes.insert(hero, at: newIndex)
-    }
-    
     func addHero(hero: Hero) {
         self.heroes.append(hero)
-    }
-    
-    func orderHeroes() {
-        self.heroes = self.heroes.sorted { $0.name ?? "" < $1.name ?? "" }
     }
     
     func clearHeroes() {

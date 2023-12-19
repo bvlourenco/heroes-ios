@@ -1,5 +1,5 @@
 //
-//  HeroesTableViewController.swift
+//  HomeViewController.swift
 //  Heroes
 //
 //  Created by Bernardo Vala Lourenço on 24/10/2023.
