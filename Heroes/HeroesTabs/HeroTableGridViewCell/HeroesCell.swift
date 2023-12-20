@@ -37,7 +37,6 @@ class HeroesCell: UIView {
         return button
     }()
     
-    var onReuse: () -> Void = {}
     weak var delegate: CellDelegate?
     
     func prepareCellForReuse() {
@@ -60,22 +59,16 @@ class HeroesCell: UIView {
     func loadImage(imageURL: URL?) {
         guard let imageURL else { return }
         
-        if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
-            heroImage.loadImage(at: imageURL)
-        } else {
-            heroImage.image = UIImage(named: Constants.placeholderImageName)
-        }
+        heroImage.loadImage(at: imageURL)
         heroImage.widthAnchor.constraint(equalTo: heroImage.heightAnchor).isActive = true
     }
     
     func loadStarImage(name: String?) {
         guard let name = name else { return }
         
-        if UserDefaults.standard.data(forKey: name) != nil {
-            heroFavouriteButton.setImage(UIImage(named: Constants.favouriteImageName), for: .normal)
-        } else {
-            heroFavouriteButton.setImage(UIImage(named: Constants.addFavouriteImageName), for: .normal)
-        }
+        heroFavouriteButton.setImage(UIImage(named: UserDefaults.standard.data(forKey: name) != nil ?
+                                             Constants.favouriteImageName : Constants.addFavouriteImageName),
+                                     for: .normal)
     }
     
     @objc

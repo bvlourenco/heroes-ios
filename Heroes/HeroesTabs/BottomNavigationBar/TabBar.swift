@@ -45,28 +45,28 @@ class TabBar: UITabBarController {
         let searchViewModel = HeroesViewModel(heroService: heroService)
         let favouritesViewModel = FavouritesViewModel()
         viewControllers = [
-            createNavController(for: SearchViewController(searchViewModel: searchViewModel,
-                                                          favouritesViewModel: favouritesViewModel),
-                                title: TabConstants.searchTitle,
-                                image: UIImage(systemName: TabConstants.searchIconName)!),
-            createNavController(for: HomeViewController(heroesViewModel: heroesViewModel,
+            createNavigationController(for: SearchViewController(searchViewModel: searchViewModel,
+                                                                 favouritesViewModel: favouritesViewModel),
+                                       title: TabConstants.searchTitle,
+                                       image: UIImage(systemName: TabConstants.searchIconName)!),
+            createNavigationController(for: HomeViewController(heroesViewModel: heroesViewModel,
                                                                favouritesViewModel: favouritesViewModel),
-                                title: TabConstants.homeTitle,
-                                image: UIImage(systemName: TabConstants.homeIconName)!),
-            createNavController(for: FavouritesViewController(favouritesViewModel: favouritesViewModel,
-                                                              heroService: heroService),
-                                title: TabConstants.favouritesTitle,
-                                image: UIImage(systemName: TabConstants.favouritesIconName)!),
-            createNavController(for: HeroesGridViewController(heroesViewModel: heroesViewModel,
-                                                              favouritesViewModel: favouritesViewModel),
-                                title: TabConstants.gridViewTitle,
-                                image: UIImage(systemName: TabConstants.gridViewIconName)!)
+                                       title: TabConstants.homeTitle,
+                                       image: UIImage(systemName: TabConstants.homeIconName)!),
+            createNavigationController(for: FavouritesViewController(favouritesViewModel: favouritesViewModel,
+                                                                     heroService: heroService),
+                                       title: TabConstants.favouritesTitle,
+                                       image: UIImage(systemName: TabConstants.favouritesIconName)!),
+            createNavigationController(for: HeroesGridViewController(heroesViewModel: heroesViewModel,
+                                                                     favouritesViewModel: favouritesViewModel),
+                                       title: TabConstants.gridViewTitle,
+                                       image: UIImage(systemName: TabConstants.gridViewIconName)!)
         ]
     }
     
-    private func createNavController(for rootViewController: UIViewController,
-                                         title: String,
-                                         image: UIImage) -> UIViewController {
+    private func createNavigationController(for rootViewController: UIViewController,
+                                            title: String,
+                                            image: UIImage) -> UIViewController {
         let navController = UINavigationController(rootViewController: rootViewController)
         navController.tabBarItem.title = title
         navController.tabBarItem.image = image

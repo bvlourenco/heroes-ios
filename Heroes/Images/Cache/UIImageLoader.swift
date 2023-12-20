@@ -21,6 +21,11 @@ class UIImageLoader {
     
     func load(_ url: URL, for imageView: UIImageView) {
         
+        if url.absoluteString.hasSuffix(Constants.notAvailableImageName) {
+            imageView.image = UIImage(named: Constants.placeholderImageName)
+            return
+        }
+        
         let token = imageLoader.loadImage(url) { result in
             
             defer {

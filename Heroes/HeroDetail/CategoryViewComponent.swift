@@ -85,9 +85,9 @@ class CategoryViewComponent: UIView {
         addSideConstraintsToLabel(label: placeholderLabel)
     }
     
-    func updateDescription(atIndex: Int, description: String) {
-        self.descriptionLabels[atIndex].text = "Description: " + description
-        self.descriptionLabels[atIndex].layoutIfNeeded()
+    func updateDescription(at index: Int, description: String) {
+        self.descriptionLabels[index].text = "Description: " + description
+        self.descriptionLabels[index].layoutIfNeeded()
         self.setViewIntrinsicHeight()
     }
     

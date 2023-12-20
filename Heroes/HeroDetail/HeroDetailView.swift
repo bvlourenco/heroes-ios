@@ -71,16 +71,13 @@ class HeroDetailView: UIView {
             heroDescriptionLabel.text = description
         }
         
-        if let imageURL, imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
-            heroImageView.loadImage(at: imageURL)
-        } else {
-            heroImageView.image = UIImage(named: Constants.placeholderImageName)
-        }
-        
         addCategoryNames(categoryValues: comics, viewCategory: comicsView)
         addCategoryNames(categoryValues: events, viewCategory: eventsView)
         addCategoryNames(categoryValues: series, viewCategory: seriesView)
         addCategoryNames(categoryValues: stories, viewCategory: storiesView)
+        
+        guard let imageURL else { return }
+        heroImageView.loadImage(at: imageURL)
     }
     
     private func addCategoryNames(categoryValues: Category?,
@@ -122,7 +119,7 @@ class HeroDetailView: UIView {
             } else {
                 description = "No description :("
             }
-            view.updateDescription(atIndex: index, description: description)
+            view.updateDescription(at: index, description: description)
         }
     }
     
