@@ -14,8 +14,8 @@ class FavouritesView: UIView {
         return heroesTableView
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init() {
+        super.init(frame: CGRectZero)
         addSubview(favourites)
         setupConstraints()
     }

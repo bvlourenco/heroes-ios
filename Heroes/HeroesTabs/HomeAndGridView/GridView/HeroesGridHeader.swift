@@ -21,8 +21,8 @@ class HeroesGridHeader: UICollectionReusableView {
     }()
 
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init() {
+        super.init(frame: CGRectZero)
         self.backgroundColor = UIColor.systemGray6
         setupHeader()
     }

@@ -48,8 +48,8 @@ class SearchView: UIView {
         return alert
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init() {
+        super.init(frame: CGRectZero)
         addSubview(stackView)
         stackView.addArrangedSubview(searchBar)
         stackView.addArrangedSubview(results)

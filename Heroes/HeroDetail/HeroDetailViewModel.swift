@@ -39,13 +39,14 @@ class HeroDetailViewModel {
     }
     
     private func categoryDescriptionIsLoaded(for category: Category?) -> Bool {
-        if let category = category {
-            for item in category.items {
-                if item.description != nil {
-                    return true
-                }
+        guard let category else { return false }
+        
+        for item in category.items {
+            if item.description != nil {
+                return true
             }
         }
+        
         return false
     }
 }

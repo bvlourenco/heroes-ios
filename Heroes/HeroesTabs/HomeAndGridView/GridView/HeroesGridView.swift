@@ -30,8 +30,8 @@ class HeroesGridView: UIView {
         return collectionView
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init() {
+        super.init(frame: CGRectZero)
         addSubview(collectionView)
         configureCollectionView()
         setupConstraints()

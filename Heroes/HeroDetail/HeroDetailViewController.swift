@@ -48,46 +48,28 @@ class HeroDetailViewController: UIViewController {
         navigationItem.titleView = createTitleLabel()
         navigationItem.largeTitleDisplayMode = .never
         
+        createStarButtonOnNavigationBar()
+        
+        heroView.setupView(description: self.hero.description,
+                           imageURL: hero.thumbnail?.imageURL,
+                           comics: self.hero.comics,
+                           events: self.hero.events,
+                           series: self.hero.series,
+                           stories: self.hero.stories)
+        
+        getCategoriesDescriptions()
+    }
+    
+    private func createStarButtonOnNavigationBar() {
         let button = UIButton()
         button.addTarget(self, action: #selector(favouriteHeroButtonPressed), for: .touchUpInside)
         button.tintColor = .systemYellow
         loadStarImage(button: button)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: button)
-        
-        if let description = self.hero.description {
-            if description.isEmpty == false {
-                heroView.heroDescriptionLabel.text = self.hero.description
-            }
-        }
-        
-        let imageURL = hero.thumbnail?.imageURL
-        
-        if let imageURL = imageURL {
-            if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
-                heroView.heroImageView.loadImage(at: imageURL)
-            } else {
-                heroView.heroImageView.image = UIImage(named: Constants.placeholderImageName)
-            }
-        } else {
-            heroView.heroImageView.image = UIImage(named: Constants.placeholderImageName)
-        }
-        
-        addCategory(categoryValues: self.hero.comics,
-                    viewCategory: self.heroView.comicsView)
-        
-        addCategory(categoryValues: self.hero.events,
-                    viewCategory: self.heroView.eventsView)
-        
-        addCategory(categoryValues: self.hero.series,
-                    viewCategory: self.heroView.seriesView)
-        
-        addCategory(categoryValues: self.hero.stories,
-                    viewCategory: self.heroView.storiesView)
-        
-        getCategoriesDescriptions()
     }
     
     private func createTitleLabel() -> UILabel {
+        // The frame arguments allows to have a very long name being shown completely
         let label = UILabel(frame: CGRect(x: CGFloat(0), y: CGFloat(0),
                                           width: UIScreen.main.bounds.width,
                                           height: CGFloat(Constants.navigationTitleFrameSize)))
@@ -108,67 +90,25 @@ class HeroDetailViewController: UIViewController {
             }
             
             if isSnapshotTest == false {
-                self.updateAllDescriptions()
+                heroView.updateAllDescriptions(comics: self.hero.comics,
+                                               events: self.hero.events,
+                                               series: self.hero.series,
+                                               stories: self.hero.stories)
             }
         }
         
         if isSnapshotTest {
-            self.updateAllDescriptions()
-        }
-    }
-    
-    private func updateAllDescriptions() {
-        updateDescriptionInView(categoryValues: self.hero.comics,
-                                viewCategory: self.heroView.comicsView)
-        
-        updateDescriptionInView(categoryValues: self.hero.events,
-                                viewCategory: self.heroView.eventsView)
-        
-        updateDescriptionInView(categoryValues: self.hero.series,
-                                viewCategory: self.heroView.seriesView)
-        
-        updateDescriptionInView(categoryValues: self.hero.stories,
-                                viewCategory: self.heroView.storiesView)
-    }
-    
-    private func addCategory(categoryValues: Category?,
-                             viewCategory: CategoryViewComponent) {
-        if let categoryValues = categoryValues {
-            if categoryValues.items.count == 0 {
-                viewCategory.addPlaceholderView()
-            } else {
-                for category in categoryValues.items {
-                    let description = "Loading..."
-                    viewCategory.addCategoryNameAndDescription(name: category.name,
-                                                               description: description)
-                }
-            }
-            viewCategory.setViewIntrinsicHeight()
-        }
-    }
-    
-    private func updateDescriptionInView(categoryValues: Category?,
-                                         viewCategory: CategoryViewComponent) {
-        if let categoryValues = categoryValues {
-            for (index, category) in categoryValues.items.enumerated() {
-                var description = category.description ?? "No description :("
-                if description == "" {
-                    description = "No description :("
-                }
-                viewCategory.updateDescription(atIndex: index, description: description)
-            }
+            heroView.updateAllDescriptions(comics: self.hero.comics,
+                                           events: self.hero.events,
+                                           series: self.hero.series,
+                                           stories: self.hero.stories)
         }
     }
     
     private func loadStarImage(button: UIButton) {
         guard let name = hero.name else { return }
         
-        var image: UIImage?
-        if UserDefaults.standard.data(forKey: name) != nil {
-            image = UIImage(named: "star")
-        } else {
-            image = UIImage(named: "star_add")
-        }
+        var image = UIImage(named: UserDefaults.standard.data(forKey: name) != nil ? "star" : "star_add")
         image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
                                                  height: Constants.iconHeightSize))
         button.setImage(image, for: .normal)

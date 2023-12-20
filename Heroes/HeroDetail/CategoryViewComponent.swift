@@ -21,8 +21,8 @@ class CategoryViewComponent: UIView {
     private var descriptionLabels: [UILabel] = []
     private var placeholderLabel: UILabel? = nil
     
-    init(frame: CGRect, categoryName: String) {
-        super.init(frame: frame)
+    init(categoryName: String) {
+        super.init(frame: CGRectZero)
         addBackgroundAndBordersToComponent()
         categoryLabel.text = categoryName
         
@@ -78,12 +78,11 @@ class CategoryViewComponent: UIView {
         let categoryName = categoryLabel.text ?? ""
         let text = "No " + categoryName + " for this hero :("
         self.placeholderLabel = getNewLabel(textLabel: text)
-        if let placeholderLabel = placeholderLabel {
-            addTopConstraint(currentLabel: placeholderLabel,
-                             topLabel: categoryLabel,
-                             paddingValue: Constants.mediumPadding)
-            addSideConstraintsToLabel(label: placeholderLabel)
-        }
+        guard let placeholderLabel = self.placeholderLabel else { return }
+        addTopConstraint(currentLabel: placeholderLabel,
+                         topLabel: categoryLabel,
+                         paddingValue: Constants.mediumPadding)
+        addSideConstraintsToLabel(label: placeholderLabel)
     }
     
     func updateDescription(atIndex: Int, description: String) {
@@ -130,16 +129,10 @@ class CategoryViewComponent: UIView {
     
     private func setupLabelConstraints(nameLabel: UILabel,
                                        descriptionLabel: UILabel) {
-        if descriptionLabels.count > 0 {
-            let lastIndex = descriptionLabels.count - 1
-            addTopConstraint(currentLabel: nameLabel,
-                             topLabel: descriptionLabels[lastIndex],
-                             paddingValue: Constants.mediumPadding)
-        } else {
-            addTopConstraint(currentLabel: nameLabel,
-                             topLabel: categoryLabel,
-                             paddingValue: Constants.mediumPadding)
-        }
+        addTopConstraint(currentLabel: nameLabel,
+                         topLabel: descriptionLabels.count > 0 ? descriptionLabels[descriptionLabels.count - 1]
+                                                                 : categoryLabel,
+                         paddingValue: Constants.mediumPadding)
         
         addTopConstraint(currentLabel: descriptionLabel,
                          topLabel: nameLabel,

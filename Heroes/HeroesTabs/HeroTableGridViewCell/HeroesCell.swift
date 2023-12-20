@@ -40,14 +40,6 @@ class HeroesCell: UIView {
     var onReuse: () -> Void = {}
     weak var delegate: CellDelegate?
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     func prepareCellForReuse() {
         heroImage.image = nil
         heroImage.cancelImageLoad()
@@ -61,18 +53,15 @@ class HeroesCell: UIView {
     
     func configure(imageURL: URL?, name: String?) {
         heroName.text = name
-        
-        loadImage(imageURL: imageURL)
         loadStarImage(name: name)
+        loadImage(imageURL: imageURL)
     }
     
     func loadImage(imageURL: URL?) {
-        if let imageURL = imageURL {
-            if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
-                heroImage.loadImage(at: imageURL)
-            } else {
-                heroImage.image = UIImage(named: Constants.placeholderImageName)
-            }
+        guard let imageURL else { return }
+        
+        if imageURL.absoluteString.hasSuffix(Constants.notAvailableImageName) == false {
+            heroImage.loadImage(at: imageURL)
         } else {
             heroImage.image = UIImage(named: Constants.placeholderImageName)
         }
