@@ -140,18 +140,17 @@ class HeroDetailView: UIView {
     private func setupConstrains() {
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: self.topAnchor),
-            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
             stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            stackView.leftAnchor.constraint(equalTo: scrollView.leftAnchor,
-                                            constant: Constants.smallPadding),
-            stackView.rightAnchor.constraint(equalTo: scrollView.rightAnchor,
-                                             constant: -Constants.smallPadding),
+            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,
+                                               constant: Constants.smallPadding),
+            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,
+                                                constant: -Constants.smallPadding),
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            
-            heroDescriptionLabel.widthAnchor.constraint(equalToConstant: UIScreen
+            stackView.widthAnchor.constraint(equalToConstant: UIScreen
                 .main.bounds.width - Constants.mediumPadding)
         ])
         

@@ -68,10 +68,10 @@ class HeroesTableView: UIView {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: self.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: self.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: self.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 }

@@ -14,6 +14,8 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
         static let leftPadding: CGFloat = 10
         static let rightPadding: CGFloat = 10
         static let cellHeight: CGFloat = 240
+        static let cellHeightLandscape: CGFloat = 260
+        static let cellWidthLandscape: CGFloat = 200
         static let headingHeight: CGFloat = 30
         static let footerIdentifier = "footer"
         static let headerIdentifier = "header"
@@ -90,13 +92,16 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let cellHeight: CGFloat = GridConstants.cellHeight
-        
-        let cellWidth = collectionView.frame.width / 2 - (
-                GridConstants.leftPadding +
-                GridConstants.rightPadding)
-        
+        let cellHeight: CGFloat = UIDevice.current.orientation.isLandscape ? GridConstants.cellHeightLandscape :
+                                                                             GridConstants.cellHeight
+        let cellWidthPortrait = collectionView.frame.width / 2 - (GridConstants.leftPadding + GridConstants.rightPadding)
+        let cellWidth = UIDevice.current.orientation.isLandscape ? GridConstants.cellWidthLandscape : cellWidthPortrait
         return CGSize(width: cellWidth, height: cellHeight)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        heroesGridView.updateLayout()
     }
     
     func collectionView(_ collectionView: UICollectionView,

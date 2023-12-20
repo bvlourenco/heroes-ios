@@ -16,8 +16,8 @@ class HeroesGridFooter: UICollectionReusableView {
         return spinner
     }()
     
-    init() {
-        super.init(frame: CGRectZero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         configureSpinner()
     }
     

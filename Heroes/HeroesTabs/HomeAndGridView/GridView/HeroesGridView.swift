@@ -57,8 +57,8 @@ class HeroesGridView: UIView {
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
-            collectionView.leftAnchor.constraint(equalTo: self.leftAnchor),
-            collectionView.rightAnchor.constraint(equalTo: self.rightAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
@@ -70,5 +70,9 @@ class HeroesGridView: UIView {
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: Constants.footerIdentifier)
         collectionView.backgroundColor = UIColor.white
+    }
+    
+    func updateLayout() {
+        collectionView.collectionViewLayout.invalidateLayout()
     }
 }
