@@ -44,7 +44,6 @@
 		D98B207C2B02345F0095C81E /* HeroViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D98B207B2B02345F0095C81E /* HeroViewControllerDelegate.swift */; };
 		D98B20802B023C840095C81E /* HeroDetailViewModelUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D98B207F2B023C840095C81E /* HeroDetailViewModelUnitTests.swift */; };
 		D98B20882B026C1E0095C81E /* HeroDetailSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D98B20872B026C1E0095C81E /* HeroDetailSnapshotTests.swift */; };
-		D99A70362B18943B0077E6C9 /* HeroesGridHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99A70352B18943B0077E6C9 /* HeroesGridHeader.swift */; };
 		D9BA0F082AF90189003D7DCC /* HeroesViewModelUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BA0F072AF90189003D7DCC /* HeroesViewModelUnitTests.swift */; };
 		D9BA0F0F2AF93651003D7DCC /* ServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BA0F0E2AF93651003D7DCC /* ServiceProtocol.swift */; };
 		D9D259912AFD4D9200D11555 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D259902AFD4D9200D11555 /* ImageLoader.swift */; };
@@ -118,7 +117,6 @@
 		D98B207B2B02345F0095C81E /* HeroViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroViewControllerDelegate.swift; sourceTree = "<group>"; };
 		D98B207F2B023C840095C81E /* HeroDetailViewModelUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroDetailViewModelUnitTests.swift; sourceTree = "<group>"; };
 		D98B20872B026C1E0095C81E /* HeroDetailSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroDetailSnapshotTests.swift; sourceTree = "<group>"; };
-		D99A70352B18943B0077E6C9 /* HeroesGridHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridHeader.swift; sourceTree = "<group>"; };
 		D9BA0F052AF90189003D7DCC /* HeroesUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeroesUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9BA0F072AF90189003D7DCC /* HeroesViewModelUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesViewModelUnitTests.swift; sourceTree = "<group>"; };
 		D9BA0F0E2AF93651003D7DCC /* ServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProtocol.swift; sourceTree = "<group>"; };
@@ -340,7 +338,6 @@
 				D90E71D52B0CBD920041AAAE /* HeroesGridViewController.swift */,
 				D90E71D12B0CBD770041AAAE /* HeroesGridView.swift */,
 				D90E71D72B0CD04C0041AAAE /* HeroesGridFooter.swift */,
-				D99A70352B18943B0077E6C9 /* HeroesGridHeader.swift */,
 			);
 			path = GridView;
 			sourceTree = "<group>";
@@ -663,7 +660,6 @@
 				D953783D2B2CC340001ADB13 /* FavouritesViewController.swift in Sources */,
 				D98B207C2B02345F0095C81E /* HeroViewControllerDelegate.swift in Sources */,
 				D93F4F9E2AE7BEDB00610761 /* AppDelegate.swift in Sources */,
-				D99A70362B18943B0077E6C9 /* HeroesGridHeader.swift in Sources */,
 				D94112202AFE340A0006C291 /* UIImageLoader.swift in Sources */,
 				D90E71D42B0CBD860041AAAE /* HeroesGridViewCell.swift in Sources */,
 				D90E71D22B0CBD770041AAAE /* HeroesGridView.swift in Sources */,
