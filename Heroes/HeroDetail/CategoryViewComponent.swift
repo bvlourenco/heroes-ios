@@ -12,8 +12,6 @@ class CategoryViewComponent: UIView {
         let categoryLabel = getNewLabel(textLabel: "",
                                         alignment: .center)
         categoryLabel.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
-        categoryLabel.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width)
-            .isActive = true
         return categoryLabel
     }()
     
@@ -25,6 +23,7 @@ class CategoryViewComponent: UIView {
         super.init(frame: CGRectZero)
         addBackgroundAndBordersToComponent()
         categoryLabel.text = categoryName
+        addSideConstraintsToLabel(label: categoryLabel)
         
         self.heightAnchor.constraint(equalToConstant: categoryLabel.frame.size.height).isActive = true
     }
@@ -91,6 +90,11 @@ class CategoryViewComponent: UIView {
         self.setViewIntrinsicHeight()
     }
     
+    func updateLayoutAfterRotation() {
+        self.layoutIfNeeded()
+        self.setViewIntrinsicHeight()
+    }
+    
     private func addBackgroundAndBordersToComponent() {
         self.layer.borderWidth = 1
         self.layer.borderColor = UIColor.systemGray2.cgColor
@@ -112,11 +116,11 @@ class CategoryViewComponent: UIView {
     }
     
     private func addSideConstraintsToLabel(label: UILabel) {
-        label.leadingAnchor.constraint(equalTo: self.leadingAnchor,
+        label.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor,
                                        constant: Constants.smallPadding)
         .isActive = true
         
-        label.trailingAnchor.constraint(equalTo: self.trailingAnchor,
+        label.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor,
                                         constant: -Constants.smallPadding)
         .isActive = true
     }

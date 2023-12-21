@@ -60,6 +60,11 @@ class HeroDetailViewController: UIViewController {
         getCategoriesDescriptions()
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        heroView.updateLayoutAfterRotation()
+    }
+    
     private func createStarButtonOnNavigationBar() {
         let button = UIButton()
         button.addTarget(self, action: #selector(favouriteHeroButtonPressed), for: .touchUpInside)

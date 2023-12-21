@@ -80,6 +80,20 @@ class HeroDetailView: UIView {
         heroImageView.loadImage(at: imageURL)
     }
     
+    func updateLayoutAfterRotation() {
+        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*Constants.mediumPadding :
+                                                                       UIScreen.main.bounds.width - Constants.mediumPadding
+        
+        if let constraint = (stackView.constraints.filter{$0.firstAttribute == .width}.first) {
+            constraint.constant = safeAreaWidth
+        }
+        
+        comicsView.updateLayoutAfterRotation()
+        seriesView.updateLayoutAfterRotation()
+        eventsView.updateLayoutAfterRotation()
+        storiesView.updateLayoutAfterRotation()
+    }
+    
     private func addCategoryNames(categoryValues: Category?,
                                   viewCategory: CategoryViewComponent) {
         guard let categoryValues else { return }
@@ -138,6 +152,9 @@ class HeroDetailView: UIView {
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
     // and: https://gist.github.com/moraei/08f1c1841f7bb73bb5c9e89ac428e027
     private func setupConstrains() {
+        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*Constants.mediumPadding :
+                                                                       UIScreen.main.bounds.width - Constants.mediumPadding
+        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: self.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
@@ -150,8 +167,8 @@ class HeroDetailView: UIView {
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,
                                                 constant: -Constants.smallPadding),
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            stackView.widthAnchor.constraint(equalToConstant: UIScreen
-                .main.bounds.width - Constants.mediumPadding)
+            
+            stackView.widthAnchor.constraint(equalToConstant: safeAreaWidth)
         ])
         
         // Used to remove white space inside scroll view with image view (when having images
