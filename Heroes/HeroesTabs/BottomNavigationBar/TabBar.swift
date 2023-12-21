@@ -16,8 +16,8 @@ class TabBar: UITabBarController {
         static let homeIconName = "house"
         static let favouritesTitle = "Favourites"
         static let favouritesIconName = "star"
-        static let gridViewTitle = "Grid View"
-        static let gridViewIconName = "square.grid.2x2"
+        static let listViewTitle = "List View"
+        static let listViewIconName = "list.bullet"
     }
     
     private let heroService: HeroServiceProtocol
@@ -58,10 +58,10 @@ class TabBar: UITabBarController {
                                                                      heroService: heroService),
                                        title: TabConstants.favouritesTitle,
                                        image: UIImage(systemName: TabConstants.favouritesIconName)!),
-            createNavigationController(for: HeroesGridViewController(heroesViewModel: heroesViewModel,
-                                                                     favouritesViewModel: favouritesViewModel),
-                                       title: TabConstants.gridViewTitle,
-                                       image: UIImage(systemName: TabConstants.gridViewIconName)!)
+            createNavigationController(for: ListViewController(heroesViewModel: heroesViewModel,
+                                                               favouritesViewModel: favouritesViewModel),
+                                       title: TabConstants.listViewTitle,
+                                       image: UIImage(systemName: TabConstants.listViewIconName)!)
         ]
     }
     

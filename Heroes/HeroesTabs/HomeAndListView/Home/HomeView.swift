@@ -7,7 +7,7 @@
 
 import UIKit
 
-class HeroesGridView: UIView {
+class HomeView: UIView {
     
     private enum GridPadding {
         static let topPadding: CGFloat = 10
@@ -43,7 +43,7 @@ class HeroesGridView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setGridDataSourceAndDelegate(viewController: HeroesGridViewController) {
+    func setGridDataSourceAndDelegate(viewController: HomeViewController) {
         collectionView.delegate = viewController
         collectionView.dataSource = viewController
     }
@@ -68,7 +68,7 @@ class HeroesGridView: UIView {
     private func configureCollectionView() {
         collectionView.register(HeroesGridViewCell.self, 
                                 forCellWithReuseIdentifier: Constants.cellIdentifier)
-        collectionView.register(HeroesGridFooter.self,
+        collectionView.register(HomeFooter.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: Constants.footerIdentifier)
     }

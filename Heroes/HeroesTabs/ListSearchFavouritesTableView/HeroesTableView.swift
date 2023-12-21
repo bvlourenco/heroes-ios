@@ -17,7 +17,7 @@ class HeroesTableView: UIView {
         // Assigning rowHeight property since a table view row initially does not have
         // the image (because of loading) and so, estimatedRowHeight would produce a
         // warning about suggesting a row height of 0
-        tableView.rowHeight = Constants.tableViewImageHeight
+        tableView.rowHeight = Constants.tableViewImageHeight + Constants.smallPadding
         
         return tableView
     }()
@@ -41,7 +41,7 @@ class HeroesTableView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setTableDataSourceAndDelegate(viewController: HomeViewController) {
+    func setTableDataSourceAndDelegate(viewController: ListViewController) {
         tableView.delegate = viewController
         tableView.dataSource = viewController
     }

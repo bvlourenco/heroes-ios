@@ -7,7 +7,7 @@
 
 import UIKit
 
-class HeroesGridFooter: UICollectionReusableView {
+class HomeFooter: UICollectionReusableView {
     
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .medium)

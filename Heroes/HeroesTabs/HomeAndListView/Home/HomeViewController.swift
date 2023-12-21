@@ -8,20 +8,20 @@
 import Combine
 import UIKit
 
-class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
+class HomeViewController: HeroesViewController, ViewControllerDelegate {
     
     private enum GridConstants {
         static let leftPadding: CGFloat = 10
         static let rightPadding: CGFloat = 10
-        static let cellHeight: CGFloat = 240
-        static let cellHeightLandscape: CGFloat = 260
+        static let cellHeight: CGFloat = 190
+        static let cellHeightLandscape: CGFloat = 220
         static let cellWidthLandscape: CGFloat = 200
         static let headingHeight: CGFloat = 30
         static let footerIdentifier = "footer"
         static let headerIdentifier = "header"
     }
     
-    private let heroesGridView = HeroesGridView()
+    private let homeView = HomeView()
     
     override init(heroesViewModel: HeroesViewModel,
                   favouritesViewModel: FavouritesViewModel) {
@@ -35,11 +35,11 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
     }
     
     override func loadView() {
-        view = heroesGridView
+        view = homeView
     }
     
     override func viewDidLoad() {
-        heroesGridView.setGridDataSourceAndDelegate(viewController: self)
+        homeView.setGridDataSourceAndDelegate(viewController: self)
         super.viewDidLoad()
     }
     
@@ -49,16 +49,16 @@ class HeroesGridViewController: HeroesViewController, ViewControllerDelegate {
     }
     
     func reloadView() {
-        heroesGridView.update()
+        homeView.update()
     }
     
     func spinnerHidden(to value: Bool) {
-        heroesGridView.isSpinnerHidden(to: value)
+        homeView.isSpinnerHidden(to: value)
     }
 }
 
-extension HeroesGridViewController: UICollectionViewDataSource, UICollectionViewDelegate,
-                                        UICollectionViewDelegateFlowLayout {
+extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegate,
+                                UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return super.getNumberOfItems()
     }
@@ -101,7 +101,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        heroesGridView.updateLayout()
+        homeView.updateLayout()
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -111,7 +111,7 @@ extension HeroesGridViewController: UICollectionViewDataSource, UICollectionView
         case UICollectionView.elementKindSectionFooter:
             return collectionView.dequeueReusableSupplementaryView(ofKind: kind,
                                                                    withReuseIdentifier: GridConstants.footerIdentifier,
-                                                                   for: indexPath) as! HeroesGridFooter
+                                                                   for: indexPath) as! HomeFooter
         default:
             assert(false, "Unexpected kind in collectionView")
         }

@@ -14,6 +14,7 @@ enum ViewType {
 class HeroesCell: UIView {
     private enum CellConstants {
         static let spacing: CGFloat = 10
+        static let borderRadius: CGFloat = 15.0
     }
     
     private let heroName = {
@@ -28,6 +29,8 @@ class HeroesCell: UIView {
     private let heroImage = {
         let image = UIImageView()
         image.translatesAutoresizingMaskIntoConstraints = false
+        image.layer.cornerRadius = CellConstants.borderRadius
+        image.layer.masksToBounds = true
         return image
     }()
     
@@ -94,15 +97,20 @@ class HeroesCell: UIView {
         ])
         
         if type == .GridView {
+            heroImage.addOverlay()
+            
             NSLayoutConstraint.activate([
                 heroImage.topAnchor.constraint(equalTo: view.topAnchor),
                 heroImage.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 heroImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                heroName.topAnchor.constraint(equalTo: heroImage.bottomAnchor,
-                                              constant: CellConstants.spacing),
-                heroName.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                heroFavouriteButton.trailingAnchor.constraint(equalTo: heroImage.trailingAnchor),
-                heroFavouriteButton.centerYAnchor.constraint(equalTo: heroName.centerYAnchor),
+                heroName.bottomAnchor.constraint(equalTo: heroImage.bottomAnchor,
+                                                 constant: -CellConstants.spacing),
+                heroName.leadingAnchor.constraint(equalTo: heroImage.leadingAnchor,
+                                                  constant: Constants.smallPadding),
+                heroFavouriteButton.trailingAnchor.constraint(equalTo: heroImage.trailingAnchor,
+                                                              constant: -Constants.smallPadding),
+                heroFavouriteButton.topAnchor.constraint(equalTo: heroImage.topAnchor,
+                                                         constant: Constants.smallPadding),
             ])
         } else if type == .TableView {
             NSLayoutConstraint.activate([
@@ -111,11 +119,23 @@ class HeroesCell: UIView {
                 heroImage.heightAnchor.constraint(equalToConstant: Constants.tableViewImageHeight),
                 heroName.leadingAnchor.constraint(equalTo: heroImage.trailingAnchor,
                                                   constant: Constants.smallPadding),
-                heroName.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                heroName.centerYAnchor.constraint(equalTo: heroImage.centerYAnchor),
                 heroFavouriteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor,
                                                               constant: -Constants.mediumPadding),
-                heroFavouriteButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+                heroFavouriteButton.centerYAnchor.constraint(equalTo: heroImage.centerYAnchor),
             ])
         }
+    }
+}
+
+
+private extension UIImageView {
+    func addOverlay(color: UIColor = .black, alpha : CGFloat = 0.6) {
+        let overlay = UIView()
+        overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        overlay.frame = bounds
+        overlay.backgroundColor = color
+        overlay.alpha = alpha
+        addSubview(overlay)
     }
 }
