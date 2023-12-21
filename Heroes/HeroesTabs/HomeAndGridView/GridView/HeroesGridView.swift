@@ -26,12 +26,14 @@ class HeroesGridView: UIView {
         let collectionView = UICollectionView(frame: CGRectZero,
                                               collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .black
         
         return collectionView
     }()
     
     init() {
         super.init(frame: CGRectZero)
+        backgroundColor = .black
         addSubview(collectionView)
         configureCollectionView()
         setupConstraints()
@@ -69,7 +71,6 @@ class HeroesGridView: UIView {
         collectionView.register(HeroesGridFooter.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: Constants.footerIdentifier)
-        collectionView.backgroundColor = UIColor.white
     }
     
     func updateLayout() {

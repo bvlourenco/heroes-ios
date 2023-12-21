@@ -16,6 +16,7 @@ class HeroDetailView: UIView {
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .white
         return label
     }()
     
@@ -52,7 +53,7 @@ class HeroDetailView: UIView {
         self.eventsView = CategoryViewComponent(categoryName: "Events")
         self.storiesView = CategoryViewComponent(categoryName: "Stories")
         super.init(frame: CGRectZero)
-        backgroundColor = .white
+        backgroundColor = .black
         addElementsToView()
         setupConstrains()
     }

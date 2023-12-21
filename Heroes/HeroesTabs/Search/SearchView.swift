@@ -21,6 +21,9 @@ class SearchView: UIView {
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.backgroundImage = UIImage()
         searchBar.placeholder = ViewConstants.searchPlaceholder
+        searchBar.tintColor = .white
+        searchBar.searchTextField.textColor = .white
+        searchBar.barStyle = .black
         return searchBar
     }()
     
@@ -50,6 +53,7 @@ class SearchView: UIView {
     
     init() {
         super.init(frame: CGRectZero)
+        backgroundColor = .black
         addSubview(stackView)
         stackView.addArrangedSubview(searchBar)
         stackView.addArrangedSubview(results)

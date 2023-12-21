@@ -16,6 +16,7 @@ class FavouritesView: UIView {
     
     init() {
         super.init(frame: CGRectZero)
+        backgroundColor = .black
         addSubview(favourites)
         setupConstraints()
     }

@@ -52,6 +52,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
                                                  for: indexPath) as! HeroesTableViewCell
+        cell.selectionStyle = .none
         let hero = super.heroesViewModel.getHero(index: indexPath.row)
         
         cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)

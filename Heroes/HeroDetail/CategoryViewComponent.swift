@@ -9,8 +9,7 @@ import UIKit
 
 class CategoryViewComponent: UIView {
     private lazy var categoryLabel: UILabel = {
-        let categoryLabel = getNewLabel(textLabel: "",
-                                        alignment: .center)
+        let categoryLabel = getNewLabel(textLabel: "")
         categoryLabel.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
         return categoryLabel
     }()
@@ -21,7 +20,7 @@ class CategoryViewComponent: UIView {
     
     init(categoryName: String) {
         super.init(frame: CGRectZero)
-        addBackgroundAndBordersToComponent()
+        backgroundColor = .black
         categoryLabel.text = categoryName
         addSideConstraintsToLabel(label: categoryLabel)
         
@@ -95,18 +94,12 @@ class CategoryViewComponent: UIView {
         self.setViewIntrinsicHeight()
     }
     
-    private func addBackgroundAndBordersToComponent() {
-        self.layer.borderWidth = 1
-        self.layer.borderColor = UIColor.systemGray2.cgColor
-        self.backgroundColor = UIColor.systemGray6
-    }
-    
     private func getNewLabel(textLabel: String,
                              alignment: NSTextAlignment = .left) -> UILabel {
         let label = UILabel()
         label.text = textLabel
         label.textAlignment = alignment
-        label.textColor = .black
+        label.textColor = .white
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
         addSubview(label)
@@ -116,13 +109,10 @@ class CategoryViewComponent: UIView {
     }
     
     private func addSideConstraintsToLabel(label: UILabel) {
-        label.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor,
-                                       constant: Constants.smallPadding)
-        .isActive = true
-        
-        label.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor,
-                                        constant: -Constants.smallPadding)
-        .isActive = true
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor)
+        ])
     }
     
     private func addTopConstraint(currentLabel: UILabel, topLabel: UILabel,

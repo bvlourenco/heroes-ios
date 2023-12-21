@@ -21,6 +21,7 @@ class HeroesCell: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 3
         label.lineBreakMode = .byTruncatingTail
+        label.textColor = .white
         return label
     }()
     

@@ -13,6 +13,7 @@ class HeroesGridViewCell: UICollectionViewCell, CellDelegate {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = .black
         allHeroesCell.delegate = self
         allHeroesCell.addViews(view: contentView)
         allHeroesCell.setupConstraints(view: contentView, type: ViewType.GridView)

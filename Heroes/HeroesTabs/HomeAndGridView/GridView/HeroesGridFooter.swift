@@ -11,6 +11,7 @@ class HeroesGridFooter: UICollectionReusableView {
     
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.color = .white
         spinner.startAnimating()
         spinner.translatesAutoresizingMaskIntoConstraints = false
         return spinner

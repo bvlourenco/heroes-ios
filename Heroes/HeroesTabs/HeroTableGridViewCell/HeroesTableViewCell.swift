@@ -13,6 +13,7 @@ class HeroesTableViewCell: UITableViewCell, CellDelegate {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .black
         allHeroesCell.delegate = self
         allHeroesCell.addViews(view: contentView)
         allHeroesCell.setupConstraints(view: contentView, type: ViewType.TableView)
