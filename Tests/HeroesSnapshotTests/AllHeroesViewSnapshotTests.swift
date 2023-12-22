@@ -45,25 +45,25 @@ final class AllHeroesViewSnapshotTests: XCTestCase {
         }
     }
     
-    func testHeroesTableViewController() {
+    func testHeroesHomeViewController() {
         let home = TabBar(heroService: createHeroService())
         home.selectedIndex = 1
         assertSnapshot(matching: home, as: .image)
     }
     
-    func testHeroesGridViewController() {
+    func testHeroesListViewController() {
         let home = TabBar(heroService: createHeroService())
         home.selectedIndex = 3
         assertSnapshot(matching: home, as: .image)
     }
     
-    func testHeroesTableViewPersistance() {
+    func testHeroesHomeViewPersistance() {
         let home = TabBar(heroService: createHeroService(numberOfFavouriteHeroes: 2))
         home.selectedIndex = 1
         assertSnapshot(matching: home, as: .image)
     }
     
-    func testHeroesGridViewPersistance() {
+    func testHeroesListViewPersistance() {
         let home = TabBar(heroService: createHeroService(numberOfFavouriteHeroes: 2))
         home.selectedIndex = 3
         assertSnapshot(matching: home, as: .image)

@@ -103,68 +103,64 @@ class HeroDetailViewController: UIViewController {
                 delegate?.updateHeroInView(heroIndex: index, hero: self.hero)
             }
             
-            heroView.comicsView.gridView.collectionView.reloadData()
-            heroView.eventsView.gridView.collectionView.reloadData()
-            heroView.seriesView.gridView.collectionView.reloadData()
-            heroView.storiesView.gridView.collectionView.reloadData()
-            
-            var hasComicElements = false
-            var hasSeriesElements = false
-            var hasEventsElements = false
-            var hasStoriesElements = false
-            
-            if let comics = self.hero.comics?.items {
-                hasComicElements = comics.count > 0
+            if isSnapshotTest == false {
+                loadImagesAndDescriptionsOfCategoriesInView()
             }
-            if let series = self.hero.series?.items {
-                hasSeriesElements = series.count > 0
-            }
-            if let events = self.hero.events?.items {
-                hasEventsElements = events.count > 0
-            }
-            if let stories = self.hero.stories?.items {
-                hasStoriesElements = stories.count > 0
-            }
-            
-            if hasComicElements == false {
-                heroView.comicsView.addPlaceholderView()
-            }
-            if hasSeriesElements == false {
-                heroView.seriesView.addPlaceholderView()
-            }
-            if hasEventsElements == false {
-                heroView.eventsView.addPlaceholderView()
-            }
-            if hasStoriesElements == false {
-                heroView.storiesView.addPlaceholderView()
-            }
-            
-            heroView.comicsView.setHasElements(hasElements: hasComicElements)
-            heroView.comicsView.setViewIntrinsicHeight()
-            
-            heroView.eventsView.setHasElements(hasElements: hasEventsElements)
-            heroView.eventsView.setViewIntrinsicHeight()
-            
-            heroView.seriesView.setHasElements(hasElements: hasSeriesElements)
-            heroView.seriesView.setViewIntrinsicHeight()
-            
-            heroView.storiesView.setHasElements(hasElements: hasStoriesElements)
-            heroView.storiesView.setViewIntrinsicHeight()
-            
-//            if isSnapshotTest == false {
-//                heroView.updateAllDescriptions(comics: self.hero.comics,
-//                                               events: self.hero.events,
-//                                               series: self.hero.series,
-//                                               stories: self.hero.stories)
-//            }
         }
         
-//        if isSnapshotTest {
-//            heroView.updateAllDescriptions(comics: self.hero.comics,
-//                                           events: self.hero.events,
-//                                           series: self.hero.series,
-//                                           stories: self.hero.stories)
-//        }
+        if isSnapshotTest {
+            loadImagesAndDescriptionsOfCategoriesInView()
+        }
+    }
+    
+    private func loadImagesAndDescriptionsOfCategoriesInView() {
+        heroView.comicsView.gridView.collectionView.reloadData()
+        heroView.eventsView.gridView.collectionView.reloadData()
+        heroView.seriesView.gridView.collectionView.reloadData()
+        heroView.storiesView.gridView.collectionView.reloadData()
+        
+        var hasComicElements = false
+        var hasSeriesElements = false
+        var hasEventsElements = false
+        var hasStoriesElements = false
+        
+        if let comics = self.hero.comics?.items {
+            hasComicElements = comics.count > 0
+        }
+        if let series = self.hero.series?.items {
+            hasSeriesElements = series.count > 0
+        }
+        if let events = self.hero.events?.items {
+            hasEventsElements = events.count > 0
+        }
+        if let stories = self.hero.stories?.items {
+            hasStoriesElements = stories.count > 0
+        }
+        
+        if hasComicElements == false {
+            heroView.comicsView.addPlaceholderView()
+        }
+        if hasSeriesElements == false {
+            heroView.seriesView.addPlaceholderView()
+        }
+        if hasEventsElements == false {
+            heroView.eventsView.addPlaceholderView()
+        }
+        if hasStoriesElements == false {
+            heroView.storiesView.addPlaceholderView()
+        }
+        
+        heroView.comicsView.setHasElements(hasElements: hasComicElements)
+        heroView.comicsView.setViewIntrinsicHeight()
+        
+        heroView.eventsView.setHasElements(hasElements: hasEventsElements)
+        heroView.eventsView.setViewIntrinsicHeight()
+        
+        heroView.seriesView.setHasElements(hasElements: hasSeriesElements)
+        heroView.seriesView.setViewIntrinsicHeight()
+        
+        heroView.storiesView.setHasElements(hasElements: hasStoriesElements)
+        heroView.storiesView.setViewIntrinsicHeight()
     }
     
     private func loadStarImage(button: UIButton) {

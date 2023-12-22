@@ -106,6 +106,7 @@ extension Hero {
     }
     
     static func updateHeroCategoryDescription(descriptions: [String],
+                                              thumbnail: Thumbnail = createThumbnailMock(),
                                               category: Category?) throws -> Category {
         guard var category = category else { throw HeroError.noCategory }
         
@@ -115,6 +116,7 @@ extension Hero {
         
         for index in 0..<category.items.count {
             category.items[index].description = descriptions[index]
+            category.items[index].thumbnail = thumbnail
         }
         
         return category
