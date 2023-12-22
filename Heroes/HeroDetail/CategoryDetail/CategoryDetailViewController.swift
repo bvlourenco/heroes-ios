@@ -32,6 +32,12 @@ class CategoryDetailViewController: UIViewController {
         categoryView.setupView(name: category?.name,
                                description: category?.description,
                                imageURL: category?.thumbnail?.imageURL)
+        categoryView.closeButton.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        categoryView.updateLayoutAfterRotation()
     }
     
     private func createTitleLabel() -> UILabel {
@@ -45,5 +51,10 @@ class CategoryDetailViewController: UIViewController {
         label.font = UIFont.boldSystemFont(ofSize: label.font.pointSize)
         label.text = category?.name
         return label
+    }
+    
+    @objc
+    func dismissView() {
+        self.dismiss(animated: true, completion: nil)
     }
 }

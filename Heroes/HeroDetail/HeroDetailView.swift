@@ -94,6 +94,20 @@ class HeroDetailView: UIView {
         stackView.addArrangedSubview(storiesView)
     }
     
+    func updateLayoutAfterRotation() {
+        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*Constants.mediumPadding :
+                                                                       UIScreen.main.bounds.width - Constants.mediumPadding
+        
+        if let constraint = (stackView.constraints.filter{$0.firstAttribute == .width}.first) {
+            constraint.constant = safeAreaWidth
+        }
+        
+        comicsView.updateLayoutAfterRotation()
+        seriesView.updateLayoutAfterRotation()
+        eventsView.updateLayoutAfterRotation()
+        storiesView.updateLayoutAfterRotation()
+    }
+    
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
     // and: https://gist.github.com/moraei/08f1c1841f7bb73bb5c9e89ac428e027
     private func setupConstrains() {

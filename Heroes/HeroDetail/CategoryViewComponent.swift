@@ -25,6 +25,7 @@ class CategoryViewComponent: UIView {
     }()
     
     private var placeholderLabel: UILabel? = nil
+    private var hasElements: Bool = false
     
     init(categoryName: String) {
         super.init(frame: CGRectZero)
@@ -35,10 +36,14 @@ class CategoryViewComponent: UIView {
         setupConstraints()
     }
     
-    func setViewIntrinsicHeight(hasElements: Bool) {
+    func setHasElements(hasElements: Bool) {
+        self.hasElements = hasElements
         spinner.isHidden = true
+    }
+    
+    func setViewIntrinsicHeight() {
         let gridViewHeight: CGFloat = hasElements ? 190 : 0
-        var totalHeight: CGFloat = gridViewHeight + 20
+        var totalHeight: CGFloat = gridViewHeight + 20 + Constants.mediumPadding
         
         if hasElements {
             gridView.heightAnchor.constraint(equalToConstant: gridViewHeight).isActive = true
@@ -65,6 +70,11 @@ class CategoryViewComponent: UIView {
                          topLabel: categoryLabel,
                          paddingValue: Constants.mediumPadding)
         addSideConstraintsToLabel(label: placeholderLabel)
+    }
+    
+    func updateLayoutAfterRotation() {
+        self.layoutIfNeeded()
+        self.setViewIntrinsicHeight()
     }
     
     private func getNewLabel(textLabel: String,

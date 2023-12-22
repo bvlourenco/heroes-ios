@@ -71,6 +71,7 @@ class HeroDetailViewController: UIViewController {
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
+        heroView.updateLayoutAfterRotation()
     }
     
     private func createStarButtonOnNavigationBar() {
@@ -138,10 +139,17 @@ class HeroDetailViewController: UIViewController {
                 heroView.storiesView.addPlaceholderView()
             }
             
-            heroView.comicsView.setViewIntrinsicHeight(hasElements: hasComicElements)
-            heroView.eventsView.setViewIntrinsicHeight(hasElements: hasEventsElements)
-            heroView.seriesView.setViewIntrinsicHeight(hasElements: hasSeriesElements)
-            heroView.storiesView.setViewIntrinsicHeight(hasElements: hasStoriesElements)
+            heroView.comicsView.setHasElements(hasElements: hasComicElements)
+            heroView.comicsView.setViewIntrinsicHeight()
+            
+            heroView.eventsView.setHasElements(hasElements: hasEventsElements)
+            heroView.eventsView.setViewIntrinsicHeight()
+            
+            heroView.seriesView.setHasElements(hasElements: hasSeriesElements)
+            heroView.seriesView.setViewIntrinsicHeight()
+            
+            heroView.storiesView.setHasElements(hasElements: hasStoriesElements)
+            heroView.storiesView.setViewIntrinsicHeight()
             
 //            if isSnapshotTest == false {
 //                heroView.updateAllDescriptions(comics: self.hero.comics,

@@ -8,10 +8,17 @@
 import UIKit
 
 class CategoryDetailView: UIView {
+    let closeButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Close", for: .normal)
+        return button
+    }()
+    
     private var categoryDescription: UILabel = {
         let label = UILabel()
         label.text = "No description :("
-        label.textAlignment = .left
+        label.textAlignment = .center
         label.textColor = .black
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
@@ -23,7 +30,7 @@ class CategoryDetailView: UIView {
     private lazy var categoryName: UILabel = {
         let label = UILabel()
         label.text = ""
-        label.textAlignment = .left
+        label.textAlignment = .center
         label.textColor = .black
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 0
@@ -79,12 +86,22 @@ class CategoryDetailView: UIView {
         categoryImageView.loadImage(at: imageURL)
     }
     
+    func updateLayoutAfterRotation() {
+        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*Constants.mediumPadding :
+        UIScreen.main.bounds.width - Constants.mediumPadding
+        
+        if let constraint = (stackView.constraints.filter{$0.firstAttribute == .width}.first) {
+            constraint.constant = safeAreaWidth
+        }
+    }
+    
     private func addElementsToView() {
         addSubview(scrollView)
         scrollView.addSubview(stackView)
         stackView.addArrangedSubview(categoryImageView)
         stackView.addArrangedSubview(categoryName)
         stackView.addArrangedSubview(categoryDescription)
+        addSubview(closeButton)
     }
     
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
@@ -107,7 +124,10 @@ class CategoryDetailView: UIView {
                                                 constant: -Constants.smallPadding),
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             
-            stackView.widthAnchor.constraint(equalToConstant: safeAreaWidth)
+            stackView.widthAnchor.constraint(equalToConstant: safeAreaWidth),
+            
+            closeButton.topAnchor.constraint(equalTo: self.topAnchor),
+            closeButton.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor)
         ])
         
         // Used to remove white space inside scroll view with image view (when having images
