@@ -27,6 +27,7 @@ struct DescriptionResponse: Decodable {
         
         struct HeroDetail: Decodable {
             let description: String?
+            let thumbnail: Thumbnail?
         }
     }
 }

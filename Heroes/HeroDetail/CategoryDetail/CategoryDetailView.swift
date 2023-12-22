@@ -1,16 +1,16 @@
 //
-//  HeroView.swift
+//  CategoryViewDetail.swift
 //  Heroes
 //
-//  Created by Bernardo Vala Lourenço on 26/10/2023.
+//  Created by Bernardo Vala Lourenço on 22/12/2023.
 //
 
 import UIKit
 
-class HeroDetailView: UIView {
-    private var heroDescriptionLabel: UILabel = {
+class CategoryDetailView: UIView {
+    private var categoryDescription: UILabel = {
         let label = UILabel()
-        label.text = "There is no description for this hero :("
+        label.text = "No description :("
         label.textAlignment = .left
         label.textColor = .black
         label.lineBreakMode = .byWordWrapping
@@ -20,7 +20,20 @@ class HeroDetailView: UIView {
         return label
     }()
     
-    private let heroImageView: UIImageView = {
+    private lazy var categoryName: UILabel = {
+        let label = UILabel()
+        label.text = ""
+        label.textAlignment = .left
+        label.textColor = .black
+        label.lineBreakMode = .byWordWrapping
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .white
+        label.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
+        return label
+    }()
+    
+    private let categoryImageView: UIImageView = {
         let placeholderImage = UIImage(named: Constants.placeholderImageName)
         let imageView = UIImageView(image: placeholderImage)
         imageView.contentMode = .scaleAspectFit
@@ -42,16 +55,7 @@ class HeroDetailView: UIView {
         return view
     }()
     
-    let comicsView: CategoryViewComponent
-    let seriesView: CategoryViewComponent
-    let eventsView: CategoryViewComponent
-    let storiesView: CategoryViewComponent
-    
     init() {
-        self.comicsView = CategoryViewComponent(categoryName: "Comics")
-        self.seriesView = CategoryViewComponent(categoryName: "Series")
-        self.eventsView = CategoryViewComponent(categoryName: "Events")
-        self.storiesView = CategoryViewComponent(categoryName: "Stories")
         super.init(frame: CGRectZero)
         backgroundColor = .black
         addElementsToView()
@@ -62,36 +66,25 @@ class HeroDetailView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setupView(description: String?,
-                   imageURL: URL?,
-                   comics: Category?,
-                   events: Category?,
-                   series: Category?,
-                   stories: Category?,
-                   viewController: HeroDetailViewController) {
-        comicsView.setGridDataSourceAndDelegate(viewController: viewController)
-        seriesView.setGridDataSourceAndDelegate(viewController: viewController)
-        eventsView.setGridDataSourceAndDelegate(viewController: viewController)
-        storiesView.setGridDataSourceAndDelegate(viewController: viewController)
+    func setupView(name: String?, description: String?, imageURL: URL?) {
+        if let name, name.isEmpty == false {
+            categoryName.text = name
+        }
         
         if let description, description.isEmpty == false {
-            heroDescriptionLabel.text = description
+            categoryDescription.text = description
         }
         
         guard let imageURL else { return }
-        heroImageView.loadImage(at: imageURL)
+        categoryImageView.loadImage(at: imageURL)
     }
     
     private func addElementsToView() {
         addSubview(scrollView)
         scrollView.addSubview(stackView)
-        
-        stackView.addArrangedSubview(heroImageView)
-        stackView.addArrangedSubview(heroDescriptionLabel)
-        stackView.addArrangedSubview(comicsView)
-        stackView.addArrangedSubview(seriesView)
-        stackView.addArrangedSubview(eventsView)
-        stackView.addArrangedSubview(storiesView)
+        stackView.addArrangedSubview(categoryImageView)
+        stackView.addArrangedSubview(categoryName)
+        stackView.addArrangedSubview(categoryDescription)
     }
     
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
@@ -106,7 +99,8 @@ class HeroDetailView: UIView {
             scrollView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
-            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor,
+                                           constant: Constants.mediumPadding),
             stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,
                                                constant: Constants.smallPadding),
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,
@@ -118,8 +112,8 @@ class HeroDetailView: UIView {
         
         // Used to remove white space inside scroll view with image view (when having images
         // with aspect ratio of 1:1 approximately)
-        guard let image = heroImageView.image else { return }
-        let height = (heroImageView.frame.width * image.size.height) /  image.size.width
-        heroImageView.heightAnchor.constraint(equalToConstant: height).isActive = true
+        guard let image = categoryImageView.image else { return }
+        let height = (categoryImageView.frame.width * image.size.height) /  image.size.width
+        categoryImageView.heightAnchor.constraint(equalToConstant: height).isActive = true
     }
 }

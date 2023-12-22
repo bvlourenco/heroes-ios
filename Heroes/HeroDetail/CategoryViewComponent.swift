@@ -9,67 +9,51 @@ import UIKit
 
 class CategoryViewComponent: UIView {
     private lazy var categoryLabel: UILabel = {
-        let categoryLabel = getNewLabel(textLabel: "")
-        categoryLabel.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
-        return categoryLabel
+        let label = getNewLabel(textLabel: "")
+        label.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
+        return label
     }()
     
-    private var nameLabels: [UILabel] = []
-    private var descriptionLabels: [UILabel] = []
+    let gridView = GridView(scrollDirection: .horizontal)
+    
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.color = .white
+        spinner.startAnimating()
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        return spinner
+    }()
+    
     private var placeholderLabel: UILabel? = nil
     
     init(categoryName: String) {
         super.init(frame: CGRectZero)
         backgroundColor = .black
         categoryLabel.text = categoryName
-        addSideConstraintsToLabel(label: categoryLabel)
-        
-        self.heightAnchor.constraint(equalToConstant: categoryLabel.frame.size.height).isActive = true
+        addSubview(spinner)
+        addSubview(gridView)
+        setupConstraints()
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func addCategoryNameAndDescription(name: String, description: String) {
-        let nameLabel = getNewLabel(textLabel: "Name: " + name)
-        let descriptionLabel = getNewLabel(textLabel: "Description: " + description)
-        setupLabelConstraints(nameLabel: nameLabel,
-                              descriptionLabel: descriptionLabel)
+    func setViewIntrinsicHeight(hasElements: Bool) {
+        spinner.isHidden = true
+        let gridViewHeight: CGFloat = hasElements ? 190 : 0
+        var totalHeight: CGFloat = gridViewHeight + 20
         
-        // Forcing the name/description view to update layout to recompute
-        // view height
-        nameLabel.layoutIfNeeded()
-        descriptionLabel.layoutIfNeeded()
-        
-        self.nameLabels.append(nameLabel)
-        self.descriptionLabels.append(descriptionLabel)
-    }
-    
-    func setViewIntrinsicHeight() {
-        var totalHeight: CGFloat = categoryLabel.frame.size.height
-        + Constants.mediumPadding
-        
-        if let placeholderLabel = placeholderLabel {
-            totalHeight += placeholderLabel.frame.size.height + Constants.mediumPadding
+        if hasElements {
+            gridView.heightAnchor.constraint(equalToConstant: gridViewHeight).isActive = true
         } else {
-            for nameLabel in nameLabels {
-                totalHeight += nameLabel.frame.size.height + Constants.mediumPadding
-            }
-            for descriptionLabel in descriptionLabels {
-                totalHeight += descriptionLabel.frame.size.height + Constants.smallPadding
-            }
+            totalHeight += 40
         }
-        
-        // Adding a special "bottom padding" in each view to add some space
-        // between two CategoryViewComponent.
-        totalHeight += Constants.mediumPadding
-        
         
         // Updating height constraint
         if let constraint = (self.constraints.filter{$0.firstAttribute == .height}.first) {
             constraint.constant = totalHeight
         }
+    }
+    
+    func setGridDataSourceAndDelegate(viewController: HeroDetailViewController) {
+        gridView.setGridDataSourceAndDelegate(viewController: viewController)
     }
     
     func addPlaceholderView() {
@@ -81,17 +65,6 @@ class CategoryViewComponent: UIView {
                          topLabel: categoryLabel,
                          paddingValue: Constants.mediumPadding)
         addSideConstraintsToLabel(label: placeholderLabel)
-    }
-    
-    func updateDescription(at index: Int, description: String) {
-        self.descriptionLabels[index].text = "Description: " + description
-        self.descriptionLabels[index].layoutIfNeeded()
-        self.setViewIntrinsicHeight()
-    }
-    
-    func updateLayoutAfterRotation() {
-        self.layoutIfNeeded()
-        self.setViewIntrinsicHeight()
     }
     
     private func getNewLabel(textLabel: String,
@@ -121,18 +94,23 @@ class CategoryViewComponent: UIView {
                                           constant: paddingValue).isActive = true
     }
     
-    private func setupLabelConstraints(nameLabel: UILabel,
-                                       descriptionLabel: UILabel) {
-        addTopConstraint(currentLabel: nameLabel,
-                         topLabel: descriptionLabels.count > 0 ? descriptionLabels[descriptionLabels.count - 1]
-                                                                 : categoryLabel,
-                         paddingValue: Constants.mediumPadding)
-        
-        addTopConstraint(currentLabel: descriptionLabel,
-                         topLabel: nameLabel,
-                         paddingValue: Constants.smallPadding)
-        
-        addSideConstraintsToLabel(label: nameLabel)
-        addSideConstraintsToLabel(label: descriptionLabel)
+    private func setupConstraints() {
+        gridView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            gridView.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: Constants.mediumPadding),
+            gridView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
+            gridView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
+            categoryLabel.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
+            categoryLabel.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
+            categoryLabel.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
+            spinner.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: Constants.mediumPadding),
+            spinner.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
+            spinner.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
+            self.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

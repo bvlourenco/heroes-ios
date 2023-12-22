@@ -7,11 +7,25 @@
 
 import Foundation
 
-typealias HeroThumbnail = Hero.Thumbnail
 typealias Stories = Category
 typealias Comics = Category
 typealias Events = Category
 typealias Series = Category
+
+struct Thumbnail: Codable {
+    let path: String
+    let `extension`: String
+    
+    var imageURL: URL {
+        URL(string: "\(path).\(`extension`)")!
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(path, forKey: .path)
+        try container.encode(`extension`, forKey: .extension)
+    }
+}
 
 struct Hero: Codable, Equatable {
     let name: String?
@@ -25,21 +39,6 @@ struct Hero: Codable, Equatable {
     private enum CodingKeys : String, CodingKey {
         case name, description, thumbnail, stories, comics,
              events, series
-    }
-    
-    struct Thumbnail: Codable {
-        let path: String
-        let `extension`: String
-        
-        var imageURL: URL {
-            URL(string: "\(path).\(`extension`)")!
-        }
-        
-        func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(path, forKey: .path)
-            try container.encode(`extension`, forKey: .extension)
-        }
     }
     
     static func ==(hero1: Hero, hero2: Hero) -> Bool {
@@ -70,8 +69,8 @@ extension Hero {
     
     static func mock(name: String = "name 1",
                      description: String = "description 1",
-                     thumbnail: HeroThumbnail = HeroThumbnail(path: notFoundImagePath,
-                                                              extension: notFoundImageExtension),
+                     thumbnail: Thumbnail = Thumbnail(path: notFoundImagePath,
+                                                      extension: notFoundImageExtension),
                      stories: Stories = Stories(items: []),
                      comics: Comics = Comics(items: []),
                      events: Events = Events(items: []),
@@ -101,9 +100,9 @@ extension Hero {
         return Category(items: items)
     }
     
-    static func createHeroThumbnailMock(path: String,
-                                        extension: String) -> HeroThumbnail {
-        return HeroThumbnail(path: path, extension: `extension`)
+    static func createThumbnailMock(path: String = notFoundImagePath,
+                                    extension: String = notFoundImageExtension) -> Thumbnail {
+        return Thumbnail(path: path, extension: `extension`)
     }
     
     static func updateHeroCategoryDescription(descriptions: [String],

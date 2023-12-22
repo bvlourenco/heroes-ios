@@ -11,7 +11,7 @@
 		4D2E2AE7E388E5952497B615 /* Pods_Heroes_HeroesSnapshotTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48E9408DB0AA21EE5691B8ED /* Pods_Heroes_HeroesSnapshotTests.framework */; };
 		BCAF2AEBBBA6D39EC8B52DC5 /* Pods_HeroesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44C68D3DE64273DCC49D3F77 /* Pods_HeroesTests.framework */; };
 		D90E71CE2B0CB7230041AAAE /* HeroesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71CD2B0CB7230041AAAE /* HeroesViewController.swift */; };
-		D90E71D22B0CBD770041AAAE /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D12B0CBD770041AAAE /* HomeView.swift */; };
+		D90E71D22B0CBD770041AAAE /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D12B0CBD770041AAAE /* GridView.swift */; };
 		D90E71D42B0CBD860041AAAE /* HeroesGridViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D32B0CBD860041AAAE /* HeroesGridViewCell.swift */; };
 		D90E71D62B0CBD920041AAAE /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D52B0CBD920041AAAE /* HomeViewController.swift */; };
 		D90E71D82B0CD04C0041AAAE /* HomeFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90E71D72B0CD04C0041AAAE /* HomeFooter.swift */; };
@@ -36,6 +36,8 @@
 		D94112202AFE340A0006C291 /* UIImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941121F2AFE340A0006C291 /* UIImageLoader.swift */; };
 		D94112232AFE4C610006C291 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94112222AFE4C610006C291 /* Category.swift */; };
 		D94112252AFE4D4D0006C291 /* ResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94112242AFE4D4D0006C291 /* ResponseModel.swift */; };
+		D9447D9D2B35A50300020892 /* CategoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9447D9C2B35A50300020892 /* CategoryDetailView.swift */; };
+		D9447DA02B35A58300020892 /* CategoryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9447D9F2B35A58300020892 /* CategoryDetailViewController.swift */; };
 		D953783B2B2CC333001ADB13 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D953783A2B2CC333001ADB13 /* SearchViewController.swift */; };
 		D953783D2B2CC340001ADB13 /* FavouritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D953783C2B2CC340001ADB13 /* FavouritesViewController.swift */; };
 		D95AD9382AFA54E400A34996 /* HeroesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95AD9372AFA54E400A34996 /* HeroesViewModel.swift */; };
@@ -82,7 +84,7 @@
 		BA962DB1900849549FEC46AE /* Pods-Heroes-HeroesSnapshotTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Heroes-HeroesSnapshotTests.debug.xcconfig"; path = "Target Support Files/Pods-Heroes-HeroesSnapshotTests/Pods-Heroes-HeroesSnapshotTests.debug.xcconfig"; sourceTree = "<group>"; };
 		CA89F45A74E7FD9A8725F9B9 /* Pods-Heroes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Heroes.release.xcconfig"; path = "Target Support Files/Pods-Heroes/Pods-Heroes.release.xcconfig"; sourceTree = "<group>"; };
 		D90E71CD2B0CB7230041AAAE /* HeroesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesViewController.swift; sourceTree = "<group>"; };
-		D90E71D12B0CBD770041AAAE /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		D90E71D12B0CBD770041AAAE /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
 		D90E71D32B0CBD860041AAAE /* HeroesGridViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesGridViewCell.swift; sourceTree = "<group>"; };
 		D90E71D52B0CBD920041AAAE /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		D90E71D72B0CD04C0041AAAE /* HomeFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFooter.swift; sourceTree = "<group>"; };
@@ -108,6 +110,8 @@
 		D941121F2AFE340A0006C291 /* UIImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageLoader.swift; sourceTree = "<group>"; };
 		D94112222AFE4C610006C291 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		D94112242AFE4D4D0006C291 /* ResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseModel.swift; sourceTree = "<group>"; };
+		D9447D9C2B35A50300020892 /* CategoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryDetailView.swift; sourceTree = "<group>"; };
+		D9447D9F2B35A58300020892 /* CategoryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryDetailViewController.swift; sourceTree = "<group>"; };
 		D953783A2B2CC333001ADB13 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		D953783C2B2CC340001ADB13 /* FavouritesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavouritesViewController.swift; sourceTree = "<group>"; };
 		D95AD9372AFA54E400A34996 /* HeroesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesViewModel.swift; sourceTree = "<group>"; };
@@ -206,6 +210,7 @@
 		D93F4F9C2AE7BEDB00610761 /* Heroes */ = {
 			isa = PBXGroup;
 			children = (
+				D9447D9B2B35865B00020892 /* GridView */,
 				D98B20782B0227330095C81E /* HeroesTabs */,
 				D98B20792B0227440095C81E /* HeroDetail */,
 				D9F6A4AA2B28639A003B0B84 /* ScreenTransition */,
@@ -259,6 +264,23 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		D9447D9B2B35865B00020892 /* GridView */ = {
+			isa = PBXGroup;
+			children = (
+				D90E71D12B0CBD770041AAAE /* GridView.swift */,
+			);
+			path = GridView;
+			sourceTree = "<group>";
+		};
+		D9447D9E2B35A51100020892 /* CategoryDetail */ = {
+			isa = PBXGroup;
+			children = (
+				D9447D9C2B35A50300020892 /* CategoryDetailView.swift */,
+				D9447D9F2B35A58300020892 /* CategoryDetailViewController.swift */,
+			);
+			path = CategoryDetail;
+			sourceTree = "<group>";
+		};
 		D95378382B2CC256001ADB13 /* Search */ = {
 			isa = PBXGroup;
 			children = (
@@ -304,6 +326,7 @@
 		D98B20792B0227440095C81E /* HeroDetail */ = {
 			isa = PBXGroup;
 			children = (
+				D9447D9E2B35A51100020892 /* CategoryDetail */,
 				D9DF20482AEBDB6F00B81F12 /* CategoryViewComponent.swift */,
 				D940FDDD2AEABF73008424B3 /* HeroDetailView.swift */,
 				D940FDDB2AEABED0008424B3 /* HeroDetailViewController.swift */,
@@ -336,7 +359,6 @@
 			isa = PBXGroup;
 			children = (
 				D90E71D52B0CBD920041AAAE /* HomeViewController.swift */,
-				D90E71D12B0CBD770041AAAE /* HomeView.swift */,
 				D90E71D72B0CD04C0041AAAE /* HomeFooter.swift */,
 			);
 			path = Home;
@@ -649,6 +671,7 @@
 				D92C15A72B1DDA1100E1DEC3 /* Transition.swift in Sources */,
 				D9D259912AFD4D9200D11555 /* ImageLoader.swift in Sources */,
 				D98B20772B021EC60095C81E /* HeroDetailViewModel.swift in Sources */,
+				D9447DA02B35A58300020892 /* CategoryDetailViewController.swift in Sources */,
 				D937F9C32AFBFC4B007BCB5D /* HeroFakeService.swift in Sources */,
 				D90E71D82B0CD04C0041AAAE /* HomeFooter.swift in Sources */,
 				D90E71CE2B0CB7230041AAAE /* HeroesViewController.swift in Sources */,
@@ -662,7 +685,7 @@
 				D93F4F9E2AE7BEDB00610761 /* AppDelegate.swift in Sources */,
 				D94112202AFE340A0006C291 /* UIImageLoader.swift in Sources */,
 				D90E71D42B0CBD860041AAAE /* HeroesGridViewCell.swift in Sources */,
-				D90E71D22B0CBD770041AAAE /* HomeView.swift in Sources */,
+				D90E71D22B0CBD770041AAAE /* GridView.swift in Sources */,
 				D9BA0F0F2AF93651003D7DCC /* ServiceProtocol.swift in Sources */,
 				D940FDDE2AEABF73008424B3 /* HeroDetailView.swift in Sources */,
 				D90E71DA2B0E28790041AAAE /* ImageResize.swift in Sources */,
@@ -675,6 +698,7 @@
 				D93F4FA02AE7BEDB00610761 /* SceneDelegate.swift in Sources */,
 				D953783B2B2CC333001ADB13 /* SearchViewController.swift in Sources */,
 				D90E71D62B0CBD920041AAAE /* HomeViewController.swift in Sources */,
+				D9447D9D2B35A50300020892 /* CategoryDetailView.swift in Sources */,
 				D92E88452B30440B0014AC3E /* SearchView.swift in Sources */,
 				D93F4FB42AE7E11900610761 /* Hero.swift in Sources */,
 				D93F4FBB2AE7FB5900610761 /* Constants.swift in Sources */,

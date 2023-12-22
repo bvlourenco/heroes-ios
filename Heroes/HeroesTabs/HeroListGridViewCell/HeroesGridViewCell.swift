@@ -27,8 +27,8 @@ class HeroesGridViewCell: UICollectionViewCell, CellDelegate {
         allHeroesCell.prepareCellForReuse()
     }
     
-    func configure(imageURL: URL?, name: String?) {
-        allHeroesCell.configure(imageURL: imageURL, name: name)
+    func configure(imageURL: URL?, name: String?, hideFavouriteButton: Bool = false) {
+        allHeroesCell.configure(imageURL: imageURL, name: name, hideFavouriteButton: hideFavouriteButton)
     }
     
     func favouriteHero() throws {

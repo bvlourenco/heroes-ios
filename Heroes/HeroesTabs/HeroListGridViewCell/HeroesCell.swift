@@ -54,10 +54,11 @@ class HeroesCell: UIView {
         view.addSubview(heroFavouriteButton)
     }
     
-    func configure(imageURL: URL?, name: String?) {
+    func configure(imageURL: URL?, name: String?, hideFavouriteButton: Bool = false) {
         heroName.text = name
         loadStarImage(name: name)
         loadImage(imageURL: imageURL)
+        heroFavouriteButton.isHidden = hideFavouriteButton
     }
     
     func loadImage(imageURL: URL?) {

@@ -21,7 +21,7 @@ class HomeViewController: HeroesViewController, ViewControllerDelegate {
         static let headerIdentifier = "header"
     }
     
-    private let homeView = HomeView()
+    private let gridView = GridView()
     
     override init(heroesViewModel: HeroesViewModel,
                   favouritesViewModel: FavouritesViewModel) {
@@ -35,11 +35,11 @@ class HomeViewController: HeroesViewController, ViewControllerDelegate {
     }
     
     override func loadView() {
-        view = homeView
+        view = gridView
     }
     
     override func viewDidLoad() {
-        homeView.setGridDataSourceAndDelegate(viewController: self)
+        gridView.setGridDataSourceAndDelegate(viewController: self)
         super.viewDidLoad()
     }
     
@@ -49,11 +49,11 @@ class HomeViewController: HeroesViewController, ViewControllerDelegate {
     }
     
     func reloadView() {
-        homeView.update()
+        gridView.update()
     }
     
     func spinnerHidden(to value: Bool) {
-        homeView.isSpinnerHidden(to: value)
+        gridView.isSpinnerHidden(to: value)
     }
 }
 
@@ -101,7 +101,7 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        homeView.updateLayout()
+        gridView.updateLayout()
     }
     
     func collectionView(_ collectionView: UICollectionView,

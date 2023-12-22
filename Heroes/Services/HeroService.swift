@@ -43,7 +43,7 @@ class HeroService: HeroServiceProtocol {
     
     func getHeroDetails(hero: Hero) async -> Result<Hero, HeroError> {
         do {
-            return try await withThrowingTaskGroup(of: (String, String, String?).self,
+            return try await withThrowingTaskGroup(of: (String, String, String?, Thumbnail?).self,
                                                    body: { group in
                 
                 addTasksToTaskGroup(heroCategory: hero.comics,
@@ -63,24 +63,28 @@ class HeroService: HeroServiceProtocol {
                                     group: &group)
                 
                 var hero = hero
-                for try await (resourceURL, type, description) in group {
+                for try await (resourceURL, type, description, thumbnail) in group {
                     switch type {
                     case CategoryTypes.comics.rawValue:
-                        setItemDescription(category: &hero.comics,
-                                           resourceURL: resourceURL,
-                                           description: description)
+                        setItem(category: &hero.comics,
+                                resourceURL: resourceURL,
+                                description: description,
+                                thumbnail: thumbnail)
                     case CategoryTypes.stories.rawValue:
-                        setItemDescription(category: &hero.stories,
-                                           resourceURL: resourceURL,
-                                           description: description)
+                        setItem(category: &hero.stories,
+                                resourceURL: resourceURL,
+                                description: description,
+                                thumbnail: thumbnail)
                     case CategoryTypes.series.rawValue:
-                        setItemDescription(category: &hero.series,
-                                           resourceURL: resourceURL,
-                                           description: description)
+                        setItem(category: &hero.series,
+                                resourceURL: resourceURL,
+                                description: description,
+                                thumbnail: thumbnail)
                     case CategoryTypes.events.rawValue:
-                        setItemDescription(category: &hero.events,
-                                           resourceURL: resourceURL,
-                                           description: description)
+                        setItem(category: &hero.events,
+                                resourceURL: resourceURL,
+                                description: description,
+                                thumbnail: thumbnail)
                     default:
                         break
                     }
@@ -93,9 +97,11 @@ class HeroService: HeroServiceProtocol {
         }
     }
     
-    private func setItemDescription(category: inout Category?, resourceURL: String, description: String?) {
+    private func setItem(category: inout Category?, resourceURL: String,
+                         description: String?, thumbnail: Thumbnail?) {
         if let index = category?.items.firstIndex(where: {$0.resourceURI == resourceURL}) {
             category?.items[index].description = description
+            category?.items[index].thumbnail = thumbnail
         }
     }
     
@@ -121,14 +127,16 @@ class HeroService: HeroServiceProtocol {
     
     private func addTasksToTaskGroup(heroCategory: Category?,
                                      categoryType: CategoryTypes,
-                                     group: inout ThrowingTaskGroup<(String, String, String?), Error>) {
+                                     group: inout ThrowingTaskGroup<(String, String, String?, Thumbnail?), Error>) {
         if let heroCategory = heroCategory {
             for category in heroCategory.items {
                 group.addTask { [weak self] in
+                    let response = await self?.getCategoryDetails(resourceURL: category.resourceURI,
+                                                                  categoryDetail: category)
                     return (category.resourceURI,
                             categoryType.rawValue,
-                            await self?.getCategoryDetails(resourceURL: category.resourceURI,
-                                                           categoryDetail: category))
+                            response?.description,
+                            response?.thumbnail)
                 }
             }
         }
@@ -136,8 +144,9 @@ class HeroService: HeroServiceProtocol {
     
     private func getCategoryDetails(resourceURL: String,
                                     categoryDetail: Category.Item)
-    async -> String? {
+    async -> (description: String?, thumbnail: Thumbnail?) {
         var description: String = "No description :("
+        var thumbnail: Thumbnail = Hero.createThumbnailMock()
         
         let result = await performRequest(resourceURL: resourceURL,
                                           limit: nil,
@@ -149,7 +158,8 @@ class HeroService: HeroServiceProtocol {
             do {
                 let response = try self.decoder.decode(DescriptionResponse.self, from: jsonData)
                 description = response.data.results[0].description ?? description
-                return description
+                thumbnail = response.data.results[0].thumbnail ?? thumbnail
+                return (description: description, thumbnail: thumbnail)
             } catch {
                print(HeroError.decodingError)
             }
@@ -157,7 +167,7 @@ class HeroService: HeroServiceProtocol {
             print(error)
         }
         
-        return description
+        return (description: description, thumbnail: thumbnail)
     }
     
     private func performRequest(resourceURL url: String,
