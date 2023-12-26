@@ -50,7 +50,7 @@ extension ListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
+        let cell = tableView.dequeueReusableCell(withIdentifier: GlobalConstants.cellIdentifier,
                                                  for: indexPath) as! HeroesTableViewCell
         cell.selectionStyle = .none
         let hero = super.heroesViewModel.getHero(index: indexPath.row)

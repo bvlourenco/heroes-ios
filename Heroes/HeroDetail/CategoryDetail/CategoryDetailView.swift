@@ -8,6 +8,13 @@
 import UIKit
 
 class CategoryDetailView: UIView {
+    
+    private enum Constants {
+        static let landscapeWidth: CGFloat = UIScreen.main.bounds.width - 9*GlobalConstants.mediumPadding
+        static let portraitWidth: CGFloat = UIScreen.main.bounds.width - GlobalConstants.mediumPadding
+        static let stackViewSpacing: CGFloat = 10
+    }
+    
     let closeButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -27,7 +34,7 @@ class CategoryDetailView: UIView {
         return label
     }()
     
-    private lazy var categoryName: UILabel = {
+    private var categoryName: UILabel = {
         let label = UILabel()
         label.text = ""
         label.textAlignment = .center
@@ -36,12 +43,12 @@ class CategoryDetailView: UIView {
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
-        label.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
+        label.font = UIFont.boldSystemFont(ofSize: GlobalConstants.categoryTitleFontSize)
         return label
     }()
     
     private let categoryImageView: UIImageView = {
-        let placeholderImage = UIImage(named: Constants.placeholderImageName)
+        let placeholderImage = UIImage(named: GlobalConstants.placeholderImageName)
         let imageView = UIImageView(image: placeholderImage)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -57,7 +64,7 @@ class CategoryDetailView: UIView {
     private let stackView: UIStackView = {
         let view = UIStackView()
         view.axis = .vertical
-        view.spacing = 10
+        view.spacing = Constants.stackViewSpacing
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -87,8 +94,8 @@ class CategoryDetailView: UIView {
     }
     
     func updateLayoutAfterRotation() {
-        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*Constants.mediumPadding :
-        UIScreen.main.bounds.width - Constants.mediumPadding
+        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? Constants.landscapeWidth : 
+                                                                       Constants.portraitWidth
         
         if let constraint = (stackView.constraints.filter{$0.firstAttribute == .width}.first) {
             constraint.constant = safeAreaWidth
@@ -107,8 +114,8 @@ class CategoryDetailView: UIView {
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
     // and: https://gist.github.com/moraei/08f1c1841f7bb73bb5c9e89ac428e027
     private func setupConstrains() {
-        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*Constants.mediumPadding :
-                                                                       UIScreen.main.bounds.width - Constants.mediumPadding
+        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? Constants.landscapeWidth : 
+                                                                       Constants.portraitWidth
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: self.topAnchor),
@@ -117,11 +124,11 @@ class CategoryDetailView: UIView {
             scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
             stackView.topAnchor.constraint(equalTo: scrollView.topAnchor,
-                                           constant: Constants.mediumPadding),
+                                           constant: GlobalConstants.mediumPadding),
             stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,
-                                               constant: Constants.smallPadding),
+                                               constant: GlobalConstants.smallPadding),
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,
-                                                constant: -Constants.smallPadding),
+                                                constant: -GlobalConstants.smallPadding),
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             
             stackView.widthAnchor.constraint(equalToConstant: safeAreaWidth),

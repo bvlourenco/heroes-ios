@@ -10,12 +10,10 @@ import UIKit
 class CategoryDetailViewController: UIViewController {
     private let categoryView: CategoryDetailView
     private var category: Category.Item?
-    private let loader: ImageLoader
     
-    init(category: Category.Item?, loader: ImageLoader) {
+    init(category: Category.Item?) {
         self.categoryView = CategoryDetailView()
         self.category = category
-        self.loader = loader
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -44,7 +42,7 @@ class CategoryDetailViewController: UIViewController {
         // The frame arguments allows to have a very long name being shown completely
         let label = UILabel(frame: CGRect(x: CGFloat(0), y: CGFloat(0),
                                           width: UIScreen.main.bounds.width,
-                                          height: CGFloat(Constants.navigationTitleFrameSize)))
+                                          height: CGFloat(GlobalConstants.navigationTitleFrameSize)))
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
         label.textAlignment = .center

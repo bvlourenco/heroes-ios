@@ -12,7 +12,7 @@ enum ViewType {
 }
 
 class HeroesCell: UIView {
-    private enum CellConstants {
+    private enum Constants {
         static let spacing: CGFloat = 10
         static let borderRadius: CGFloat = 15.0
     }
@@ -29,7 +29,7 @@ class HeroesCell: UIView {
     private let heroImage = {
         let image = UIImageView()
         image.translatesAutoresizingMaskIntoConstraints = false
-        image.layer.cornerRadius = CellConstants.borderRadius
+        image.layer.cornerRadius = Constants.borderRadius
         image.layer.masksToBounds = true
         return image
     }()
@@ -72,7 +72,7 @@ class HeroesCell: UIView {
         guard let name = name else { return }
         
         heroFavouriteButton.setImage(UIImage(named: UserDefaults.standard.data(forKey: name) != nil ?
-                                             Constants.favouriteImageName : Constants.addFavouriteImageName),
+                                             GlobalConstants.favouriteImageName : GlobalConstants.addFavouriteImageName),
                                      for: .normal)
     }
     
@@ -92,7 +92,7 @@ class HeroesCell: UIView {
         heroFavouriteButton.addTarget(self, action: #selector(favouriteButtonPressed), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
-            heroFavouriteButton.heightAnchor.constraint(equalToConstant: Constants.favouriteIconHeight),
+            heroFavouriteButton.heightAnchor.constraint(equalToConstant: GlobalConstants.favouriteIconHeight),
             heroFavouriteButton.widthAnchor.constraint(equalTo: heroFavouriteButton.heightAnchor),
             heroName.trailingAnchor.constraint(equalTo: heroFavouriteButton.leadingAnchor)
         ])
@@ -105,24 +105,24 @@ class HeroesCell: UIView {
                 heroImage.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 heroImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 heroName.bottomAnchor.constraint(equalTo: heroImage.bottomAnchor,
-                                                 constant: -CellConstants.spacing),
+                                                 constant: -Constants.spacing),
                 heroName.leadingAnchor.constraint(equalTo: heroImage.leadingAnchor,
-                                                  constant: Constants.smallPadding),
+                                                  constant: GlobalConstants.smallPadding),
                 heroFavouriteButton.trailingAnchor.constraint(equalTo: heroImage.trailingAnchor,
-                                                              constant: -Constants.smallPadding),
+                                                              constant: -GlobalConstants.smallPadding),
                 heroFavouriteButton.topAnchor.constraint(equalTo: heroImage.topAnchor,
-                                                         constant: Constants.smallPadding),
+                                                         constant: GlobalConstants.smallPadding),
             ])
         } else if type == .TableView {
             NSLayoutConstraint.activate([
                 heroImage.leadingAnchor.constraint(equalTo: view.leadingAnchor,
-                                                   constant: Constants.mediumPadding),
-                heroImage.heightAnchor.constraint(equalToConstant: Constants.tableViewImageHeight),
+                                                   constant: GlobalConstants.mediumPadding),
+                heroImage.heightAnchor.constraint(equalToConstant: GlobalConstants.tableViewImageHeight),
                 heroName.leadingAnchor.constraint(equalTo: heroImage.trailingAnchor,
-                                                  constant: Constants.smallPadding),
+                                                  constant: GlobalConstants.smallPadding),
                 heroName.centerYAnchor.constraint(equalTo: heroImage.centerYAnchor),
                 heroFavouriteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor,
-                                                              constant: -Constants.mediumPadding),
+                                                              constant: -GlobalConstants.mediumPadding),
                 heroFavouriteButton.centerYAnchor.constraint(equalTo: heroImage.centerYAnchor),
             ])
         }

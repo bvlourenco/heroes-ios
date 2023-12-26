@@ -9,7 +9,7 @@ import UIKit
 
 class TabBar: UITabBarController {
     
-    private enum TabConstants {
+    private enum Constants {
         static let searchTitle = "Search"
         static let searchIconName = "magnifyingglass"
         static let homeTitle = "Home"
@@ -48,20 +48,20 @@ class TabBar: UITabBarController {
         viewControllers = [
             createNavigationController(for: SearchViewController(searchViewModel: searchViewModel,
                                                                  favouritesViewModel: favouritesViewModel),
-                                       title: TabConstants.searchTitle,
-                                       image: UIImage(systemName: TabConstants.searchIconName)!),
+                                       title: Constants.searchTitle,
+                                       image: UIImage(systemName: Constants.searchIconName)!),
             createNavigationController(for: HomeViewController(heroesViewModel: heroesViewModel,
                                                                favouritesViewModel: favouritesViewModel),
-                                       title: TabConstants.homeTitle,
-                                       image: UIImage(systemName: TabConstants.homeIconName)!),
+                                       title: Constants.homeTitle,
+                                       image: UIImage(systemName: Constants.homeIconName)!),
             createNavigationController(for: FavouritesViewController(favouritesViewModel: favouritesViewModel,
                                                                      heroService: heroService),
-                                       title: TabConstants.favouritesTitle,
-                                       image: UIImage(systemName: TabConstants.favouritesIconName)!),
+                                       title: Constants.favouritesTitle,
+                                       image: UIImage(systemName: Constants.favouritesIconName)!),
             createNavigationController(for: ListViewController(heroesViewModel: heroesViewModel,
                                                                favouritesViewModel: favouritesViewModel),
-                                       title: TabConstants.listViewTitle,
-                                       image: UIImage(systemName: TabConstants.listViewIconName)!)
+                                       title: Constants.listViewTitle,
+                                       image: UIImage(systemName: Constants.listViewIconName)!)
         ]
     }
     
@@ -88,7 +88,7 @@ extension TabBar: UITabBarControllerDelegate {
         if fromView != toView {
             UIView.transition(from: fromView,
                               to: toView,
-                              duration: Constants.animationDuration,
+                              duration: GlobalConstants.animationDuration,
                               options: .transitionCrossDissolve,
                               completion: nil)
         }

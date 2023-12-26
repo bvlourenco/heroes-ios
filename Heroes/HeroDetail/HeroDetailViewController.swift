@@ -8,21 +8,11 @@
 import UIKit
 
 class HeroDetailViewController: UIViewController {
-    
-    private enum GridConstants {
-        static let leftPadding: CGFloat = 10
-        static let rightPadding: CGFloat = 10
-        static let cellHeight: CGFloat = 190
-        static let cellHeightLandscape: CGFloat = 220
-        static let cellWidthLandscape: CGFloat = 200
-    }
-    
     private let heroView: HeroDetailView
     private var hero: Hero
     private let heroIndex: Int?
     private let heroViewModel: HeroDetailViewModel
     private let favouritesViewModel: FavouritesViewModel
-    private let loader: ImageLoader
     // TODO: Try to remove the distinction between snapshot test and normal program execution
     private let isSnapshotTest: Bool
     weak var delegate: HeroViewControllerDelegate?
@@ -30,13 +20,11 @@ class HeroDetailViewController: UIViewController {
     init(hero: Hero, 
          heroIndex: Int?,
          heroDetailViewModel: HeroDetailViewModel,
-         loader: ImageLoader,
          favouritesViewModel: FavouritesViewModel,
          isSnapshotTest: Bool = false) {
         self.hero = hero
         self.heroView = HeroDetailView()
         self.heroViewModel = heroDetailViewModel
-        self.loader = loader
         self.heroIndex = heroIndex
         self.isSnapshotTest = isSnapshotTest
         self.favouritesViewModel = favouritesViewModel
@@ -86,7 +74,7 @@ class HeroDetailViewController: UIViewController {
         // The frame arguments allows to have a very long name being shown completely
         let label = UILabel(frame: CGRect(x: CGFloat(0), y: CGFloat(0),
                                           width: UIScreen.main.bounds.width,
-                                          height: CGFloat(Constants.navigationTitleFrameSize)))
+                                          height: CGFloat(GlobalConstants.navigationTitleFrameSize)))
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
         label.textAlignment = .center
@@ -114,61 +102,28 @@ class HeroDetailViewController: UIViewController {
     }
     
     private func loadImagesAndDescriptionsOfCategoriesInView() {
-        heroView.comicsView.gridView.collectionView.reloadData()
-        heroView.eventsView.gridView.collectionView.reloadData()
-        heroView.seriesView.gridView.collectionView.reloadData()
-        heroView.storiesView.gridView.collectionView.reloadData()
-        
-        var hasComicElements = false
-        var hasSeriesElements = false
-        var hasEventsElements = false
-        var hasStoriesElements = false
+        heroView.reloadCategories()
         
         if let comics = self.hero.comics?.items {
-            hasComicElements = comics.count > 0
+            heroView.configure(hasElements: comics.count > 0, for: "comics")
         }
         if let series = self.hero.series?.items {
-            hasSeriesElements = series.count > 0
+            heroView.configure(hasElements: series.count > 0, for: "series")
         }
         if let events = self.hero.events?.items {
-            hasEventsElements = events.count > 0
+            heroView.configure(hasElements: events.count > 0, for: "events")
         }
         if let stories = self.hero.stories?.items {
-            hasStoriesElements = stories.count > 0
+            heroView.configure(hasElements: stories.count > 0, for: "stories")
         }
-        
-        if hasComicElements == false {
-            heroView.comicsView.addPlaceholderView()
-        }
-        if hasSeriesElements == false {
-            heroView.seriesView.addPlaceholderView()
-        }
-        if hasEventsElements == false {
-            heroView.eventsView.addPlaceholderView()
-        }
-        if hasStoriesElements == false {
-            heroView.storiesView.addPlaceholderView()
-        }
-        
-        heroView.comicsView.setHasElements(hasElements: hasComicElements)
-        heroView.comicsView.setViewIntrinsicHeight()
-        
-        heroView.eventsView.setHasElements(hasElements: hasEventsElements)
-        heroView.eventsView.setViewIntrinsicHeight()
-        
-        heroView.seriesView.setHasElements(hasElements: hasSeriesElements)
-        heroView.seriesView.setViewIntrinsicHeight()
-        
-        heroView.storiesView.setHasElements(hasElements: hasStoriesElements)
-        heroView.storiesView.setViewIntrinsicHeight()
     }
     
     private func loadStarImage(button: UIButton) {
         guard let name = hero.name else { return }
         
         var image = UIImage(named: UserDefaults.standard.data(forKey: name) != nil ? "star" : "star_add")
-        image = image?.imageWith(newSize: CGSize(width: Constants.iconWidthSize,
-                                                 height: Constants.iconHeightSize))
+        image = image?.imageWith(newSize: CGSize(width: GlobalConstants.iconWidthSize,
+                                                 height: GlobalConstants.iconHeightSize))
         button.setImage(image, for: .normal)
     }
     
@@ -185,13 +140,13 @@ class HeroDetailViewController: UIViewController {
 extension HeroDetailViewController: UICollectionViewDataSource, UICollectionViewDelegate,
                                         UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == heroView.comicsView.gridView.collectionView {
+        if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "comics") {
             return self.hero.comics?.items.count ?? 0
-        } else if collectionView == heroView.seriesView.gridView.collectionView {
+        } else if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "series") {
             return self.hero.series?.items.count ?? 0
-        } else if collectionView == heroView.eventsView.gridView.collectionView {
+        } else if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "events") {
             return self.hero.events?.items.count ?? 0
-        } else if collectionView == heroView.storiesView.gridView.collectionView {
+        } else if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "stories") {
             return self.hero.stories?.items.count ?? 0
         } else {
             assert(false, "Error building collection view in hero detail page")
@@ -200,24 +155,24 @@ extension HeroDetailViewController: UICollectionViewDataSource, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier,
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GlobalConstants.cellIdentifier,
                                                       for: indexPath) as! HeroesGridViewCell
-        if collectionView == heroView.comicsView.gridView.collectionView {
+        if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "comics") {
             cell.configure(imageURL: hero.comics?.items[indexPath.row].thumbnail?.imageURL,
                            name: hero.comics?.items[indexPath.row].name,
                            hideFavouriteButton: true)
             return cell
-        } else if collectionView == heroView.seriesView.gridView.collectionView {
+        } else if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "series") {
             cell.configure(imageURL: hero.series?.items[indexPath.row].thumbnail?.imageURL,
                            name: hero.series?.items[indexPath.row].name,
                            hideFavouriteButton: true)
             return cell
-        } else if collectionView == heroView.eventsView.gridView.collectionView {
+        } else if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "events") {
             cell.configure(imageURL: hero.events?.items[indexPath.row].thumbnail?.imageURL,
                            name: hero.events?.items[indexPath.row].name,
                            hideFavouriteButton: true)
             return cell
-        } else if collectionView == heroView.storiesView.gridView.collectionView {
+        } else if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "stories") {
             cell.configure(imageURL: hero.stories?.items[indexPath.row].thumbnail?.imageURL,
                            name: hero.stories?.items[indexPath.row].name,
                            hideFavouriteButton: true)
@@ -231,14 +186,14 @@ extension HeroDetailViewController: UICollectionViewDataSource, UICollectionView
         collectionView.deselectItem(at: indexPath, animated: true)
         var destination: CategoryDetailViewController?
         
-        if collectionView == heroView.comicsView.gridView.collectionView {
-            destination = CategoryDetailViewController(category: self.hero.comics?.items[indexPath.row], loader: loader)
-        } else if collectionView == heroView.seriesView.gridView.collectionView {
-            destination = CategoryDetailViewController(category: self.hero.series?.items[indexPath.row], loader: loader)
-        } else if collectionView == heroView.eventsView.gridView.collectionView {
-            destination = CategoryDetailViewController(category: self.hero.events?.items[indexPath.row], loader: loader)
-        } else if collectionView == heroView.storiesView.gridView.collectionView {
-            destination = CategoryDetailViewController(category: self.hero.stories?.items[indexPath.row], loader: loader)
+        if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "comics") {
+            destination = CategoryDetailViewController(category: self.hero.comics?.items[indexPath.row])
+        } else if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "series") {
+            destination = CategoryDetailViewController(category: self.hero.series?.items[indexPath.row])
+        } else if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "events") {
+            destination = CategoryDetailViewController(category: self.hero.events?.items[indexPath.row])
+        } else if heroView.isCategoryCollectionViews(collectionView: collectionView, category: "stories") {
+            destination = CategoryDetailViewController(category: self.hero.stories?.items[indexPath.row])
         }
         
         guard let destination else { assert(false, "Error building collection view in hero detail page") }

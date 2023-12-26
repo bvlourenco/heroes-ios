@@ -11,13 +11,13 @@ class HeroesTableView: UIView {
     private let tableView: UITableView = {
         let tableView = UITableView(frame: CGRectZero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(HeroesTableViewCell.self, forCellReuseIdentifier: Constants.cellIdentifier)
+        tableView.register(HeroesTableViewCell.self, forCellReuseIdentifier: GlobalConstants.cellIdentifier)
         tableView.backgroundColor = .black
         
         // Assigning rowHeight property since a table view row initially does not have
         // the image (because of loading) and so, estimatedRowHeight would produce a
         // warning about suggesting a row height of 0
-        tableView.rowHeight = Constants.tableViewImageHeight + Constants.smallPadding
+        tableView.rowHeight = GlobalConstants.tableViewImageHeight + GlobalConstants.smallPadding
         
         return tableView
     }()

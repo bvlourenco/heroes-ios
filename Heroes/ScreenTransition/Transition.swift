@@ -9,7 +9,7 @@ import UIKit
 
 class Transition: NSObject, UIViewControllerAnimatedTransitioning {
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return Constants.animationDuration
+        return GlobalConstants.animationDuration
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
@@ -21,7 +21,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                               y: containerView.frame.height,
                               width: containerView.frame.width,
                               height: containerView.frame.height)
-        UIView.animate(withDuration: Constants.animationDuration,
+        UIView.animate(withDuration: GlobalConstants.animationDuration,
                        delay: 0.0,
                        options: .curveEaseInOut,
                        animations: {

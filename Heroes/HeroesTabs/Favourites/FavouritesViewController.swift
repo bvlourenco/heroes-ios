@@ -11,7 +11,6 @@ class FavouritesViewController: UIViewController {
     private let favouritesView = FavouritesView()
     private let favouritesViewModel: FavouritesViewModel
     private let heroService: HeroServiceProtocol
-    private let loader: ImageLoader = ImageLoader()
     private let encoder = JSONEncoder()
     
     init(favouritesViewModel: FavouritesViewModel, heroService: HeroServiceProtocol) {
@@ -48,7 +47,7 @@ extension FavouritesViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
+        let cell = tableView.dequeueReusableCell(withIdentifier: GlobalConstants.cellIdentifier,
                                                  for: indexPath) as! HeroesTableViewCell
         let hero = favouritesViewModel.getHero(index: indexPath.row)
         cell.configure(imageURL: hero.thumbnail?.imageURL, name: hero.name)
@@ -68,7 +67,6 @@ extension FavouritesViewController: UITableViewDelegate, UITableViewDataSource {
         let destination = HeroDetailViewController(hero: hero,
                                                    heroIndex: indexPath.row,
                                                    heroDetailViewModel: heroDetailViewModel,
-                                                   loader: loader, 
                                                    favouritesViewModel: favouritesViewModel)
         navigationController?.pushViewController(destination, animated: true)
     }

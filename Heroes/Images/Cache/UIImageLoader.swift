@@ -21,8 +21,8 @@ class UIImageLoader {
     
     func load(_ url: URL, for imageView: UIImageView) {
         
-        if url.absoluteString.hasSuffix(Constants.notAvailableImageName) {
-            imageView.image = UIImage(named: Constants.placeholderImageName)
+        if url.absoluteString.hasSuffix(GlobalConstants.notAvailableImageName) {
+            imageView.image = UIImage(named: GlobalConstants.placeholderImageName)
             return
         }
         

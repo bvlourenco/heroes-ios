@@ -66,7 +66,6 @@ final class HeroDetailSnapshotTests: XCTestCase {
         let heroViewController = HeroDetailViewController(hero: hero,
                                                           heroIndex: 0,
                                                           heroDetailViewModel: heroDetailViewModel,
-                                                          loader: ImageLoader(),
                                                           favouritesViewModel: favouritesViewModel,
                                                           isSnapshotTest: true)
         let navigationController = UINavigationController(rootViewController: heroViewController)
@@ -90,7 +89,6 @@ final class HeroDetailSnapshotTests: XCTestCase {
         let heroViewController = HeroDetailViewController(hero: hero,
                                                           heroIndex: 0,
                                                           heroDetailViewModel: heroDetailViewModel,
-                                                          loader: ImageLoader(),
                                                           favouritesViewModel: favouritesViewModel,
                                                           isSnapshotTest: true)
         let navigationController = UINavigationController(rootViewController: heroViewController)

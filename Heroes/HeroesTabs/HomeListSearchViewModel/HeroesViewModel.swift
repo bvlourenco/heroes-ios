@@ -18,7 +18,7 @@ class HeroesViewModel {
     func fetchHeroes(searchQuery: String?, addHeroesToView: @escaping () -> Void) {
         Task {
             let result = await self.heroService.getHeroes(offset: self.heroes.count,
-                                                          numberOfHeroesPerRequest: Constants.numberOfHeroesPerRequest,
+                                                          numberOfHeroesPerRequest: GlobalConstants.numberOfHeroesPerRequest,
                                                           searchQuery: searchQuery)
             
             if let additionalHeroes = try? result.get() {

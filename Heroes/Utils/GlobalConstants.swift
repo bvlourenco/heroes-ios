@@ -1,5 +1,5 @@
 //
-//  constants.swift
+//  GlobalConstants.swift
 //  Heroes
 //
 //  Created by Bernardo Vala Lourenço on 24/10/2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Constants {
+struct GlobalConstants {
     static let notAvailableImageName = "image_not_available.jpg"
     static let numberOfHeroesPerRequest = 20
     static let categoryTitleFontSize: CGFloat = 24
@@ -27,4 +27,15 @@ struct Constants {
     static let favouriteImageName = "star"
     static let addFavouriteImageName = "star_add"
     static let animationDuration = 0.3
+}
+
+enum GridConstants {
+    static let leftPadding: CGFloat = 10
+    static let rightPadding: CGFloat = 10
+    static let cellHeight: CGFloat = 190
+    static let cellHeightLandscape: CGFloat = 220
+    static let cellWidthLandscape: CGFloat = 200
+    static let headingHeight: CGFloat = 30
+    static let footerIdentifier = "footer"
+    static let headerIdentifier = "header"
 }

@@ -10,13 +10,12 @@ import UIKit
 
 class HeroesViewController: UIViewController {
     
-    private enum ViewConstants {
+    private enum Constants {
         static let navigationTitle = "All Heroes"
     }
     
     let heroesViewModel: HeroesViewModel
     private let favouritesViewModel: FavouritesViewModel
-    private let loader: ImageLoader = ImageLoader()
     private var isLoadingData: Bool = false
     weak var delegate: ViewControllerDelegate?
     
@@ -38,7 +37,7 @@ class HeroesViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = ViewConstants.navigationTitle
+        navigationItem.title = Constants.navigationTitle
         navigationController?.delegate = self
         heroesViewModel.fetchHeroes(searchQuery: nil, addHeroesToView: delegate?.addHeroesToView ?? {})
     }
@@ -57,12 +56,12 @@ class HeroesViewController: UIViewController {
     
     func willFetchMoreHeroes(indexPath: IndexPath, lastRowIndex: Int) {
         let numberOfHeroes = heroesViewModel.numberOfHeroes()
-        if numberOfHeroes < Constants.numberOfHeroesPerRequest {
+        if numberOfHeroes < GlobalConstants.numberOfHeroesPerRequest {
             delegate?.spinnerHidden(to: true)
             return
         }
         
-        let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
+        let batchMiddleRowIndex = GlobalConstants.numberOfHeroesPerRequest / 2
         let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
         if self.isLoadingData == false && indexPath.row >= rowIndexLoadMoreHeroes {
             delegate?.spinnerHidden(to: false)
@@ -81,7 +80,6 @@ class HeroesViewController: UIViewController {
         let destination = HeroDetailViewController(hero: hero,
                                                    heroIndex: indexPath.row,
                                                    heroDetailViewModel: heroDetailViewModel,
-                                                   loader: loader,
                                                    favouritesViewModel: favouritesViewModel)
         destination.delegate = self
         navigationController?.pushViewController(destination, animated: true)

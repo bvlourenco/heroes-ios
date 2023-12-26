@@ -8,7 +8,7 @@
 import UIKit
 
 class SearchView: UIView {
-    private enum ViewConstants {
+    private enum Constants {
         static let alertTitle = "Cannot perform search"
         static let alertMessage = "Your search query has less than 3 characters. Insert more characters"
         static let alertButtonTitle = "Ok"
@@ -20,7 +20,7 @@ class SearchView: UIView {
         searchBar.showsCancelButton = true
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.backgroundImage = UIImage()
-        searchBar.placeholder = ViewConstants.searchPlaceholder
+        searchBar.placeholder = Constants.searchPlaceholder
         searchBar.tintColor = .white
         searchBar.searchTextField.textColor = .white
         searchBar.barStyle = .black
@@ -42,10 +42,10 @@ class SearchView: UIView {
     }()
     
     private let alert: UIAlertController = {
-        let alert = UIAlertController(title: ViewConstants.alertTitle,
-                                      message: ViewConstants.alertMessage,
+        let alert = UIAlertController(title: Constants.alertTitle,
+                                      message: Constants.alertMessage,
                                       preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: ViewConstants.alertButtonTitle,
+        alert.addAction(UIAlertAction(title: Constants.alertButtonTitle,
                                       style: UIAlertAction.Style.default,
                                       handler: nil))
         return alert

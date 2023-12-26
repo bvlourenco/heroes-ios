@@ -9,7 +9,7 @@ import Combine
 import UIKit
 
 class SearchViewController: UIViewController {
-    private enum ViewConstants {
+    private enum Constants {
         static let navigationTitle = "All Heroes"
         static let searchQueryMinimumLength = 2
         static let secondsToWait = 1
@@ -19,7 +19,6 @@ class SearchViewController: UIViewController {
     private let searchViewModel: HeroesViewModel
     private let favouritesViewModel: FavouritesViewModel
     private let encoder = JSONEncoder()
-    private let loader: ImageLoader = ImageLoader()
     private var isLoadingData: Bool = false
     private var cancellables: Set<AnyCancellable> = []
     
@@ -51,8 +50,8 @@ class SearchViewController: UIViewController {
         searchView.setResultsDataSourceAndDelegate(viewController: self)
 
         $searchQuery
-            .debounce(for: .seconds(ViewConstants.secondsToWait), scheduler: DispatchQueue.main)
-            .filter { $0.count > ViewConstants.searchQueryMinimumLength }
+            .debounce(for: .seconds(Constants.secondsToWait), scheduler: DispatchQueue.main)
+            .filter { $0.count > Constants.searchQueryMinimumLength }
             .removeDuplicates()
             .sink { [weak self] text in
                 self?.searchForHeroes(searchQuery: text)
@@ -94,7 +93,7 @@ extension SearchViewController: UISearchBarDelegate {
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let text = searchBar.text ?? ""
-        if text.isEmpty == false && text.count > ViewConstants.searchQueryMinimumLength {
+        if text.isEmpty == false && text.count > Constants.searchQueryMinimumLength {
             searchBar.resignFirstResponder()
             searchForHeroes(searchQuery: text)
         } else {
@@ -119,7 +118,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,
+        let cell = tableView.dequeueReusableCell(withIdentifier: GlobalConstants.cellIdentifier,
                                                  for: indexPath) as! HeroesTableViewCell
         let hero = searchViewModel.getHero(index: indexPath.row)
         
@@ -139,7 +138,6 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         let destination = HeroDetailViewController(hero: hero,
                                                    heroIndex: indexPath.row,
                                                    heroDetailViewModel: heroDetailViewModel,
-                                                   loader: loader,
                                                    favouritesViewModel: favouritesViewModel)
         destination.delegate = self
         navigationController?.pushViewController(destination, animated: true)
@@ -150,11 +148,11 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
                    forRowAt indexPath: IndexPath) {
         let lastRowIndex = tableView.numberOfRows(inSection: 0) - 1
         let numberOfHeroes = searchViewModel.numberOfHeroes()
-        if numberOfHeroes < Constants.numberOfHeroesPerRequest {
+        if numberOfHeroes < GlobalConstants.numberOfHeroesPerRequest {
             return
         }
         
-        let batchMiddleRowIndex = Constants.numberOfHeroesPerRequest / 2
+        let batchMiddleRowIndex = GlobalConstants.numberOfHeroesPerRequest / 2
         let rowIndexLoadMoreHeroes = lastRowIndex - batchMiddleRowIndex
         if self.isLoadingData == false && indexPath.row >= rowIndexLoadMoreHeroes {
             searchView.spinnerHidden(to: false)

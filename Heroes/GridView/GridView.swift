@@ -9,33 +9,36 @@ import UIKit
 
 class GridView: UIView {
     
-    private enum GridPadding {
+    private enum Constants {
         static let topPadding: CGFloat = 10
         static let leftPadding: CGFloat = 10
         static let bottomPadding: CGFloat = 10
         static let rightPadding: CGFloat = 10
     }
     
-    var collectionView: UICollectionView
-    
-    init(scrollDirection: UICollectionView.ScrollDirection = .vertical) {
+    private let scrollDirection: UICollectionView.ScrollDirection
+    private lazy var collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.scrollDirection = scrollDirection
-        layout.sectionInset = UIEdgeInsets(top: GridPadding.topPadding,
-                                           left: GridPadding.leftPadding,
-                                           bottom: GridPadding.bottomPadding,
-                                           right: GridPadding.rightPadding)
-        
+        layout.scrollDirection = self.scrollDirection
+        layout.sectionInset = UIEdgeInsets(top: Constants.topPadding,
+                                           left: Constants.leftPadding,
+                                           bottom: Constants.bottomPadding,
+                                           right: Constants.rightPadding)
         collectionView = UICollectionView(frame: CGRectZero,
                                           collectionViewLayout: layout)
+        
         collectionView.register(HeroesGridViewCell.self,
-                                forCellWithReuseIdentifier: Constants.cellIdentifier)
+                                forCellWithReuseIdentifier: GlobalConstants.cellIdentifier)
         collectionView.register(HomeFooter.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                                withReuseIdentifier: Constants.footerIdentifier)
+                                withReuseIdentifier: GlobalConstants.footerIdentifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .black
-        
+        return collectionView
+    }()
+    
+    init(scrollDirection: UICollectionView.ScrollDirection = .vertical) {
+        self.scrollDirection = scrollDirection
         super.init(frame: CGRectZero)
         backgroundColor = .black
         addSubview(collectionView)
@@ -62,6 +65,10 @@ class GridView: UIView {
     }
     
     func isSpinnerHidden(to value: Bool) {
+    }
+    
+    func getCollectionView() -> UICollectionView {
+        return collectionView
     }
     
     private func setupConstraints() {

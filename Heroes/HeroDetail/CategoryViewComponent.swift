@@ -8,13 +8,21 @@
 import UIKit
 
 class CategoryViewComponent: UIView {
+    
+    private enum Constants {
+        static let titleSize: CGFloat = 20
+        static let textSize: CGFloat = 24
+        static let gridCellHeight: CGFloat = 190
+        static let viewWithSpinnerHeight: CGFloat = 60
+    }
+    
     private lazy var categoryLabel: UILabel = {
         let label = getNewLabel(textLabel: "")
-        label.font = UIFont.boldSystemFont(ofSize: Constants.categoryTitleFontSize)
+        label.font = UIFont.boldSystemFont(ofSize: GlobalConstants.categoryTitleFontSize)
         return label
     }()
     
-    let gridView = GridView(scrollDirection: .horizontal)
+    private let gridView = GridView(scrollDirection: .horizontal)
     
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .medium)
@@ -42,13 +50,13 @@ class CategoryViewComponent: UIView {
     }
     
     func setViewIntrinsicHeight() {
-        let gridViewHeight: CGFloat = hasElements ? 190 : 0
-        var totalHeight: CGFloat = gridViewHeight + 20 + Constants.mediumPadding
+        var totalHeight: CGFloat = Constants.titleSize + GlobalConstants.mediumPadding
         
         if hasElements {
-            gridView.heightAnchor.constraint(equalToConstant: gridViewHeight).isActive = true
+            gridView.heightAnchor.constraint(equalToConstant: Constants.gridCellHeight).isActive = true
+            totalHeight += Constants.gridCellHeight
         } else {
-            totalHeight += 40
+            totalHeight += Constants.textSize + GlobalConstants.mediumPadding
         }
         
         // Updating height constraint
@@ -68,13 +76,21 @@ class CategoryViewComponent: UIView {
         guard let placeholderLabel = self.placeholderLabel else { return }
         addTopConstraint(currentLabel: placeholderLabel,
                          topLabel: categoryLabel,
-                         paddingValue: Constants.mediumPadding)
+                         paddingValue: GlobalConstants.mediumPadding)
         addSideConstraintsToLabel(label: placeholderLabel)
     }
     
     func updateLayoutAfterRotation() {
         self.layoutIfNeeded()
         self.setViewIntrinsicHeight()
+    }
+    
+    func reload() {
+        gridView.update()
+    }
+    
+    func getGridView() -> GridView {
+        return gridView
     }
     
     private func getNewLabel(textLabel: String,
@@ -107,16 +123,16 @@ class CategoryViewComponent: UIView {
     private func setupConstraints() {
         gridView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            gridView.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: Constants.mediumPadding),
+            gridView.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: GlobalConstants.mediumPadding),
             gridView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
             gridView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
             categoryLabel.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
             categoryLabel.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
             categoryLabel.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
-            spinner.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: Constants.mediumPadding),
+            spinner.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: GlobalConstants.mediumPadding),
             spinner.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
             spinner.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
-            self.heightAnchor.constraint(equalToConstant: 50)
+            self.heightAnchor.constraint(equalToConstant: Constants.viewWithSpinnerHeight)
         ])
     }
     

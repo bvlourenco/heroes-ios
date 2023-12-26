@@ -21,7 +21,7 @@ class HeroDetailView: UIView {
     }()
     
     private let heroImageView: UIImageView = {
-        let placeholderImage = UIImage(named: Constants.placeholderImageName)
+        let placeholderImage = UIImage(named: GlobalConstants.placeholderImageName)
         let imageView = UIImageView(image: placeholderImage)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -42,16 +42,13 @@ class HeroDetailView: UIView {
         return view
     }()
     
-    let comicsView: CategoryViewComponent
-    let seriesView: CategoryViewComponent
-    let eventsView: CategoryViewComponent
-    let storiesView: CategoryViewComponent
+    private var categoriesView: [String:CategoryViewComponent] = [:]
     
     init() {
-        self.comicsView = CategoryViewComponent(categoryName: "Comics")
-        self.seriesView = CategoryViewComponent(categoryName: "Series")
-        self.eventsView = CategoryViewComponent(categoryName: "Events")
-        self.storiesView = CategoryViewComponent(categoryName: "Stories")
+        self.categoriesView["comics"] = CategoryViewComponent(categoryName: "Comics")
+        self.categoriesView["series"] = CategoryViewComponent(categoryName: "Series")
+        self.categoriesView["events"] = CategoryViewComponent(categoryName: "Events")
+        self.categoriesView["stories"] = CategoryViewComponent(categoryName: "Stories")
         super.init(frame: CGRectZero)
         backgroundColor = .black
         addElementsToView()
@@ -69,10 +66,9 @@ class HeroDetailView: UIView {
                    series: Category?,
                    stories: Category?,
                    viewController: HeroDetailViewController) {
-        comicsView.setGridDataSourceAndDelegate(viewController: viewController)
-        seriesView.setGridDataSourceAndDelegate(viewController: viewController)
-        eventsView.setGridDataSourceAndDelegate(viewController: viewController)
-        storiesView.setGridDataSourceAndDelegate(viewController: viewController)
+        for category in categoriesView.values {
+            category.setGridDataSourceAndDelegate(viewController: viewController)
+        }
         
         if let description, description.isEmpty == false {
             heroDescriptionLabel.text = description
@@ -82,37 +78,61 @@ class HeroDetailView: UIView {
         heroImageView.loadImage(at: imageURL)
     }
     
+    func reloadCategories() {
+        for category in categoriesView.values {
+            category.reload()
+        }
+    }
+    
+    func configure(hasElements: Bool, for key: String) {
+        let categoryView = self.categoriesView[key]
+        
+        guard let categoryView else { return }
+        
+        if hasElements == false {
+            categoryView.addPlaceholderView()
+        }
+        
+        categoryView.setHasElements(hasElements: hasElements)
+        categoryView.setViewIntrinsicHeight()
+    }
+    
+    func isCategoryCollectionViews(collectionView: UICollectionView, category key: String) -> Bool {
+        let categoryView = self.categoriesView[key]
+        guard let categoryView else { return false }
+        return collectionView == categoryView.getGridView().getCollectionView()
+    }
+    
+    func updateLayoutAfterRotation() {
+        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*GlobalConstants.mediumPadding :
+                                                                       UIScreen.main.bounds.width - GlobalConstants.mediumPadding
+        
+        if let constraint = (stackView.constraints.filter{$0.firstAttribute == .width}.first) {
+            constraint.constant = safeAreaWidth
+        }
+        
+        for category in categoriesView.values {
+            category.updateLayoutAfterRotation()
+        }
+    }
+    
     private func addElementsToView() {
         addSubview(scrollView)
         scrollView.addSubview(stackView)
         
         stackView.addArrangedSubview(heroImageView)
         stackView.addArrangedSubview(heroDescriptionLabel)
-        stackView.addArrangedSubview(comicsView)
-        stackView.addArrangedSubview(seriesView)
-        stackView.addArrangedSubview(eventsView)
-        stackView.addArrangedSubview(storiesView)
-    }
-    
-    func updateLayoutAfterRotation() {
-        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*Constants.mediumPadding :
-                                                                       UIScreen.main.bounds.width - Constants.mediumPadding
-        
-        if let constraint = (stackView.constraints.filter{$0.firstAttribute == .width}.first) {
-            constraint.constant = safeAreaWidth
-        }
-        
-        comicsView.updateLayoutAfterRotation()
-        seriesView.updateLayoutAfterRotation()
-        eventsView.updateLayoutAfterRotation()
-        storiesView.updateLayoutAfterRotation()
+        stackView.addArrangedSubview(categoriesView["comics"] ?? UIView())
+        stackView.addArrangedSubview(categoriesView["series"] ?? UIView())
+        stackView.addArrangedSubview(categoriesView["events"] ?? UIView())
+        stackView.addArrangedSubview(categoriesView["stories"] ?? UIView())
     }
     
     // From: https://dev.to/msa_128/how-to-create-custom-views-programmatically-2cfm
     // and: https://gist.github.com/moraei/08f1c1841f7bb73bb5c9e89ac428e027
     private func setupConstrains() {
-        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*Constants.mediumPadding :
-                                                                       UIScreen.main.bounds.width - Constants.mediumPadding
+        let safeAreaWidth = UIDevice.current.orientation.isLandscape ? UIScreen.main.bounds.width - 9*GlobalConstants.mediumPadding :
+                                                                       UIScreen.main.bounds.width - GlobalConstants.mediumPadding
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: self.topAnchor),
@@ -122,9 +142,9 @@ class HeroDetailView: UIView {
             
             stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor,
-                                               constant: Constants.smallPadding),
+                                               constant: GlobalConstants.smallPadding),
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor,
-                                                constant: -Constants.smallPadding),
+                                                constant: -GlobalConstants.smallPadding),
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             
             stackView.widthAnchor.constraint(equalToConstant: safeAreaWidth)

@@ -9,18 +9,6 @@ import Combine
 import UIKit
 
 class HomeViewController: HeroesViewController, ViewControllerDelegate {
-    
-    private enum GridConstants {
-        static let leftPadding: CGFloat = 10
-        static let rightPadding: CGFloat = 10
-        static let cellHeight: CGFloat = 190
-        static let cellHeightLandscape: CGFloat = 220
-        static let cellWidthLandscape: CGFloat = 200
-        static let headingHeight: CGFloat = 30
-        static let footerIdentifier = "footer"
-        static let headerIdentifier = "header"
-    }
-    
     private let gridView = GridView()
     
     override init(heroesViewModel: HeroesViewModel,
@@ -65,7 +53,7 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellIdentifier,
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GlobalConstants.cellIdentifier,
                                                       for: indexPath) as! HeroesGridViewCell
         let hero = super.heroesViewModel.getHero(index: indexPath.row)
         
@@ -120,6 +108,6 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForFooterInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: Constants.spinnerHeight)
+        return CGSize(width: collectionView.frame.width, height: GlobalConstants.spinnerHeight)
     }
 }
